@@ -8,10 +8,14 @@ import router from "express";
 
 const authRouter = router.Router();
 
-authRouter.post("/signUp", 
+authRouter.post("/signUp",
     nameValidator,
     emailValidator,
     passwordValidator,
     AuthController.signUp);
+
+authRouter.post("/login",
+    emailValidator,
+    AuthController.login);
 
 export default authRouter;

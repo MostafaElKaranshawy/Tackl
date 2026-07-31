@@ -4,7 +4,8 @@ import AlreadyExistsException from "../exceptions/alreadyExistsException";
 import DBException from "../exceptions/dbException";
 
 export default class UserRepository {
-    static async createUser(name: string, email: string, password: string) {
+
+    static async createUser(name: string, email: string, password: string): Promise<User> {
         // check email uniqueness
         const existingUser = await User.findOne({ where: { email } });
 
@@ -14,29 +15,29 @@ export default class UserRepository {
         try {
             const user = await User.create({ name, email, password });
             return user;
-            
+
         } catch (error) {
             throw new DBException("Error creating user");
         }
     }
-    
-    static async getUserById(id: string) {
+
+    static async getUserById(id: string): Promise<User> {
         const user = await User.findByPk(id);
         if (!user) {
             throw new NotFoundException("User not found");
         }
         return user;
     }
-    
-    static async getUserByEmail(email: string) {
+
+    static async getUserByEmail(email: string): Promise<User> {
         const user = await User.findOne({ where: { email } });
         if (!user) {
             throw new NotFoundException("User not found");
         }
         return user;
     }
-    
-    static async updateUser(id: string, updates: Partial<{ name: string; email: string; password: string }>) {
+
+    static async updateUser(id: string, updates: Partial<{ name: string; email: string; password: string }>): Promise<User> {
         const user = await User.findByPk(id);
         if (!user) {
             throw new NotFoundException("User not found");
@@ -48,8 +49,8 @@ export default class UserRepository {
             throw new DBException("Error updating user");
         }
     }
-    
-    static async deleteUser(id: string) {
+
+    static async deleteUser(id: string): Promise<void> {
         const user = await User.findByPk(id);
         if (!user) {
             throw new NotFoundException("User not found");
