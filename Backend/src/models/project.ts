@@ -1,45 +1,64 @@
-import { sequelize, DataTypes } from "../config/database";
-import {Models} from "./models";
+import {
+    Model,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    CreationOptional,
+} from "sequelize";
+import { sequelize } from "../config/database";
+import { Models } from "./models";
 
-const Project = sequelize.define(
-  "Project",
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+export default class Project extends Model<
+    InferAttributes<Project, {
+        omit: "createdAt" | "updatedAt";
+    }>,
+    InferCreationAttributes<Project, {
+        omit: "createdAt" | "updatedAt";
+    }>
+> {
+    declare id: CreationOptional<string>;
+    declare name: string;
+    declare description: CreationOptional<string | null>;
+
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+
+    static associate(models: Models) {
+        Project.belongsTo(models.User, {
+            foreignKey: "userId",
+            as: "owner",
+            onDelete: "CASCADE",
+        });
+
+        Project.hasMany(models.Task, {
+            foreignKey: "projectId",
+            as: "tasks",
+            onDelete: "CASCADE",
+        });
+    }
+}
+
+Project.init(
+    {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+        },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-  },
-  {
-    tableName: "projects",
-    timestamps: true,
-  }
+    {
+        sequelize,
+        modelName: "Project",
+        tableName: "projects",
+        timestamps: true,
+    }
 );
-
-
-(Project as typeof Project & {
-  associate?: (models: Models) => void;
-}).associate = (models: Models) => {
-  
-  Project.belongsTo(models.User, {
-    foreignKey: "userId",
-    as: "owner",
-    onDelete: "CASCADE",
-  });
-
-  Project.hasMany(models.Task, {
-    foreignKey: "projectId",
-    as: "tasks",
-    onDelete: "CASCADE",
-  });
-};
-
-export default Project;

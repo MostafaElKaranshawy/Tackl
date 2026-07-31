@@ -5,16 +5,7 @@ import TimeEntry from "./timeEntry";
 import TaskHistory from "./taskHistory";
 import TaskChange from "./taskChange";
 
-export interface Models {
-    User: typeof import("./user").default;
-    Project: typeof import("./project").default;
-    Task: typeof import("./task").default;
-    TimeEntry: typeof import("./timeEntry").default;
-    TaskHistory: typeof import("./taskHistory").default;
-    TaskChange: typeof import("./taskChange").default;
-}
-
-const models = {
+export const models = {
     User,
     Project,
     Task,
@@ -23,9 +14,9 @@ const models = {
     TaskChange,
 };
 
-(Object.keys(models) as Array<keyof typeof models>).forEach((modelName) => {
-    const model = models[modelName];
+export type Models = typeof models;
 
+Object.values(models).forEach((model) => {
     if ("associate" in model && typeof model.associate === "function") {
         model.associate(models);
     }

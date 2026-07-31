@@ -1,26 +1,31 @@
 import express, { Request, Response } from "express";
 import "./config/env";
-
+import cookieParser from "cookie-parser";
 import { sequelize } from "./config/database";
 import "./models/models";
+import baseRouter from "./routes/baseRouter";
+import setupSwagger from "./config/swagger";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-app.use(express.json());
-
 sequelize
-  .sync({ alter: true })
-  .then(() => {
-    console.log("Database synchronized successfully.");
-
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err: unknown) => {
-    console.error("Error synchronizing the database:", err);
+.sync({ alter: true })
+.then(() => {
+  console.log("Database synchronized successfully.");
+  
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
   });
+})
+.catch((err: unknown) => {
+  console.error("Error synchronizing the database:", err);
+});
+
+app.use(express.json());
+app.use(cookieParser());
+app.use("/api", baseRouter);
+setupSwagger(app);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, Express with TypeScript!");

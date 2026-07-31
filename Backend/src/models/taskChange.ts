@@ -1,41 +1,63 @@
-import { sequelize, DataTypes } from "../config/database";
+import {
+    Model,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    CreationOptional,
+} from "sequelize";
+import { sequelize } from "../config/database";
 import { Models } from "./models";
 
-const TaskChange = sequelize.define(
-  "TaskChange",
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+export default class TaskChange extends Model<
+    InferAttributes<TaskChange, {
+        omit: "createdAt" | "updatedAt";
+    }>,
+    InferCreationAttributes<TaskChange, {
+        omit: "createdAt" | "updatedAt";
+    }>
+> {
+    declare id: CreationOptional<string>;
+    declare fieldName: string;
+    declare oldValue: CreationOptional<string | null>;
+    declare newValue: CreationOptional<string | null>;
+
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+
+    static associate(models: Models) {
+        TaskChange.belongsTo(models.TaskHistory, {
+            foreignKey: "taskHistoryId",
+            as: "taskHistory",
+            onDelete: "CASCADE",
+        });
+    }
+}
+
+TaskChange.init(
+    {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+        },
+        fieldName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        oldValue: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        newValue: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+
     },
-    fieldName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    oldValue: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    newValue: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-  },
-  {
-    tableName: "task_changes",
-    timestamps: true,
-  }
+    {
+        sequelize,
+        modelName: "TaskChange",
+        tableName: "task_changes",
+        timestamps: true,
+    }
 );
-
-(TaskChange as typeof TaskChange & {
-  associate?: (models: Models) => void;
-}).associate = (models: Models) => {
-  TaskChange.belongsTo(models.Task, {
-    foreignKey: "taskId",
-    as: "task",
-    onDelete: "CASCADE",
-  });
-};
-
-export default TaskChange;
