@@ -6,6 +6,7 @@ import WrongCredentialsException from "../exceptions/wrongCredentialsException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import { Request, Response } from "express";
 import ForbiddenException from "../exceptions/forbiddenException";
+import Jwt from "../config/jwt";
 
 export default class AuthController {
 
@@ -119,18 +120,29 @@ export default class AuthController {
 
     static async resetPassword(req: Request, res: Response) {
         const { password } = req.body;
-        const { token } = req.query;
+        let userId = req.userId;
+
+        if (!userId) {
+            const { token } = req.query;
+
+            if (!token || typeof token !== "string") {
+                return res.status(400).json({ message: "Confirmation token is required" });
+            }
+
+            try {
+                userId = Jwt.extractIdFromToken(token);
+            } catch (error) {
+                return res.status(400).json({ message: "Invalid or expired token" });
+            }
+        }
 
         if (!password || typeof password !== "string") {
             return res.status(400).json({ message: "New password is required" });
         }
 
-        if (!token || typeof token !== "string") {
-            return res.status(400).json({ message: "Reset token is required" });
-        }
 
         try {
-            await AuthService.resetPassword(password, token);
+            await AuthService.resetPassword(password, userId);
             res.status(200).json({ message: "Password reset successfully" });
         } catch (error: any) {
             if (error instanceof NotFoundException) {

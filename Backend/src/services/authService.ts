@@ -47,7 +47,8 @@ export default class AuthService {
             }
 
             const token = Jwt.generateToken({ id: user.id, email: user.email });
-            await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${user.name},\n\nA new login was detected on your account.\n\nBest regards,\n\n\nTackl Team`);
+            // await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${user.name},\n\nA new login was detected on your account.\n\nBest regards,\n\n\nTackl Team`);
+            console.log(token);
             return token;
 
         } catch (error) {
@@ -88,7 +89,7 @@ export default class AuthService {
                 }
             }
             await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-            const confirmationToken = Jwt.generateToken({ id: user.id, confirmation: true });
+            const confirmationToken = Jwt.generateToken({ id: user.id, confirmation: true }, '30m');
             const confirmationLink = `${process.env.FRONTEND_Link}/api/auth/confirmEmail?token=${confirmationToken}`;
             await EmailService.sendEmail(email, "Email Confirmation", `Hello ${user.name},\n\nPlease confirm your email by clicking the following link: ${confirmationLink}\n\nBest regards,\nThe Team`);
         } catch (error) {
@@ -96,11 +97,10 @@ export default class AuthService {
         }
     }
 
-    static async resetPassword(password: string, token: string): Promise<void> {
+    static async resetPassword(password: string, userId: string): Promise<void> {
         try {
 
-            const extractedId = Jwt.extractIdFromToken(token);
-            const user = await UserRepository.getUserById(extractedId);
+            const user = await UserRepository.getUserById(userId);
             if (!user) {
                 throw new NotFoundException("User not found", 404);
             }
@@ -129,7 +129,7 @@ export default class AuthService {
         }
 
         await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-        const resetToken = Jwt.generateToken({ id: user.id, resetPassword: true });
+        const resetToken = Jwt.generateToken({ id: user.id, resetPassword: true }, '30m');
 
         const resetLink = `${process.env.FRONTEND_Link}/api/auth/resetPassword?token=${resetToken}`;
 

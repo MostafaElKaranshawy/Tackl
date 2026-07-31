@@ -4,6 +4,7 @@ import emailValidator from "../middlewares/emailValidator.js";
 import nameValidator from "../middlewares/nameValidator.js";
 
 import router from "express";
+import checkUser from "../middlewares/checkUser.js";
 
 
 const authRouter = router.Router();
@@ -157,7 +158,7 @@ authRouter.get(
 
 /**
  * @openapi
- * /api/auth/resetPassword:
+ * /api/auth/resetPasswordFromLink:
  *   put:
  *     summary: Reset a user's password using a token
  *     tags:
@@ -192,7 +193,43 @@ authRouter.get(
  *         description: Internal server error.
  */
 authRouter.put(
+    "/resetPasswordFromLink",
+    passwordValidator,
+    AuthController.resetPassword
+);
+
+/**
+ * @openapi
+ * /api/auth/resetPassword:
+ *   put:
+ *     summary: Reset a user's password using a token
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: SecurePassword123!
+ *     responses:
+ *       "200":
+ *         description: Password reset successfully.
+ *       "400":
+ *         description: Missing or invalid request data.
+ *       "404":
+ *         description: User not found.
+ *       "500":
+ *         description: Internal server error.
+ */
+authRouter.put(
     "/resetPassword",
+    checkUser,
     passwordValidator,
     AuthController.resetPassword
 );

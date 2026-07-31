@@ -12,7 +12,11 @@ export default class Jwt {
         });
     }
     static verifyToken(token: string) {
-        return jwt.verify(token, process.env.JWT_TOKEN_SECRET as string);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET as string) as {id: string, email: string} | null;
+        if (!decoded) {
+            throw new ForbiddenException("Invalid token");
+        }
+        return decoded;
     }
 
     static decodeToken(token: string) {
