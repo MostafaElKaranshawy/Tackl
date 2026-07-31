@@ -1,13 +1,15 @@
 import express from "express";
+import dotenv from "./config/env.mjs";
 
 import {sequelize} from "./config/database.mjs";
+import models from "./models/models.mjs";
 
-sequelize.authenticate()
+sequelize.sync({ alter: true })
   .then(() => {
-    console.log("Database connection has been established successfully.");
+    console.log("Database synchronized successfully.");
   })
   .catch((err) => {
-    console.error("Unable to connect to the database:", err);
+    console.error("Error synchronizing the database:", err);
   });
   
 const app = express();
