@@ -3,11 +3,13 @@ import "./config/env";
 
 import { sequelize } from "./config/database";
 import "./models/models";
+import baseRouter from "./routers/baseRouter";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
+app.use("/api", baseRouter);
 
 sequelize
   .sync({ alter: true })
