@@ -14,6 +14,8 @@ export default class User extends Model<
     declare name: string;
     declare email: string;
     declare password: string;
+    declare confirmed: CreationOptional<boolean>;
+    declare lastLinkTime: CreationOptional<Date>;
 
     declare readonly createdAt: CreationOptional<Date>;
     declare readonly updatedAt: CreationOptional<Date>;
@@ -47,6 +49,14 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        confirmed: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+        lastLinkTime: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        }
     },
     {
         sequelize,

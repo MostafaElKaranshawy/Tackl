@@ -1,4 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
+import { ConfirmationTokenPayload } from "../interfaces/ConfirmationTokenPayLoad";
+import ForbiddenException from "../exceptions/forbiddenException";
 
 export default class Jwt {
     static generateToken(
@@ -15,6 +17,21 @@ export default class Jwt {
 
     static decodeToken(token: string) {
         return jwt.decode(token);
+    }
+
+    static extractIdFromToken(token: string): string {
+        const decoded = jwt.decode(token) as { id: string } | null;
+        if (!decoded || !decoded.id) {
+            throw new ForbiddenException("Invalid token");
+        }
+        return decoded.id;
+    }
+    static confirmationTokenDecode(token: string):ConfirmationTokenPayload {
+        const decoded = jwt.decode(token) as { id: string; confirmation: boolean } | null;
+        if (!decoded || !decoded.id || !decoded.confirmation) {
+            throw new ForbiddenException("Invalid token");
+        }
+        return decoded;
     }
 
 }

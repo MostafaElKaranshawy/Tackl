@@ -37,7 +37,20 @@ export default class UserRepository {
         return user;
     }
 
-    static async updateUser(id: string, updates: Partial<{ name: string; email: string; password: string }>): Promise<User> {
+    static async confirmUserEmail(id: string): Promise<void> {
+        const user = await User.findByPk(id);
+        if (!user) {
+            throw new NotFoundException("User not found");
+        }
+        try {
+            user.confirmed = true;
+            await user.save();
+        } catch (error) {
+            throw new DBException("Error confirming user email");
+        }
+    }
+
+    static async updateUser(id: string, updates: Partial<{ name: string; email: string; password: string, confirmed: boolean, lastLinkTime: Date }>): Promise<User> {
         const user = await User.findByPk(id);
         if (!user) {
             throw new NotFoundException("User not found");

@@ -55,6 +55,7 @@ authRouter.post(
     AuthController.signUp
 );
 
+
 /**
  * @openapi
  * /api/auth/login:
@@ -87,9 +88,145 @@ authRouter.post(
  *         description: Invalid email or password.
  *       "500":
  *         description: Internal server error.
- */
+*/
 authRouter.post("/login",
     emailValidator,
     AuthController.login);
+
+
+/**
+ * @openapi
+ * /api/auth/confirmEmail:
+ *   get:
+ *     summary: Confirm a user's email address using a token
+ *     tags:
+ *       - Authentication
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The confirmation token sent to the user's email.
+ *     responses:
+ *       "200":
+ *         description: Email confirmed successfully.
+ *       "400":
+ *         description: Invalid or expired token.
+ *       "404":
+ *         description: User not found.
+ */
+authRouter.get(
+    "/confirmEmail",
+    AuthController.confirmEmail
+);
+
+/**
+ * @openapi
+ * /api/auth/getConfirmationLink:
+ *   get:
+ *     summary: Request a new email confirmation link
+ *     tags:
+ *       - Authentication
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: email
+ *         description: The email address of the user requesting a confirmation link.
+ *     responses:
+ *       "200":
+ *         description: Confirmation link sent successfully.
+ *       "400":
+ *         description: Missing or invalid request data.
+ *       "404":
+ *         description: User not found.
+ *       "429":
+ *         description: Confirmation link was sent recently. Please check your email.
+ *       "500":
+ *         description: Internal server error.
+ */
+
+authRouter.get(
+    "/getConfirmationLink",
+    AuthController.getConfirmationLink
+);
+
+
+/**
+ * @openapi
+ * /api/auth/resetPassword:
+ *   put:
+ *     summary: Reset a user's password using a token
+ *     tags:
+ *       - Authentication
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The password reset token sent to the user's email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: SecurePassword123!
+ *     responses:
+ *       "200":
+ *         description: Password reset successfully.
+ *       "400":
+ *         description: Missing or invalid request data.
+ *       "404":
+ *         description: User not found.
+ *       "500":
+ *         description: Internal server error.
+ */
+authRouter.put(
+    "/resetPassword",
+    passwordValidator,
+    AuthController.resetPassword
+);
+
+/**
+ * @openapi
+ * /api/auth/getResetPasswordLink:
+ *   get:
+ *     summary: Request a new password reset link
+ *     tags:
+ *       - Authentication
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: email
+ *         description: The email address of the user requesting a password reset.
+ *     responses:
+ *       "200":
+ *         description: Reset password link sent successfully.
+ *       "400":
+ *         description: Missing or invalid request data.
+ *       "404":
+ *         description: User not found.
+ *       "429":
+ *         description: Confirmation link was sent recently. Please check your email.
+ *       "500":
+ *         description: Internal server error.
+ */
+authRouter.get(
+    "/getResetPasswordLink",
+    AuthController.getResetPasswordLink
+)
 
 export default authRouter;
