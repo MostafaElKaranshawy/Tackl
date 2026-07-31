@@ -1,8 +1,39 @@
-import { sequelize, DataTypes } from '../config/database';
-import { Models } from './models';
+import {
+    DataTypes,
+    Model,
+    InferAttributes,
+    InferCreationAttributes,
+    CreationOptional,
+} from "sequelize";
+import { sequelize } from "../config/database";
+import { Models } from "./models";
 
-const TimeEntry = sequelize.define(
-    "TimeEntry",
+export default class TimeEntry extends Model<
+    InferAttributes<TimeEntry, {
+        omit: "createdAt" | "updatedAt";
+    }>,
+    InferCreationAttributes<TimeEntry, {
+        omit: "createdAt" | "updatedAt";
+    }>
+> {
+    declare id: CreationOptional<string>;
+    declare duration: number;
+    declare date: Date;
+    declare note: CreationOptional<string | null>;
+
+    declare readonly createdAt: CreationOptional<Date>;
+    declare readonly updatedAt: CreationOptional<Date>;
+
+    static associate(models: Models) {
+        TimeEntry.belongsTo(models.Task, {
+            foreignKey: "taskId",
+            as: "task",
+            onDelete: "CASCADE",
+        });
+    }
+}
+
+TimeEntry.init(
     {
         id: {
             type: DataTypes.UUID,
@@ -20,23 +51,12 @@ const TimeEntry = sequelize.define(
         note: {
             type: DataTypes.TEXT,
             allowNull: true,
-        }
+        },
     },
     {
+        sequelize,
+        modelName: "TimeEntry",
         tableName: "time_entries",
         timestamps: true,
     }
 );
-
-
-(TimeEntry as typeof TimeEntry & {
-    associate?: (models: Models) => void;
-}).associate = (models: Models) => {
-    TimeEntry.belongsTo(models.Task, {
-        foreignKey: "taskId",
-        as: "task",
-        onDelete: "CASCADE",
-    });
-}
-
-export default TimeEntry;
