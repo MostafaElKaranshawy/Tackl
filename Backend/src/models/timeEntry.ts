@@ -1,4 +1,5 @@
-import { sequelize, DataTypes } from '../config/database.mjs';
+import { sequelize, DataTypes } from '../config/database';
+import { Models } from './models';
 
 const TimeEntry = sequelize.define(
     "TimeEntry",
@@ -27,7 +28,10 @@ const TimeEntry = sequelize.define(
     }
 );
 
-TimeEntry.associate = (models) => {
+
+(TimeEntry as typeof TimeEntry & {
+    associate?: (models: Models) => void;
+}).associate = (models: Models) => {
     TimeEntry.belongsTo(models.Task, {
         foreignKey: "taskId",
         as: "task",

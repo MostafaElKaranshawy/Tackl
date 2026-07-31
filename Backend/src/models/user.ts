@@ -1,4 +1,5 @@
-import { sequelize, DataTypes } from "../config/database.mjs";
+import { sequelize, DataTypes } from "../config/database.js";
+import { Models } from "./models";
 
 const User = sequelize.define(
     "User",
@@ -29,7 +30,9 @@ const User = sequelize.define(
     }
 );
 
-User.associate = (models) => {
+(User as typeof User & {
+    associate?: (models: Models) => void;
+}).associate = (models: Models) => {
     User.hasMany(models.Project, {
         foreignKey: "userId",
         as: "projects",
