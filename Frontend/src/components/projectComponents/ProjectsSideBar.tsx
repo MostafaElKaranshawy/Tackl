@@ -3,15 +3,19 @@ import { MdOutlineSort, MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight 
 import { GoProjectRoadmap } from "react-icons/go";
 import { IoMdAdd } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
-import { getProjects } from "../services/projectService";
+import { getProjects } from "../../services/projectService";
 import axios from "axios";
-import { notify } from "../utils/notify";
-import type Project from "../types/project";
+import { notify } from "../../utils/notify";
+import type Project from "../../types/project";
 import SortByComponent from "./SortByComponent";
+import CreateProjectCard from "./ManageProjectCard";
+import { useCurrentProjectContext } from "../../contexts/CurrentProjectContext";
+import { IoReload } from "react-icons/io5";
 
 export default function ProjectsSideBar() {
     const PAGE_SIZE = 10;
     const sortMenuRef = useRef<HTMLDivElement>(null);
+    const { projectId } = useCurrentProjectContext();
     const [projects, setProjects] = useState<Project[]>([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [sortBy, setSortBy] = useState("createdAt");
@@ -19,29 +23,9 @@ export default function ProjectsSideBar() {
     const [totalProjects, setTotalProjects] = useState(0);
     const [showSortOptions, setShowSortOptions] = useState(false);
     const attributesList = ["name", "createdAt", "updatedAt"];
+    const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
+
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await getProjects({
-                    page: currentPage,
-                    pageSize: PAGE_SIZE,
-                    sortBy,
-                    sortOrder
-                });
-                setProjects(data.projects || []);
-                setTotalProjects(data.total || 0);
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    if (error.response?.status === 401) {
-                        notify.error("You are not authorized to view the projects. Please log in.");
-                    } else {
-                        notify.error("Failed to fetch projects. Please try again later.");
-                    }
-                } else {
-                    notify.error("An unexpected error occurred. Please try again later.");
-                }
-            }
-        }
         fetchProjects();
     }, [sortOrder, sortBy, currentPage]);
 
@@ -57,6 +41,36 @@ export default function ProjectsSideBar() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [sortMenuRef]);
+
+    useEffect(() => {
+        if (projectId) return;
+
+        fetchProjects();
+    }, [projectId]);
+
+    const fetchProjects = async () => {
+        try {
+            const data = await getProjects({
+                page: currentPage,
+                pageSize: PAGE_SIZE,
+                sortBy,
+                sortOrder
+            });
+            setProjects(data.projects || []);
+            setTotalProjects(data.total || 0);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 401) {
+                    notify.error("You are not authorized to view the projects. Please log in.");
+                } else {
+                    notify.error("Failed to fetch projects. Please try again later.");
+                }
+            } else {
+                notify.error("An unexpected error occurred. Please try again later.");
+            }
+        }
+    };
+
     return (
         <section className="projects-section bg-[linear-gradient(to_top,_#d9e8fd,_#ebf3fe)] rounded-lg min-w-[300px] max-w-[400px] flex-shrink-0 shadow-md shadow-blue-200 border border-gray-300">
             <div className="nav-bar-header text-blue-500 text-2xl p-2 pt-4 pb-4 flex items-center justify-between rounded-t-lg border-b border-gray-300">
@@ -65,7 +79,14 @@ export default function ProjectsSideBar() {
                     <p className="text-xl font-bold font-mono text-blue-800 text-bold">Projects</p>
                 </div>
                 <div ref={sortMenuRef} className="tools-button flex justify-center items-center gap-2 relative">
-                    <IoMdAdd className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150" />
+                    <IoReload
+                        className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150"
+                        onClick={fetchProjects}
+                    />
+                    <IoMdAdd
+                        className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150"
+                        onClick={() => setShowCreateProjectModal(true)}
+                    />
                     <MdOutlineSort
                         className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150"
                         onClick={() => {
@@ -80,7 +101,6 @@ export default function ProjectsSideBar() {
                             sortOrder={sortOrder}
                             setSortOrder={setSortOrder}
                             attributesList={attributesList}
-                            setShowSortOptions={setShowSortOptions}
                         />
                     )}
                 </div>
@@ -120,6 +140,18 @@ export default function ProjectsSideBar() {
                     <ProjectCard key={project.id} project={project} />
                 ))}
             </div>
+            {
+                showCreateProjectModal && (
+                    <CreateProjectCard
+                        mode="create"
+                        onSuccess={() => {
+                            setShowCreateProjectModal(false);
+                            setCurrentPage(1); // Reset to the first page to see the new project
+                        }}
+                        onClose={() => setShowCreateProjectModal(false)}
+                    />
+                )
+            }
         </section>
     );
 }

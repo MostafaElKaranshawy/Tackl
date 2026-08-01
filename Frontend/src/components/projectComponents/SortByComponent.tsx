@@ -7,13 +7,11 @@ export default function SortByComponent(
         sortOrder,
         setSortOrder,
         attributesList,
-        setShowSortOptions
     }: {
         sortBy: string;
         setSortBy: (value: string) => void; sortOrder: string;
         setSortOrder: (value: string) => void;
         attributesList: string[];
-        setShowSortOptions: (value: boolean) => void
     }) {
     const menuRef = useRef<HTMLDivElement>(null);
     const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { checkAuthentication } from "../../services/authService";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import ProjectBoard from "../../components/projectBoard/ProjectBoard";
-import ProjectsSideBar from "../../components/ProjectsSideBar";
+import ProjectBoard from "../../components/projectComponents/projectBoard/ProjectBoard";
+import ProjectsSideBar from "../../components/projectComponents/ProjectsSideBar";
+import { CurrentProjectProvider } from "../../contexts/CurrentProjectContext";
 
 export default function HomePage() {
     const [loading, setLoading] = useState(true);
@@ -48,11 +49,13 @@ export default function HomePage() {
     }
 
     return (
-        <div className="home container min-h-screen min-w-screen flex flex-col items-start justify-start">
+        <div className="home container min-h-screen min-w-screen flex flex-col items-start justify-start relative">
             <Header />
             <div className="main-section w-full flex flex-1 flex-row items-stretch p-2 gap-4">
-                <ProjectsSideBar />
-                <ProjectBoard />
+                <CurrentProjectProvider>
+                    <ProjectsSideBar />
+                    <ProjectBoard />
+                </CurrentProjectProvider>
             </div>
         </div>
     );
