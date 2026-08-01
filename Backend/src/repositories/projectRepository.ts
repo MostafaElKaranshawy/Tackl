@@ -50,14 +50,15 @@ export default class ProjectRepo {
         }
     }
 
-    static async getUserProjects(userId: string, page: number, limit: number): Promise<{ projects: Project[], total: number }> {
+    static async getUserProjects(userId: string, page: number, limit: number, sortBy: string, sortOrder: string): Promise<{ projects: Project[], total: number }> {
         try {
             const projects = await Project.findAll({
                 where: {
                     userId: userId
                 },
                 offset: (page - 1) * limit,
-                limit: limit
+                limit: limit,
+                order: [[sortBy, sortOrder]]
             }); 
             const total = await Project.count({
                 where: {

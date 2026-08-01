@@ -28,18 +28,20 @@ export default function LoginPage() {
     }, []);
 
     const resetForm = () => {
-        setEmail('');
         setPassword('');
+        setEmail('');
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             console.log(email, password);
-            await login(email, password);
-            resetForm();
-            window.location.href = '/home';
+            await login(email, password).then(() => {
+                resetForm();
+                window.location.href = '/home';
+            });
         } catch (error) {
+            resetForm();
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 400) {
                     notify.error("Invalid input. Please check your details and try again.");

@@ -12,7 +12,7 @@ import HomePage from './pages/HomePage/HomePage'
 
 function App() {
   return (
-    <div className="app container mx-auto p-4 bg-white min-h-screen flex flex-col items-center justify-center">
+    <div className="app container mx-auto bg-white min-h-screen flex flex-col items-center justify-center">
       <Router>
         <Routes>
           <Route path="/" element={<SignUpPage />} />

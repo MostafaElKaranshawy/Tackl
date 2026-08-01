@@ -80,7 +80,9 @@ export default class ProjectController {
             const userId = req.userId;
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
-            const { projects, total } = await ProjectService.getProjectsByUserId(userId, page, limit);
+            const sortBy = req.query.sortBy || 'createdAt';
+            const sortOrder = req.query.sortOrder || 'asc';
+            const { projects, total } = await ProjectService.getProjectsByUserId(userId, page, limit, sortBy, sortOrder);
             res.status(200).json({ projects, total, page, limit });
         } catch (error) {
             if (error instanceof NotFoundException) {

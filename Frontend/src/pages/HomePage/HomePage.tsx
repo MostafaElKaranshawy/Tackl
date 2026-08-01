@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { checkAuthentication } from "../../services/authService";
 import { useEffect, useState } from "react";
+import Header from "../../components/Header";
+import ProjectBoard from "../../components/projectBoard/ProjectBoard";
+import ProjectsSideBar from "../../components/ProjectsSideBar";
 
 export default function HomePage() {
     const [loading, setLoading] = useState(true);
@@ -45,13 +48,12 @@ export default function HomePage() {
     }
 
     return (
-        <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-            <h1 className="text-4xl font-bold text-gray-800">
-                Welcome to Tackl
-            </h1>
-            <p className="mt-4 text-lg text-gray-600">
-                Your one-stop solution for task management.
-            </p>
+        <div className="home container min-h-screen min-w-screen flex flex-col items-start justify-start">
+            <Header />
+            <div className="main-section w-full flex flex-1 flex-row items-stretch p-2 gap-4">
+                <ProjectsSideBar />
+                <ProjectBoard />
+            </div>
         </div>
     );
 }

@@ -62,6 +62,22 @@ projectRouter.post("/", ProjectController.createProject);
  *           minimum: 1
  *           default: 10
  *         description: Number of projects per page.
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [name, createdAt]
+ *           default: createdAt
+ *         description: Field to sort by.
+ *       - in: query
+ *         name: sortOrder
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order.
  *     responses:
  *       200:
  *         description: List of projects.

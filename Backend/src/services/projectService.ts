@@ -78,13 +78,13 @@ export default class ProjectService {
         }
     }
 
-    static async getProjectsByUserId(userId: string, page: number, limit: number) {
+    static async getProjectsByUserId(userId: string, page: number, limit: number, sortBy: string, sortOrder: string) {
         try {
             const user = await UserRepository.getUserById(userId);
             if (!user) {
                 throw new ForbiddenException("User not found");
             }
-            return await ProjectRepository.getUserProjects(userId, page, limit);
+            return await ProjectRepository.getUserProjects(userId, page, limit, sortBy, sortOrder);
         } catch (error) {
             throw error;
         }
