@@ -9,10 +9,11 @@ export default async function checkUser(req: any, res: any, next: any) {
     }
 
     try {
-        const { id: userId, email } = Jwt.verifyToken(token);
-        if (!userId || !email) {
+        const { id: userId } = Jwt.verifyToken(token);
+        if (!userId) {
             return res.status(401).json({ message: "Unauthorized" });
         }
+
 
         const user = await UserRepository.getUserById(userId);
 
@@ -21,6 +22,7 @@ export default async function checkUser(req: any, res: any, next: any) {
         }
 
         req.userId = userId;
+        console.log("User ID from checkUser middleware:", userId); // Debugging line
         next();
     } catch (error) {
         console.error("Error in checkUser middleware:", error);

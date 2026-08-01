@@ -26,8 +26,6 @@ export default class AuthController {
                 res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
-            } else if (error instanceof NotFoundException) {
-                res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof MissingRequiredDataException) {
                 res.status(error.statusCode).json({ message: error.message });
             } else {
@@ -57,11 +55,8 @@ export default class AuthController {
 
             res.status(200).json({ message: "Login successful" });
         } catch (error: any) {
-
-            if (error instanceof WrongCredentialsException) {
-                res.status(error.statusCode).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(error.statusCode).json({ message: error.message });
+            if (error instanceof WrongCredentialsException || error instanceof NotFoundException) {
+                res.status(error.statusCode).json({ message: "Invalid email or password" });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
             } else if (error instanceof MissingRequiredDataException) {
@@ -73,15 +68,15 @@ export default class AuthController {
     }
 
     static async confirmEmail(req: Request, res: Response) {
-        const { token } = req.query;
+        const userId = req.userId;
 
-        if (!token || typeof token !== "string") {
-            return res.status(400).json({ message: "Confirmation token is required" });
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
         }
 
         try {
 
-            await AuthService.confirmEmail(token);
+            await AuthService.confirmEmail(userId);
             res.status(200).json({ message: "Email confirmed successfully" });
 
         } catch (error: any) {
@@ -102,12 +97,12 @@ export default class AuthController {
 
         try {
             await AuthService.getConfirmationLink(email);
-            res.status(200).json({ message: "Confirmation link sent successfully" });
+            res.status(200).json({ message: "If an account with that email exists, a confirmation link has been sent." });
         } catch (error: any) {
-            if (error.statusCode === 429) {
-                res.status(429).json({ message: "Confirmation link was sent recently. Please check your email." });
+            if (error.statusCode === 409 && error.message === "Confirmation link was sent recently. Please check your email.") {
+                res.status(409).json({ message: error.message });
             } else if (error instanceof NotFoundException) {
-                res.status(error.statusCode).json({ message: error.message });
+                res.status(200).json({ message: "If an account with that email exists, a confirmation link has been sent." });
             } else if (error instanceof AlreadyExistsException) {
                 res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof DBException) {
@@ -121,7 +116,6 @@ export default class AuthController {
     static async resetPassword(req: Request, res: Response) {
         const { password } = req.body;
         let userId = req.userId;
-
         if (!userId) {
             const { token } = req.query;
 
@@ -165,8 +159,8 @@ export default class AuthController {
             await AuthService.getResetPasswordLink(email);
             res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
         } catch (error: any) {
-            if (error.statusCode === 429) {
-                res.status(429).json({ message: "Confirmation link was sent recently. Please check your email." });
+            if (error instanceof AlreadyExistsException) {
+                res.status(409).json({ message: error.message });
             } else if (error instanceof NotFoundException || error instanceof WrongCredentialsException) {
                 res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
             } else if (error instanceof DBException) {
@@ -174,6 +168,34 @@ export default class AuthController {
             } else {
                 res.status(400).json({ message: error.message });
             }
+        }
+    }
+
+    static async checkAuthentication(req: Request, res: Response) {
+        const token = req.cookies.accessToken;
+
+        if (!token) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+
+        try {
+            const userId = Jwt.extractIdFromToken(token);
+            res.status(200).json({ message: "Authenticated", userId });
+        } catch (error) {
+            res.status(403).json({ message: "Not authenticated" });
+        }
+    }
+
+    static async logout(req: Request, res: Response) {
+        try {
+            res.clearCookie("accessToken", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+            });
+            res.status(200).json({ message: "Logged out successfully" });
+        } catch (error: any) {
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 }

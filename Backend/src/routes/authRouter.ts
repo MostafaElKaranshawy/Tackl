@@ -11,7 +11,7 @@ const authRouter = router.Router();
 
 /**
  * @openapi
- * /api/auth/signUp:
+ * /api/auth/signup:
  *   post:
  *     summary: Register a new user
  *     tags:
@@ -49,7 +49,7 @@ const authRouter = router.Router();
  *         description: Internal server error.
  */
 authRouter.post(
-    "/signUp",
+    "/signup",
     nameValidator,
     emailValidator,
     passwordValidator,
@@ -87,6 +87,8 @@ authRouter.post(
  *         description: User logged in successfully.
  *       "401":
  *         description: Invalid email or password.
+ *       "400":
+ *         description: Missing or invalid request data.
  *       "500":
  *         description: Internal server error.
 */
@@ -102,23 +104,17 @@ authRouter.post("/login",
  *     summary: Confirm a user's email address using a token
  *     tags:
  *       - Authentication
- *     parameters:
- *       - in: query
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: The confirmation token sent to the user's email.
  *     responses:
  *       "200":
  *         description: Email confirmed successfully.
- *       "400":
- *         description: Invalid or expired token.
+ *       "403":
+ *         description: Forbidden.
  *       "404":
  *         description: User not found.
  */
 authRouter.get(
     "/confirmEmail",
+    checkUser,
     AuthController.confirmEmail
 );
 
@@ -139,12 +135,10 @@ authRouter.get(
  *         description: The email address of the user requesting a confirmation link.
  *     responses:
  *       "200":
- *         description: Confirmation link sent successfully.
+ *         description: If an account with that email exists, a confirmation link has been sent.
  *       "400":
  *         description: Missing or invalid request data.
- *       "404":
- *         description: User not found.
- *       "429":
+ *       "409":
  *         description: Confirmation link was sent recently. Please check your email.
  *       "500":
  *         description: Internal server error.
@@ -163,13 +157,6 @@ authRouter.get(
  *     summary: Reset a user's password using a token
  *     tags:
  *       - Authentication
- *     parameters:
- *       - in: query
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: The password reset token sent to the user's email.
  *     requestBody:
  *       required: true
  *       content:
@@ -251,12 +238,10 @@ authRouter.put(
  *         description: The email address of the user requesting a password reset.
  *     responses:
  *       "200":
- *         description: Reset password link sent successfully.
+ *         description: If an account with that email exists, a password reset link has been sent.
  *       "400":
  *         description: Missing or invalid request data.
- *       "404":
- *         description: User not found.
- *       "429":
+ *       "409":
  *         description: Confirmation link was sent recently. Please check your email.
  *       "500":
  *         description: Internal server error.
@@ -266,4 +251,39 @@ authRouter.get(
     AuthController.getResetPasswordLink
 )
 
+/**
+ * @openapi
+ * /api/auth/checkAuthentication:
+ *   get:
+ *     summary: Check if the user is authenticated
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       "200":
+ *         description: User is authenticated.
+ *       "403":
+ *         description: User is not authenticated. 
+ */
+authRouter.get(
+    "/checkAuthentication",
+    AuthController.checkAuthentication
+)
+
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     summary: Log out the user by clearing the authentication cookie
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       "200":
+ *         description: User logged out successfully.
+ *       "500":
+ *         description: Internal server error.
+ */
+authRouter.post(
+    "/logout",
+    AuthController.logout
+)
 export default authRouter;
