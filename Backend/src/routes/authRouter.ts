@@ -261,10 +261,8 @@ authRouter.get(
  *     responses:
  *       "200":
  *         description: User is authenticated.
- *       "401":
- *         description: User is not authenticated.
- *       "500":
- *         description: Internal server error.  
+ *       "403":
+ *         description: User is not authenticated. 
  */
 authRouter.get(
     "/checkAuthentication",
