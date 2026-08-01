@@ -1,8 +1,7 @@
-import UserRepository from "../repositories/userRepo";
+import UserRepository from "../repositories/userRepository";
 import bcrypt from "bcrypt";
 import Jwt from "../config/jwt";
 import { randomInt } from "crypto";
-import User from "../models/user";
 import DBException from "../exceptions/dbException";
 import WrongCredentialsException from "../exceptions/wrongCredentialsException";
 import NotFoundException from "../exceptions/notFoundException";

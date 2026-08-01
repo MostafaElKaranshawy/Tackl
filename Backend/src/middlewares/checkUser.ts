@@ -1,5 +1,5 @@
 import Jwt from "../config/jwt";
-import UserRepository from "../repositories/userRepo";
+import UserRepository from "../repositories/userRepository";
 
 export default async function checkUser(req: any, res: any, next: any) {
     const token = req.cookies.accessToken || req.headers.authorization?.split("Bearer ")[1];
@@ -14,15 +14,7 @@ export default async function checkUser(req: any, res: any, next: any) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-
-        const user = await UserRepository.getUserById(userId);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
         req.userId = userId;
-        console.log("User ID from checkUser middleware:", userId); // Debugging line
         next();
     } catch (error) {
         console.error("Error in checkUser middleware:", error);
