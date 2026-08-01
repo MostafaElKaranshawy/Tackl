@@ -2,26 +2,24 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL + "/api/auth";
 
-async function signUp(name: string, email: string, password: string) {
+async function signUp(name: string, email: string, password: string): Promise<any> {
     if (!name || !email || !password) {
         throw new Error("Name, email, and password are required");
     }
-
     try {
         const response = await axios.post(`${API_URL}/signup`, {
             name,
             email,
             password
         });
-        console.log("Sign up response:", response.data);
         return response.data;
     } catch (error) {
-        throw new Error("Error signing up");
+        throw error;
     }
 
 }
 
-async function login(email: string, password: string) {
+async function login(email: string, password: string): Promise<any> {
     if (!email || !password) {
         throw new Error("Email and password are required");
     }
@@ -34,12 +32,11 @@ async function login(email: string, password: string) {
         console.log("Login response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Login error:", error);
-        throw new Error("Error logging in");
+        throw error;
     }
 }
 
-async function getResetPasswordLink(email: string) {
+async function getResetPasswordLink(email: string): Promise<any> {
     if (!email) {
         throw new Error("Email is required");
     }
@@ -52,7 +49,7 @@ async function getResetPasswordLink(email: string) {
         return response.data;
     } catch (error) {
         console.error("Error getting reset password link:", error);
-        throw new Error("Error getting reset password link");
+        throw error;
     }
 }
 
@@ -69,13 +66,12 @@ async function resetPassword(password: string, token: string) {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        }
-    );
+        });
         console.log("Reset password response:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error resetting password:", error);
-        throw new Error("Error resetting password");
+        throw error;
     }
 }
 
@@ -94,7 +90,7 @@ async function confirmEmail(token: string) {
         return response.data;
     } catch (error) {
         console.error("Error confirming email:", error);
-        throw new Error("Error confirming email");
+        throw error;
     }
 }
 
@@ -111,14 +107,36 @@ async function getEmailConfirmationLink(email: string) {
         return response.data;
     } catch (error) {
         console.error("Error getting confirmation link:", error);
-        throw new Error("Error getting confirmation link");
+        throw error;
     }
 }
+
+async function checkAuthentication(): Promise<boolean> {
+    try {
+        await axios.get(`${API_URL}/checkAuthentication`, { withCredentials: true });
+        return true;
+    } catch (error) {
+        console.error("Error checking authentication:", error);
+        return false;
+    }
+}
+
+async function logout(): Promise<void> {
+    try {
+        await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+    } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+    }
+}
+
 export {
     signUp,
     login,
     getResetPasswordLink,
     resetPassword,
     confirmEmail,
-    getEmailConfirmationLink
+    getEmailConfirmationLink,
+    checkAuthentication,
+    logout
 }

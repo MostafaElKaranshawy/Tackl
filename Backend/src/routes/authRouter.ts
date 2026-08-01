@@ -251,4 +251,41 @@ authRouter.get(
     AuthController.getResetPasswordLink
 )
 
+/**
+ * @openapi
+ * /api/auth/checkAuthentication:
+ *   get:
+ *     summary: Check if the user is authenticated
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       "200":
+ *         description: User is authenticated.
+ *       "401":
+ *         description: User is not authenticated.
+ *       "500":
+ *         description: Internal server error.  
+ */
+authRouter.get(
+    "/checkAuthentication",
+    AuthController.checkAuthentication
+)
+
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     summary: Log out the user by clearing the authentication cookie
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       "200":
+ *         description: User logged out successfully.
+ *       "500":
+ *         description: Internal server error.
+ */
+authRouter.post(
+    "/logout",
+    AuthController.logout
+)
 export default authRouter;

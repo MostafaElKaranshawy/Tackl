@@ -1,55 +1,137 @@
-import { useState } from 'react';
-import './signUpPage.css';
-import { signUp } from '../../services/authService';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { notify } from "../../utils/notify";
+import { checkAuthentication, signUp } from '../../services/authService';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import FloatingInput from '../../components/FloatingInput';
+import FormComponent from '../../components/FormComponent';
+import { validatePassword, validateName, validateEmail, validatePasswordRules } from '../../utils/validators';
 
 export default function SignUpPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        const verifyAuthentication = async () => {
+            try {
+                const authenticated = await checkAuthentication();
+                if (authenticated) {
+                    window.location.href = '/home';
+                }
+            } finally {
+            }
+        };
+
+        verifyAuthentication();
+    }, []);
+    
+    const resetForm = () => {
+        setName('');
+        setEmail('');
+        setPassword('');
+    }
+    const [nameError, setNameError] = useState('');
+    const [emailError, setEmailError] = useState('');
+
+    const validateForm = () => {
+        const isNameValid = validateName(name, setNameError);
+        const isEmailValid = validateEmail(email, setEmailError);
+        const isPasswordValid = validatePassword(password);
+
+        return isNameValid && isEmailValid && isPasswordValid;
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await signUp(name, email, password);
+        try {
+            if (!validateForm()) return;
+            await signUp(name, email, password);
+            resetForm();
+            notify.success("Sign up successful! Please check your email to confirm your account.");
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 400) {
+                    notify.error("Invalid input. Please check your details and try again.");
+                } else if (error.response?.status === 409) {
+                    notify.error("Email already exists. Please use a different email or log in using it.");
+                } else {
+                    notify.error("An unexpected error occurred. Please try again.");
+                }
+
+            } else {
+                notify.error("An unexpected error occurred. Please try again.");
+            }
+        }
     }
+    const inputGroupClassName = "input-group relative w-full";
     return (
-        <div className="sign-up-page">
-            <h1>Sign Up Page</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="input-group">
-                    <label htmlFor="name">Name:</label>
-                    <input
+        <FormComponent
+            title="Sign Up"
+            subtitle="Create your account"
+            submitText="Sign Up"
+            validateForm={() => validateForm}
+            onSubmit={handleSubmit}
+            children={
+                <>
+                    <FloatingInput
+                        label="Name"
                         type="text"
-                        id="name"
-                        required
-                        onChange={(e) => setName(e.target.value)}
+                        value={name}
+                        onChangeHandler={(e) => {
+                            setName(e.target.value)
+                        }}
                     />
-                </div>
+                    {nameError && <p className="text-xs text-red-500">{nameError}</p>}
 
-                <div className="input-group">
-                    <label htmlFor="email">Email:</label>
-                    <input
+                    <FloatingInput
+                        label="Email"
                         type="email"
-                        id="email"
-                        required
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={email}
+                        onChangeHandler={(e) => setEmail(e.target.value)}
                     />
+                    {emailError && <p className="text-xs text-red-500">{emailError}</p>}
+                    <div className={inputGroupClassName}>
+                        <FloatingInput
+                            label="Password"
+                            value={password}
+                            type={showPassword ? "text" : "password"}
+                            onChangeHandler={(e) => {
+                                setPassword(e.target.value)
+                                validatePassword(e.target.value)
+                            }}
+                        />
+                        <span
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
+                    </div>
+                    <div className="constraints mt-2 bg-yellow-100 p-2 rounded-md font-mono">
+                        {validatePasswordRules.map((rule, index) => (
+                            <p key={index} className={`text-xs ${rule.validate(password) ? "text-green-500" : "text-red-500"}`}>
+                                {rule.label}
+                            </p>
+                        ))}
+                    </div>
+                </>
+            }
+            footer={
+                <div>
+                    <p className="text-sm text-gray-600">
+                        Already have an account? <a href="/login" className="text-blue-500 hover:underline">
+                            Login here
+                        </a>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                        Didn't receive confirmation email? <a href="/confirm-email" className="text-blue-500 hover:underline">
+                            Resend
+                        </a>
+                    </p>
                 </div>
-
-                <div className="input-group">
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        required
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-
-                <button type="submit">Sign Up</button>
-            </form>
-            <div className="to-login">
-                <p>Already have an account? <a href="/login">Login here</a></p>
-            </div>
-        </div>
+            }
+        />
     );
 }

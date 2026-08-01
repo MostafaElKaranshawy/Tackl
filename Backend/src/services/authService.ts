@@ -19,7 +19,7 @@ export default class AuthService {
         try {
             const user = await UserRepository.createUser(name, email, hashedPassword);
             const confirmationToken = Jwt.generateToken({ id: user.id, confirmation: true });
-            const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email?token=${confirmationToken}`;
+            const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
 
             await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${name},\n\nThank you for signing up! We're excited to have you on board. \n\n Use the following link to confirm your email: ${confirmationLink}\n\nBest regards,\nThe Team`);
         } catch (error) {
