@@ -4,9 +4,11 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
+    ForeignKey,
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
+import Project from "./project";
 
 export type TaskStatus = "todo" | "in_progress" | "done";
 export type TaskPriority = "low" | "medium" | "high";
@@ -26,7 +28,7 @@ export default class Task extends Model<
     declare priority: CreationOptional<TaskPriority>;
     declare estimatedTime: CreationOptional<number | null>;
     declare dueDate: CreationOptional<Date | null>;
-
+    declare projectId: ForeignKey<Project["id"]>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
@@ -82,7 +84,10 @@ Task.init(
             type: DataTypes.DATE,
             allowNull: true,
         },
-
+        projectId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+        },
     },
     {
         sequelize,

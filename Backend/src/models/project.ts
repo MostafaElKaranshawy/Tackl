@@ -4,9 +4,11 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
+    ForeignKey,
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
+import User from "./user";
 
 export default class Project extends Model<
     InferAttributes<Project, {
@@ -19,7 +21,7 @@ export default class Project extends Model<
     declare id: CreationOptional<string>;
     declare name: string;
     declare description: CreationOptional<string | null>;
-
+    declare userId: ForeignKey<User["id"]>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
@@ -53,7 +55,10 @@ Project.init(
             type: DataTypes.TEXT,
             allowNull: true,
         },
-
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+        },
     },
     {
         sequelize,
