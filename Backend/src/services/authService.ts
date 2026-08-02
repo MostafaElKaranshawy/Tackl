@@ -17,7 +17,7 @@ export default class AuthService {
         const hashedPassword = await bcrypt.hash(password, passwordSalt);
         try {
             const user = await UserRepository.createUser(name, email, hashedPassword);
-            const confirmationToken = Jwt.generateToken({ id: user.id, confirmation: true });
+            const confirmationToken = Jwt.generateToken({ id: user.id, purpose: 'emailConfirmation' });
             const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
 
             await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${name},\n\nThank you for signing up! We're excited to have you on board. \n\n Use the following link to confirm your email: ${confirmationLink}\n\nBest regards,\nThe Team`);
@@ -44,9 +44,8 @@ export default class AuthService {
                 throw new WrongCredentialsException("Email not confirmed. Please check your inbox for the confirmation email.");
             }
 
-            const token = Jwt.generateToken({ id: user.id, email: user.email });
+            const token = Jwt.generateToken({ id: user.id, purpose: 'accessToken' }, '1h');
             // await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${user.name},\n\nA new login was detected on your account.\n\nBest regards,\n\n\nTackl Team`);
-            console.log(token);
             return token;
 
         } catch (error) {
@@ -85,7 +84,7 @@ export default class AuthService {
                 }
             }
             await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-            const confirmationToken = Jwt.generateToken({ id: user.id, confirmation: true }, '30m');
+            const confirmationToken = Jwt.generateToken({ id: user.id, purpose: 'emailConfirmation' }, '30m');
             const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
             await EmailService.sendEmail(email, "Email Confirmation", `Hello ${user.name},\n\nPlease confirm your email by clicking the following link: ${confirmationLink}\n\nBest regards,\nThe Team`);
         } catch (error) {
@@ -125,7 +124,7 @@ export default class AuthService {
         }
 
         await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-        const resetToken = Jwt.generateToken({ id: user.id, resetPassword: true }, '30m');
+        const resetToken = Jwt.generateToken({ id: user.id, purpose: 'passwordReset' }, '30m');
 
         const resetLink = `${process.env.FRONTEND_LINK}/reset-password/${resetToken}`;
 

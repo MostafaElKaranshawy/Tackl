@@ -27,6 +27,8 @@ export default function ResetPasswordPage() {
         }
         try {
             await resetPassword(password, token);
+            setPassword("");
+            setConfirmPassword("");
             notify.success("Password reset successful! You can now log in with your new password.");
             setTimeout(() => {
                 window.location.href = "/login";
@@ -43,31 +45,35 @@ export default function ResetPasswordPage() {
             submitText="Reset Password"
             onSubmit={handleSubmit}
             children={
-                <>
-                    <FloatingInput
-                        label="New Password"
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChangeHandler={(e) => setPassword(e.target.value)}
-                    />
-                    <span
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-                    <FloatingInput
-                        label="Confirm Password"
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChangeHandler={(e) => setConfirmPassword(e.target.value)}
-                    />
-                    <span
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
+                <>  
+                    <div className="password-container relative">
+                        <FloatingInput
+                            label="New Password"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChangeHandler={(e) => setPassword(e.target.value)}
+                        />
+                        <span
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
+                    </div>
+                    <div className="password-container relative">
+                        <FloatingInput
+                            label="Confirm Password"
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={confirmPassword}
+                            onChangeHandler={(e) => setConfirmPassword(e.target.value)}
+                        />
+                        <span
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
+                    </div>
                 </>
             }
         />

@@ -59,7 +59,7 @@ async function resetPassword(password: string, token: string) {
     }
 
     try {
-        const response = await axios.put(`${API_URL}/resetPassword`, {
+        const response = await axios.put(`${API_URL}/resetPasswordFromLink`, {
             password
         },
         {
