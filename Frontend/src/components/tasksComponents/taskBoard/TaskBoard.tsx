@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type Task from "../../../types/task";
-import { getAllProjectTasks } from "../../../services/taskService";
 import TaskBoardCard from "./TaskBoardCard";
-import { updateTask } from "../../../services/taskService";
-import type { UpdateTaskDto } from "../../../types/task";
 import TaskShow from "../../tasksComponents/TaskShow";
 
 export default function TaskBoard({
@@ -15,7 +12,6 @@ export default function TaskBoard({
     tasks: Task[];
     fetchTasks: () => void;
 }) {
-    // const [tasks, setTasks] = useState<Task[]>([]);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const selectedTaskRef = useRef<HTMLDivElement>(null);
 
