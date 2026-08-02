@@ -10,6 +10,7 @@ import { checkAuthentication } from '../../services/authService';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
@@ -40,7 +41,7 @@ export default function LoginPage() {
                 window.location.href = '/home';
             });
         } catch (error) {
-            resetForm();
+            // resetForm();
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 400) {
                     notify.error("Invalid input. Please check your details and try again.");
@@ -62,7 +63,11 @@ export default function LoginPage() {
             subtitle="Sign in to your account"
             submitText="Login"
             validateForm={() => {
-                validateEmail(email, setEmail);
+                if(!validateEmail(email, setEmailError)) {
+                    setEmailError("Please enter a valid email address.");
+                    return false;
+                }
+                return true;
             }}
             onSubmit={handleSubmit}
             children={
@@ -71,8 +76,12 @@ export default function LoginPage() {
                         label="Email"
                         type="email"
                         value={email}
-                        onChangeHandler={(e) => setEmail(e.target.value)}
-                    />
+                        onChangeHandler={(e) => {
+                            setEmail(e.target.value);
+                            setEmailError('');
+                        }}
+                            />
+                    <span className="text-xs text-red-500">{emailError}</span>
                     <div className={inputGroupClassName}>
                         <FloatingInput
                             label="Password"

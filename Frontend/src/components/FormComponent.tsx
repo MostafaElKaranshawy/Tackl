@@ -4,8 +4,8 @@ type AuthFormProps = {
     title: string;
     subtitle: string;
     submitText: string;
-    validateForm?: (e: React.FormEvent<HTMLFormElement>) => void;
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    validateForm?: (e: React.FormEvent<HTMLFormElement>) => boolean;
+    onSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
     children: ReactNode;
     footer?: ReactNode;
 };
@@ -29,11 +29,14 @@ export default function AuthForm({
                 <p className="text-xs text-gray-600">{subtitle}</p>
             </div>
 
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
                 e.preventDefault();
                 setIsSubmitting(true);
-                if (validateForm) validateForm(e);
-                onSubmit(e);
+                if(validateForm && !validateForm(e)) {
+                    setIsSubmitting(false);
+                    return;
+                }
+                await onSubmit(e);
                 setIsSubmitting(false);
             }} className="flex w-full flex-col gap-4">
                 {children}
