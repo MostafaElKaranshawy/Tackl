@@ -95,13 +95,19 @@ taskRouter.post("/", TaskController.createTask);
  *         description: Sort order.
  *     responses:
  *       200:
- *         description: A list of tasks for the specified project.
+ *         description: A paginated list of tasks for the specified project.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Task'
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of tasks in the project.
+ *                 tasks:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Task'
  *       400:
  *         description: Bad request. Missing required task data.
  *       403:

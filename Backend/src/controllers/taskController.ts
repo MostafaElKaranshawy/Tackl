@@ -11,8 +11,6 @@ export default class TaskController {
             const userId = req.userId
             const taskData = req.body as Task;
             const projectId = req.params.projectId;
-            console.log("Received task data:", taskData);
-            console.log("Received project ID:", projectId);
 
             if (!taskData.title || !taskData.status || !taskData.priority) {
                 throw new MissingRequiredDataException("Missing required task data.");
@@ -21,7 +19,15 @@ export default class TaskController {
             if (!projectId) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
-            const task = await TaskService.createTask(taskData, projectId, userId);
+            const parsedTaskData = {
+                title: taskData.title,
+                description: taskData.description || null,
+                status: taskData.status || "todo",
+                priority: taskData.priority || "medium",
+                estimatedTime: taskData.estimatedTime || null,
+                dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
+            };
+            const task = await TaskService.createTask(parsedTaskData, projectId, userId);
             res.status(201).json(task);
         } catch (error) {
             if (error instanceof ForbiddenException) {
@@ -68,10 +74,19 @@ export default class TaskController {
             if (!taskId) {
                 throw new MissingRequiredDataException("Task ID is required.");
             }
+            const parsedTaskData = {
+                title: updatedData.title,
+                description: updatedData.description || null,
+                status: updatedData.status || "todo",
+                priority: updatedData.priority || "medium",
+                estimatedTime: updatedData.estimatedTime || null,
+                dueDate: updatedData.dueDate ? new Date(updatedData.dueDate) : null,
+            };
 
-            const task = await TaskService.updateTask(taskId, updatedData, userId);
+            const task = await TaskService.updateTask(taskId, parsedTaskData, userId);
             res.status(200).json(task);
         } catch (error) {
+            console.log("Error in updateTask:", error);
             if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else if (error instanceof NotFoundException) {
@@ -117,7 +132,17 @@ export default class TaskController {
             const sortBy = (req.query.sortBy as string) || 'createdAt';
             const sortOrder = (req.query.sortOrder as string) || 'asc';
 
+            if (page <= 0 || limit <= 0) {
+                throw new MissingRequiredDataException("Page and limit must be positive integers.");
+            }
 
+            if (["createdAt", "updatedAt", "title", "dueDate", "priority"].indexOf(sortBy) === -1) {
+                throw new MissingRequiredDataException("Invalid sortBy value. Must be one of: createdAt, updatedAt, title, dueDate, priority.");
+            }
+
+            if (["asc", "desc"].indexOf(sortOrder) === -1) {
+                throw new MissingRequiredDataException("Invalid sortOrder value. Must be 'asc' or 'desc'.");
+            }
             if (!projectId) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
@@ -148,6 +173,13 @@ export default class TaskController {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
 
+            if (["createdAt", "updatedAt", "title", "dueDate", "priority"].indexOf(sortBy) === -1) {
+                throw new MissingRequiredDataException("Invalid sortBy value. Must be one of: createdAt, updatedAt, title, dueDate, priority.");
+            }
+
+            if (["asc", "desc"].indexOf(sortOrder) === -1) {
+                throw new MissingRequiredDataException("Invalid sortOrder value. Must be 'asc' or 'desc'.");
+            }
             const tasks = await TaskService.getAllProjectTasks(projectId, userId, sortBy, sortOrder);
             res.status(200).json(tasks);
         } catch (error) {

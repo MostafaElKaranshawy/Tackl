@@ -12,9 +12,10 @@ import CreateProjectCard from "./ManageProjectCard";
 import { useCurrentProjectContext } from "../../contexts/CurrentProjectContext";
 import { IoReload } from "react-icons/io5";
 import { useRefreshContext } from "../../contexts/RefreshContext";
+import { PROJECTS_PAGE_SIZE } from "../../constants";
 
 export default function ProjectsSideBar() {
-    const PAGE_SIZE = 10;
+    const PAGE_SIZE = PROJECTS_PAGE_SIZE;
     const sortMenuRef = useRef<HTMLDivElement>(null);
     const { projectId } = useCurrentProjectContext();
     const { key } = useRefreshContext();
@@ -109,7 +110,7 @@ export default function ProjectsSideBar() {
             </div>
             <div className="pagination flex justify-between items-center p-2 rounded-b-lg">
                 <div className="total-projects">
-                    <p className="text-sm text-gray-600 p-2">{projects.length + " out of " + totalProjects}</p>
+                    {totalProjects === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1} - {Math.min(currentPage * PAGE_SIZE, totalProjects)} of {totalProjects}
                 </div>
                 <div className="move-page flex justify-center items-center gap-2 p-2">
                     <MdOutlineKeyboardArrowLeft

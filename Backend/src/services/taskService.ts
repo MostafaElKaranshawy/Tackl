@@ -7,7 +7,7 @@ import NotFoundException from "../exceptions/notFoundException";
 
 export default class TaskService {
 
-    static async createTask(taskData: Task, projectId: string, userId: string): Promise<Task> {
+    static async createTask(taskData: any, projectId: string, userId: string): Promise<Task> {
 
         try {
             const user = await UserRepository.getUserById(userId);
@@ -50,7 +50,7 @@ export default class TaskService {
         }
     }
 
-    static async updateTask(taskId: string, updatedData: Partial<Task>, userId: string): Promise<Task | null> {
+    static async updateTask(taskId: string, updatedData: any, userId: string): Promise<Task | null> {
         try {
             const task = await TaskRepository.getTaskById(taskId);
             if (!task) {
@@ -102,7 +102,8 @@ export default class TaskService {
                 throw new ForbiddenException("Access denied");
             }
 
-            return await TaskRepository.getProjectTasks(projectId, page, limit, sortBy, sortOrder);
+            const { tasks, total } = await TaskRepository.getProjectTasks(projectId, page, limit, sortBy, sortOrder);
+            return { tasks, total };
         } catch (error) {
             throw error;
         }
