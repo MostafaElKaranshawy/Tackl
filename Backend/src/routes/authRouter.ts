@@ -5,6 +5,7 @@ import nameValidator from "../middlewares/nameValidator.js";
 
 import router from "express";
 import checkUser from "../middlewares/checkUser.js";
+import checkToken from "../middlewares/checkToken.js";
 
 
 const authRouter = router.Router();
@@ -114,7 +115,7 @@ authRouter.post("/login",
  */
 authRouter.get(
     "/confirmEmail",
-    checkUser,
+    checkToken,
     AuthController.confirmEmail
 );
 
@@ -181,6 +182,7 @@ authRouter.get(
  */
 authRouter.put(
     "/resetPasswordFromLink",
+    checkToken,
     passwordValidator,
     AuthController.resetPassword
 );

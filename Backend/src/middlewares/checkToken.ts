@@ -1,8 +1,8 @@
 import Jwt from "../config/jwt";
 
-export default async function checkUser(req: any, res: any, next: any) {
+export default async function checkToken(req: any, res: any, next: any) {
     const token = req.cookies.accessToken || req.headers.authorization?.split("Bearer ")[1];
-
+    
     if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
     }
@@ -16,9 +16,6 @@ export default async function checkUser(req: any, res: any, next: any) {
         req.userId = tokenData.id;
         req.tokenPurpose = tokenData.purpose;
 
-        if (req.tokenPurpose !== "accessToken") {
-            return res.status(403).json({ message: "Forbidden" });
-        }
         next();
     } catch (error) {
         console.error("Error in checkUser middleware:", error);
