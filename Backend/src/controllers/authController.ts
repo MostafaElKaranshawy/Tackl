@@ -129,7 +129,6 @@ export default class AuthController {
             await AuthService.resetPassword(password, userId);
             res.status(200).json({ message: "Password reset successfully" });
         } catch (error: any) {
-            console.log(error)
             if (error instanceof NotFoundException) {
                 res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof DBException) {
