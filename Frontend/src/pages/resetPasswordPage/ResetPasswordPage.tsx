@@ -5,6 +5,7 @@ import FormComponent from "../../components/FormComponent";
 import FloatingInput from "../../components/FloatingInput";
 import { notify } from "../../utils/notify";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import { validatePasswordRules, validatePassword } from "../../utils/validators";
 
 export default function ResetPasswordPage() {
     const { token } = useParams<{ token: string }>();
@@ -15,8 +16,12 @@ export default function ResetPasswordPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    const [passwordError, setPasswordError] = useState("");
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!validatePassword(password, setPasswordError)) {
+            return;
+        }
         if (password !== confirmPassword) {
             notify.error("Passwords do not match. Please try again.");
             return;
@@ -73,6 +78,14 @@ export default function ResetPasswordPage() {
                         >
                             {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
+                    </div>
+                    {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
+                    <div className="constraints mt-2 bg-yellow-100 p-2 rounded-md font-mono">
+                        {validatePasswordRules.map((rule, index) => (
+                            <p key={index} className={`text-xs ${rule.validate(password) ? "text-green-500" : "text-red-500"}`}>
+                                {rule.label}
+                            </p>
+                        ))}
                     </div>
                 </>
             }

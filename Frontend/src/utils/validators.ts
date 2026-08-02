@@ -21,10 +21,18 @@ const validatePasswordRules = [
         validate: (password: string) => /[!@#$%^&*(),.?":{}|<>]/.test(password),
     },
 ];
-const validatePassword = (password: string) => {
-    return validatePasswordRules.every(rule => rule.validate(password));
+const validatePassword = (password: string, setPasswordError: (error: string) => void) => {
+    setPasswordError("");
+    const is_valid = validatePasswordRules.every(rule => rule.validate(password));
+    if (!is_valid) {
+        setPasswordError("Password does not meet the required criteria.");
+    } else {
+        setPasswordError("");
+    }
+    return is_valid;
 }
 const validateName = (name: string, setNameError: (error: string) => void) => {
+    setNameError("");
     if (!name) {
         setNameError("Name is required");
         return false;
@@ -38,6 +46,7 @@ const validateName = (name: string, setNameError: (error: string) => void) => {
     }
 }
 const validateEmail = (email: string, setEmailError: (error: string) => void) => {
+    setEmailError("");
     if (!email) {
         setEmailError("Email is required");
         return false;

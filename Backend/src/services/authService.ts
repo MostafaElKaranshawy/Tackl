@@ -111,24 +111,30 @@ export default class AuthService {
     }
 
     static async getResetPasswordLink(email: string): Promise<string> {
-        const user = await UserRepository.getUserByEmail(email);
-        if (!user) {
-            throw new NotFoundException("User not found", 404);
-        }
-        if (user.lastLinkTime) {
-            const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
-            const oneHourInMilliseconds = 60 * 60 * 1000;
-            if (timeSinceLastLink < oneHourInMilliseconds) {
-                throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.", 409);
+        try {
+
+            const user = await UserRepository.getUserByEmail(email);
+            if (!user) {
+                throw new NotFoundException("User not found", 404);
             }
+            if (user.lastLinkTime) {
+                const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
+                const oneHourInMilliseconds = 60 * 60 * 1000;
+                if (timeSinceLastLink < oneHourInMilliseconds) {
+                    throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.", 409);
+                }
+            }
+    
+            const resetToken = Jwt.generateToken({ id: user.id, purpose: 'passwordReset' }, '30m');
+            const resetLink = `${process.env.FRONTEND_LINK}/reset-password/${resetToken}`;
+
+            await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
+            
+            await EmailService.sendEmail(email, "Password Reset Request", `Hello ${user.name},\n\nYou requested a password reset. Please use the following link to reset your password: ${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`);
+    
+            return resetLink;
+        } catch (error) {
+            throw error;
         }
-
-        await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-        const resetToken = Jwt.generateToken({ id: user.id, purpose: 'passwordReset' }, '30m');
-
-        const resetLink = `${process.env.FRONTEND_LINK}/reset-password/${resetToken}`;
-
-        EmailService.sendEmail(email, "Password Reset Request", `Hello ${user.name},\n\nYou requested a password reset. Please use the following link to reset your password: ${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`);
-        return resetLink;
     }
 }

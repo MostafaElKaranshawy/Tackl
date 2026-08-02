@@ -68,7 +68,7 @@ export default function EmailConfirmationPage() {
                             </Link>
                         ) : (
                             <Link
-                                to="/signup"
+                                to="/"
                                 className="inline-block rounded-md border border-gray-300 px-6 py-2 text-gray-700 transition hover:bg-gray-100"
                             >
                                 Back to Sign Up
