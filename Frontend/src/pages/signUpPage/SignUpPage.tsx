@@ -12,6 +12,9 @@ export default function SignUpPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [nameError, setNameError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
     useEffect(() => {
         const verifyAuthentication = async () => {
@@ -32,13 +35,10 @@ export default function SignUpPage() {
         setEmail('');
         setPassword('');
     }
-    const [nameError, setNameError] = useState('');
-    const [emailError, setEmailError] = useState('');
-
     const validateForm = () => {
         const isNameValid = validateName(name, setNameError);
         const isEmailValid = validateEmail(email, setEmailError);
-        const isPasswordValid = validatePassword(password);
+        const isPasswordValid = validatePassword(password, setPasswordError);
 
         return isNameValid && isEmailValid && isPasswordValid;
     }
@@ -71,7 +71,12 @@ export default function SignUpPage() {
             title="Sign Up"
             subtitle="Create your account"
             submitText="Sign Up"
-            validateForm={() => validateForm}
+            validateForm={() => {
+                if(!validateForm()) {
+                    return false;
+                }
+                return true;
+            }}
             onSubmit={handleSubmit}
             children={
                 <>
@@ -99,7 +104,7 @@ export default function SignUpPage() {
                             type={showPassword ? "text" : "password"}
                             onChangeHandler={(e) => {
                                 setPassword(e.target.value)
-                                validatePassword(e.target.value)
+                                validatePassword(e.target.value, setPasswordError)
                             }}
                         />
                         <span
@@ -109,6 +114,7 @@ export default function SignUpPage() {
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
+                    { passwordError && <p className="text-xs text-red-500">{passwordError}</p> }
                     <div className="constraints mt-2 bg-yellow-100 p-2 rounded-md font-mono">
                         {validatePasswordRules.map((rule, index) => (
                             <p key={index} className={`text-xs ${rule.validate(password) ? "text-green-500" : "text-red-500"}`}>

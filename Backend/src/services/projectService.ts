@@ -1,5 +1,6 @@
 import ForbiddenException from "../exceptions/forbiddenException";
 import NotFoundException from "../exceptions/notFoundException";
+import Project from "../models/project";
 import ProjectRepository from "../repositories/projectRepository";
 import UserRepository from "../repositories/userRepository";
 

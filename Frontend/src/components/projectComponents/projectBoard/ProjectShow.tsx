@@ -1,26 +1,68 @@
 import type Project from "../../../types/project";
 import { GoProjectRoadmap } from "react-icons/go";
-import { MdAccessTime, MdUpdate } from "react-icons/md";
+import { MdAccessTime, MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight, MdOutlineSort, MdUpdate } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ManageProjectCard from "../ManageProjectCard";
 import ConfirmationModal from "../../ConfirmationModal";
 import { deleteProject } from "../../../services/projectService";
 import { useCurrentProjectContext } from "../../../contexts/CurrentProjectContext";
+import ManageTaskCard from "../../tasksComponents/ManageTaskCard";
+import type Task from "../../../types/task";
+import { getProjectTasks } from "../../../services/taskService";
+import TasksList from "../../tasksComponents/TasksList";
+import SortByComponent from "../SortByComponent";
+import { TASKS_PAGE_SIZE } from "../../../constants";
 
-export default function ProjectShow({ project, deleteRefresh }: { project: Project, deleteRefresh?: () => void }) {
+export default function ProjectShow(
+    { project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
+    const PAGE_SIZE = TASKS_PAGE_SIZE;
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+    const [taskList, setTaskList] = useState<Task[]>([]);
+    const [sortOrder, setSortOrder] = useState("asc");
+    const [sortBy, setSortBy] = useState("createdAt");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalTasks, setTotalTasks] = useState(0);
+    const [showSortOptions, setShowSortOptions] = useState(false);
+    const attributesList = ["title", "dueDate", "priority", "createdAt", "updatedAt"];
     const { setProjectId } = useCurrentProjectContext();
+    const sortRef = useRef<HTMLDivElement>(null);
+    
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+                setShowSortOptions(false);
+            }
+        };
 
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        fetchTasks();
+    }, [currentPage, sortBy, sortOrder, project.id]);
+
+    const fetchTasks = async () => {
+        try {
+            const response = await getProjectTasks(project.id, { page: currentPage, pageSize: PAGE_SIZE, sortBy, sortOrder });
+            setTaskList(response.tasks);
+            setTotalTasks(response.total);
+        } catch (error) {
+            console.error("Failed to fetch tasks:", error);
+        }
+    };
     const handleDeleteProject = async (id: string) => {
         try {
             await deleteProject(id);
             setProjectId(null);
             deleteRefresh && deleteRefresh();
         } catch (error) {
-            console.error("Failed to delete project:", error);
             alert("Failed to delete project. Please try again later.");
         }
     }
@@ -60,7 +102,7 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
 
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                         <p className="leading-7 text-gray-700">
-                            {project.description || (
+                            {project.description ? project.description : (
                                 <span className="italic text-gray-400">
                                     No description provided.
                                 </span>
@@ -105,26 +147,97 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
                     <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
                         Tasks
                     </h2>
+                    <div className="left-side flex items-center gap-3">
 
-                    <button
-                        disabled
-                        className="rounded-md bg-blue-500 px-3 py-1 text-sm font-medium text-white opacity-50 cursor-not-allowed"
-                    >
-                        + Add Task
-                    </button>
+                        <div className="tools flex items-center gap-3 text-gray-500 self-end">
+                            <div className="sort-section relative" ref={sortRef}>
+                                <MdOutlineSort
+                                    className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150"
+                                    onClick={() => {
+                                        setShowSortOptions((prev) => !prev);
+                                    }}
+                                />
+                                {
+                                    showSortOptions && (
+                                        <SortByComponent
+                                            attributesList={attributesList}
+                                            sortBy={sortBy}
+                                            setSortBy={setSortBy}
+                                            sortOrder={sortOrder}
+                                            setSortOrder={setSortOrder}
+                                        />
+                                    )
+                                }
+                            </div>
+                            <MdOutlineKeyboardArrowLeft
+                                onClick={() => {
+                                    if (currentPage > 1) {
+                                        setCurrentPage((p) => p - 1);
+                                    }
+                                }}
+                                className={`text-2xl transition duration-150 ${currentPage > 1
+                                    ? "text-blue-500 cursor-pointer hover:text-blue-700"
+                                    : "text-gray-400 cursor-not-allowed"
+                                    }`}
+                            />
+                            <div className="tasks-count">
+                                <span className="text-sm text-gray-500">
+                                    {totalTasks === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1} - {Math.min(currentPage * PAGE_SIZE, totalTasks)} of {totalTasks}
+                                </span>
+                            </div>
+                            <MdOutlineKeyboardArrowRight
+                                onClick={() => {
+                                    if (currentPage < Math.ceil(totalTasks / PAGE_SIZE)) {
+                                        setCurrentPage((p) => p + 1);
+                                    }
+                                }}
+                                className={`text-2xl transition duration-150 ${currentPage * PAGE_SIZE < totalTasks
+                                    ? "text-blue-500 cursor-pointer hover:text-blue-700"
+                                    : "text-gray-400 cursor-not-allowed"
+                                    }`}
+                            />
+                        </div>
+                        <button
+                            className="rounded-md bg-blue-500 px-3 py-1 text-sm font-medium text-white cursor-pointer hover:bg-blue-600 transition ease duration-150"
+                            onClick={() => {
+                                setShowAddTaskModal(true);
+                            }}
+                        >
+                            + Add Task
+                        </button>
+                        {
+                            showAddTaskModal && (
+                                <ManageTaskCard
+                                    mode="create"
+                                    projectId={project.id}
+                                    onSuccess={async () => {
+                                        setShowAddTaskModal(false);
+                                        await fetchTasks();
+                                    }}
+                                    onClose={() => setShowAddTaskModal(false)}
+                                />
+                            )
+                        }
+                    </div>
                 </div>
 
                 <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8">
-                    <div className="flex flex-col items-center justify-center text-center">
-                        <p className="text-lg font-medium text-gray-600">
-                            No tasks yet
-                        </p>
+                    {
+                        taskList.length > 0 ? (
+                            <TasksList tasks={taskList} refresh={fetchTasks} />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <p className="text-lg font-medium text-gray-600">
+                                    No tasks yet
+                                </p>
 
-                        <p className="mt-2 max-w-md text-sm text-gray-500">
-                            Tasks for this project will appear here. You'll be able to
-                            create, assign, prioritize, and track progress.
-                        </p>
-                    </div>
+                                <p className="mt-2 max-w-md text-sm text-gray-500">
+                                    Tasks for this project will appear here. You'll be able to
+                                    create, assign, prioritize, and track progress.
+                                </p>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
             {
@@ -132,8 +245,13 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
                     <ManageProjectCard
                         mode="edit"
                         project={project}
-                        onSuccess={() => {
+                        onSuccess={(project: Project | undefined) => {
                             setShowEditModal(false);
+                            setProjectId(project?.id || null);
+
+                            if (project && onUpdated) {
+                                onUpdated(project);
+                            }
                         }}
                         onClose={() => setShowEditModal(false)}
                     />
@@ -153,6 +271,7 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
                     />
                 )
             }
+
         </section>
     );
 }

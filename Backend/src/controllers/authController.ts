@@ -68,10 +68,10 @@ export default class AuthController {
     }
 
     static async confirmEmail(req: Request, res: Response) {
-        const userId = req.userId;
+        const { userId, tokenPurpose } = req;
 
-        if (!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+        if (!userId || tokenPurpose !== "emailConfirmation") {
+            throw new ForbiddenException("Invalid token");
         }
 
         try {
@@ -115,25 +115,15 @@ export default class AuthController {
 
     static async resetPassword(req: Request, res: Response) {
         const { password } = req.body;
-        let userId = req.userId;
-        if (!userId) {
-            const { token } = req.query;
+        const { userId, tokenPurpose } = req;
 
-            if (!token || typeof token !== "string") {
-                return res.status(400).json({ message: "Confirmation token is required" });
-            }
-
-            try {
-                userId = Jwt.extractIdFromToken(token);
-            } catch (error) {
-                return res.status(400).json({ message: "Invalid or expired token" });
-            }
+        if (!userId || tokenPurpose !== "passwordReset") {
+            throw new ForbiddenException("Invalid token purpose");
         }
 
         if (!password || typeof password !== "string") {
             return res.status(400).json({ message: "New password is required" });
         }
-
 
         try {
             await AuthService.resetPassword(password, userId);
@@ -179,8 +169,11 @@ export default class AuthController {
         }
 
         try {
-            const userId = Jwt.extractIdFromToken(token);
-            res.status(200).json({ message: "Authenticated", userId });
+            const tokenData = Jwt.verifyToken(token);
+            if (!tokenData) {
+                return res.status(403).json({ message: "Not authenticated" });
+            }
+            res.status(200).json({ message: "Authenticated", userId: tokenData.id });
         } catch (error) {
             res.status(403).json({ message: "Not authenticated" });
         }
