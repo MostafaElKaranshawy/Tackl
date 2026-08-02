@@ -29,7 +29,6 @@ async function login(email: string, password: string): Promise<any> {
             email,
             password
         }, { withCredentials: true });
-        console.log("Login response:", response.data);
         return response.data;
     } catch (error) {
         throw error;
@@ -45,10 +44,8 @@ async function getResetPasswordLink(email: string): Promise<any> {
         const response = await axios.get(`${API_URL}/getResetPasswordLink`, {
             params: { email }
         });
-        console.log("Reset password link response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error getting reset password link:", error);
         throw error;
     }
 }
@@ -67,10 +64,8 @@ async function resetPassword(password: string, token: string) {
                 Authorization: `Bearer ${token}`
             }
         });
-        console.log("Reset password response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error resetting password:", error);
         throw error;
     }
 }
@@ -86,10 +81,8 @@ async function confirmEmail(token: string) {
                 Authorization: `Bearer ${token}`
             }
         });
-        console.log("Confirm email response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error confirming email:", error);
         throw error;
     }
 }
@@ -103,10 +96,8 @@ async function getEmailConfirmationLink(email: string) {
         const response = await axios.get(`${API_URL}/getConfirmationLink`, {
             params: { email }
         });
-        console.log("Get confirmation link response:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error getting confirmation link:", error);
         throw error;
     }
 }
@@ -116,7 +107,6 @@ async function checkAuthentication(): Promise<boolean> {
         await axios.get(`${API_URL}/checkAuthentication`, { withCredentials: true });
         return true;
     } catch (error) {
-        console.error("Error checking authentication:", error);
         return false;
     }
 }
@@ -125,7 +115,6 @@ async function logout(): Promise<void> {
     try {
         await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
     } catch (error) {
-        console.error("Error logging out:", error);
         throw error;
     }
 }
