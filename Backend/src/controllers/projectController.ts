@@ -1,4 +1,5 @@
 import ForbiddenException from "../exceptions/forbiddenException";
+import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import ProjectService from "../services/projectService";
 
@@ -8,12 +9,19 @@ export default class ProjectController {
 
             const userId = req.userId;
             const projectData = req.body;
+            
+            if (!projectData.name || !projectData.description) {
+                throw new MissingRequiredDataException("Missing required project data.");
+            }
+
             const project = await ProjectService.createProject(projectData, userId);
 
             res.status(201).json(project);
         } catch (error) {
             if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
+            } else if (error instanceof MissingRequiredDataException) {
+                res.status(400).json({ message: error.message });
             } else {
                 res.status(500).json({ message: (error as Error).message });
             }
@@ -25,6 +33,11 @@ export default class ProjectController {
 
             const userId = req.userId;
             const projectId = req.params.id;
+
+            if (!projectId) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
             const project = await ProjectService.getProjectById(projectId, userId);
 
             res.status(200).json(project);
@@ -34,6 +47,8 @@ export default class ProjectController {
                 res.status(404).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
+            } else if (error instanceof MissingRequiredDataException) {
+                res.status(400).json({ message: error.message });
             } else {
                 res.status(500).json({ message: (error as Error).message });
             }
@@ -45,11 +60,22 @@ export default class ProjectController {
             const userId = req.userId;
             const projectId = req.params.id;
             const updatedData = req.body;
+
+            if (!projectId) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            if (!updatedData.name && !updatedData.description) {
+                throw new MissingRequiredDataException("At least one field (name or description) must be provided for update.");
+            }
+
             const project = await ProjectService.updateProject(projectId, updatedData, userId);
             res.status(200).json(project);
         } catch (error) {
             if (error instanceof NotFoundException) {
                 res.status(404).json({ message: error.message });
+            } else if (error instanceof MissingRequiredDataException) {
+                res.status(400).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else {
@@ -62,11 +88,16 @@ export default class ProjectController {
         try {
             const userId = req.userId;
             const projectId = req.params.id;
+            if (!projectId) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
             await ProjectService.deleteProject(projectId, userId);
             res.status(204).send();
         } catch (error) {
             if (error instanceof NotFoundException) {
                 res.status(404).json({ message: error.message });
+            } else if (error instanceof MissingRequiredDataException) {
+                res.status(400).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else {
@@ -82,6 +113,7 @@ export default class ProjectController {
             const limit = parseInt(req.query.limit) || 10;
             const sortBy = req.query.sortBy || 'createdAt';
             const sortOrder = req.query.sortOrder || 'asc';
+
             const { projects, total } = await ProjectService.getProjectsByUserId(userId, page, limit, sortBy, sortOrder);
             res.status(200).json({ projects, total, page, limit });
         } catch (error) {

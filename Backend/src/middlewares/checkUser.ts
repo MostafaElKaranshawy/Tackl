@@ -3,7 +3,6 @@ import UserRepository from "../repositories/userRepository";
 
 export default async function checkUser(req: any, res: any, next: any) {
     const token = req.cookies.accessToken || req.headers.authorization?.split("Bearer ")[1];
-
     if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
     }

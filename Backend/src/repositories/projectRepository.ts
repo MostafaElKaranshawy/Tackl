@@ -1,5 +1,4 @@
 import DBException from "../exceptions/dbException";
-import ForbiddenException from "../exceptions/forbiddenException";
 import NotFoundException from "../exceptions/notFoundException";
 import Project from "../models/project";
 

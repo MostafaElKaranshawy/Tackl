@@ -126,6 +126,30 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
+                TaskInput: {
+                    type: "object",
+                    required: ["title", "priority", "status"],
+                    properties: {
+                        title: {
+                            type: "string",
+                            example: "My Task",
+                        },
+                        description: {
+                            type: "string",
+                            example: "Task description",
+                        },
+                        priority: {
+                            type: "string",
+                            enum: ["low", "medium", "high"],
+                            example: "medium",
+                        },
+                        status: {
+                            type: "string",
+                            enum: ["todo", "in-progress", "done"],
+                            example: "todo",
+                        },
+                    },
+                },
                 TaskChange: {
                     type: "object",
                     properties: {

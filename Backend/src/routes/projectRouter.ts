@@ -12,7 +12,7 @@ const projectRouter = router.Router();
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -44,7 +44,7 @@ projectRouter.post("/", ProjectController.createProject);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -112,7 +112,7 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -128,6 +128,8 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Project'
+ *       400:
+ *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
  *       404:
@@ -146,7 +148,7 @@ projectRouter.get("/:id", ProjectController.getProjectById);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -188,7 +190,7 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -200,6 +202,8 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *     responses:
  *       204:
  *         description: Project deleted successfully.
+ *       400:
+ *         description: ProjectId Required.
  *       401:
  *         description: Unauthorized.
  *       404:
