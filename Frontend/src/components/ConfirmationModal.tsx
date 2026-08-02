@@ -40,7 +40,7 @@ export default function ConfirmationModal({
                     <button
                         onClick={onCancel}
                         disabled={loading}
-                        className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition ease cursor-pointer hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 cursor-pointer hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {cancelText}
                     </button>
@@ -48,7 +48,7 @@ export default function ConfirmationModal({
                     <button
                         onClick={onConfirm}
                         disabled={loading}
-                        className={`rounded-lg px-4 py-2 text-white transition ease disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer ${danger
+                        className={`rounded-lg px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer ${danger
                             ? "bg-red-600 hover:bg-red-700"
                             : "bg-blue-600 hover:bg-blue-700"
                             }`}

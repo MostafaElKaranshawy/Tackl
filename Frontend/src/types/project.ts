@@ -1,7 +1,7 @@
 export default interface Project {
     id: string;
     name: string;
-    description: string;
+    description: string | null;
     createdAt: string;
     updatedAt: string;
 }

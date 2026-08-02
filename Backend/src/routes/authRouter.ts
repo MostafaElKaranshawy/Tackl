@@ -105,6 +105,8 @@ authRouter.post("/login",
  *     summary: Confirm a user's email address using a token
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       "200":
  *         description: Email confirmed successfully.
@@ -158,6 +160,8 @@ authRouter.get(
  *     summary: Reset a user's password using a token
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

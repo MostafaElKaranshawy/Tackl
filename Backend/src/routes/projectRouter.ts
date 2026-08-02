@@ -12,7 +12,7 @@ const projectRouter = router.Router();
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -44,7 +44,7 @@ projectRouter.post("/", ProjectController.createProject);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -112,7 +112,7 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -146,7 +146,7 @@ projectRouter.get("/:id", ProjectController.getProjectById);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -188,7 +188,7 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *     tags:
  *       - Projects
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

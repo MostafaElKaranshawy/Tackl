@@ -11,11 +11,13 @@ import SortByComponent from "./SortByComponent";
 import CreateProjectCard from "./ManageProjectCard";
 import { useCurrentProjectContext } from "../../contexts/CurrentProjectContext";
 import { IoReload } from "react-icons/io5";
+import { useRefreshContext } from "../../contexts/RefreshContext";
 
 export default function ProjectsSideBar() {
     const PAGE_SIZE = 10;
     const sortMenuRef = useRef<HTMLDivElement>(null);
     const { projectId } = useCurrentProjectContext();
+    const { key } = useRefreshContext();
     const [projects, setProjects] = useState<Project[]>([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [sortBy, setSortBy] = useState("createdAt");
@@ -27,7 +29,7 @@ export default function ProjectsSideBar() {
 
     useEffect(() => {
         fetchProjects();
-    }, [sortOrder, sortBy, currentPage]);
+    }, [sortOrder, sortBy, currentPage, key]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -144,9 +146,9 @@ export default function ProjectsSideBar() {
                 showCreateProjectModal && (
                     <CreateProjectCard
                         mode="create"
-                        onSuccess={() => {
+                        onSuccess={async () => {
                             setShowCreateProjectModal(false);
-                            setCurrentPage(1); // Reset to the first page to see the new project
+                            await fetchProjects();
                         }}
                         onClose={() => setShowCreateProjectModal(false)}
                     />
