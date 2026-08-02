@@ -53,7 +53,7 @@ export default function EmailConfirmationPage() {
                 ) : (
                     <>
                         <p
-                            className={`mb-8 text-lg font-medium ${success ? "text-green-600" : "text-red-600"
+                            className={`mb-2 text-lg font-medium ${success ? "text-green-600" : "text-red-600"
                                 }`}
                         >
                             {message}

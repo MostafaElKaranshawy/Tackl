@@ -26,14 +26,14 @@ const getProjectTasks = async (
 
 const getAllProjectTasks = async (
     projectId: string,
-    options: { sortBy: string; sortOrder: string })
-    : Promise<{ tasks: Task[] }> => {
+    options?: { sortBy: string; sortOrder: string })
+    : Promise<Task[] > => {
     try {
         const response = await axios.get(`${API_URL}/${projectId}/tasks/all`, {
             withCredentials: true,
             params: {
-                sortBy: options.sortBy,
-                sortOrder: options.sortOrder
+                sortBy: options?.sortBy,
+                sortOrder: options?.sortOrder
             }
         });
         return response.data;
