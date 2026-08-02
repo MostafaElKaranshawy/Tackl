@@ -18,7 +18,6 @@ export default function ProjectBoard() {
                 } catch (error) {
                     setProjectId(null);
                     setProject(null);
-                    console.error("Failed to fetch project details:", error);
                     notify.error("Project not found or has been deleted. Please select another project.");
                 }
             }

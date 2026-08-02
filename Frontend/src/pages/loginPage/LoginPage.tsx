@@ -35,7 +35,6 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            console.log(email, password);
             await login(email, password).then(() => {
                 resetForm();
                 window.location.href = '/home';

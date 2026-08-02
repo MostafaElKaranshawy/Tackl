@@ -20,7 +20,6 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
             setProjectId(null);
             deleteRefresh && deleteRefresh();
         } catch (error) {
-            console.error("Failed to delete project:", error);
             alert("Failed to delete project. Please try again later.");
         }
     }
