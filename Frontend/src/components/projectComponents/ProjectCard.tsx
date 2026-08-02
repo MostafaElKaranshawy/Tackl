@@ -1,6 +1,6 @@
 import { useCurrentProjectContext } from "../../contexts/CurrentProjectContext";
 
-export default function ProjectCard({ project }: { project: { id: string; name: string; description: string } }) {
+export default function ProjectCard({ project }: { project: { id: string; name: string; description: string | null } }) {
     const { setProjectId } = useCurrentProjectContext();
 
     const handleProjectClick = () => {

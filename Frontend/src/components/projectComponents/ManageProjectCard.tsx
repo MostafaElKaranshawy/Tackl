@@ -7,7 +7,7 @@ import type Project from "../../types/project";
 interface ProjectFormModalProps {
     mode: "create" | "edit";
     project?: Project;
-    onSuccess: () => void;
+    onSuccess: (project?: Project) => void;
     onClose: () => void;
 }
 
@@ -18,6 +18,8 @@ export default function ManageProjectCard({
     onClose,
 }: ProjectFormModalProps) {
     const [name, setName] = useState("");
+    const [nameError, setNameError] = useState("");
+
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -33,19 +35,19 @@ export default function ManageProjectCard({
 
     const handleSubmit = async () => {
         if (!name.trim()) {
-            notify.error("Project name cannot be empty.");
+            setNameError("Project name cannot be empty.");
             return;
         }
 
         setLoading(true);
-
+        
         try {
             if (mode === "create") {
-                await createProject({
+                const createdProject = await createProject({
                     name: name.trim(),
                     description: description.trim(),
                 });
-
+                onSuccess(createdProject);
                 notify.success("Project created successfully!");
             } else {
                 if (!project) {
@@ -53,15 +55,15 @@ export default function ManageProjectCard({
                     return;
                 }
 
-                await updateProject(project.id, {
+                const updatedProject = await updateProject(project.id, {
                     name: name.trim(),
                     description: description.trim(),
-                });
-
+                }) as Project;
+                
+                onSuccess(updatedProject);
                 notify.success("Project updated successfully!");
             }
-
-            onSuccess();
+            
             onClose();
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -104,7 +106,7 @@ export default function ManageProjectCard({
                     <button
                         onClick={onClose}
                         disabled={loading}
-                        className="text-3xl leading-none text-gray-400 transition hover:text-red-500"
+                        className="text-3xl leading-none text-gray-400 transition hover:text-red-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         &times;
                     </button>
@@ -119,10 +121,16 @@ export default function ManageProjectCard({
                         <input
                             type="text"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                setNameError("");
+                            }}
                             placeholder="Enter project name"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none transition focus:border-blue-500"
+                            className={"w-full rounded-lg border border-gray-300 px-3 py-2 outline-none transition focus:border-blue-500 " + (nameError ? 'border-red-500' : '')}
                         />
+                        {nameError && (
+                            <p className="mt-1 text-sm text-red-500">{nameError}</p>
+                        )}
                     </div>
 
                     <div>
@@ -143,7 +151,7 @@ export default function ManageProjectCard({
                         <button
                             onClick={onClose}
                             disabled={loading}
-                            className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition hover:bg-gray-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Cancel
                         </button>
@@ -151,7 +159,7 @@ export default function ManageProjectCard({
                         <button
                             onClick={handleSubmit}
                             disabled={loading}
-                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-700 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {loading
                                 ? mode === "create"

@@ -5,7 +5,7 @@ import ProjectRepository from "../repositories/projectRepository";
 import UserRepository from "../repositories/userRepository";
 
 export default class ProjectService {
-    static async createProject(projectData: Project, userId: string) {
+    static async createProject(projectData: any, userId: string) {
         try {
             const user = await UserRepository.getUserById(userId);
             if (!user) {

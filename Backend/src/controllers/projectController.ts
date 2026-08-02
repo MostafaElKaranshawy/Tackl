@@ -9,12 +9,12 @@ export default class ProjectController {
 
             const userId = req.userId;
             const projectData = req.body;
-            
-            if (!projectData.name || !projectData.description) {
+
+            if (!projectData.name) {
                 throw new MissingRequiredDataException("Missing required project data.");
             }
 
-            const project = await ProjectService.createProject(projectData, userId);
+            const project = await ProjectService.createProject({ name: projectData.name, description: projectData.description || null }, userId);
 
             res.status(201).json(project);
         } catch (error) {
@@ -23,7 +23,7 @@ export default class ProjectController {
             } else if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else {
-                res.status(500).json({ message: (error as Error).message });
+                res.status(500).json({ message: "Internal Server Error, try again later" });
             }
         }
     }
@@ -50,7 +50,7 @@ export default class ProjectController {
             } else if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else {
-                res.status(500).json({ message: (error as Error).message });
+                res.status(500).json({ message: "Internal Server Error, try again later" });
             }
         }
     }
@@ -69,7 +69,7 @@ export default class ProjectController {
                 throw new MissingRequiredDataException("At least one field (name or description) must be provided for update.");
             }
 
-            const project = await ProjectService.updateProject(projectId, updatedData, userId);
+            const project = await ProjectService.updateProject(projectId, { name: updatedData.name, description: updatedData.description }, userId);
             res.status(200).json(project);
         } catch (error) {
             if (error instanceof NotFoundException) {
@@ -79,7 +79,7 @@ export default class ProjectController {
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else {
-                res.status(500).json({ message: (error as Error).message });
+                res.status(500).json({ message: "Internal Server Error, try again later" });
             }
         }
     }
@@ -92,7 +92,9 @@ export default class ProjectController {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
             await ProjectService.deleteProject(projectId, userId);
+
             res.status(204).send();
+
         } catch (error) {
             if (error instanceof NotFoundException) {
                 res.status(404).json({ message: error.message });
@@ -101,7 +103,7 @@ export default class ProjectController {
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else {
-                res.status(500).json({ message: (error as Error).message });
+                res.status(500).json({ message: "Internal Server Error, try again later" });
             }
         }
     }
@@ -110,19 +112,36 @@ export default class ProjectController {
         try {
             const userId = req.userId;
             const page = parseInt(req.query.page) || 1;
+            if (page < 1) {
+                throw new MissingRequiredDataException("Page number must be greater than 0.");
+            }
             const limit = parseInt(req.query.limit) || 10;
+            if (limit < 1) {
+                throw new MissingRequiredDataException("Limit must be greater than 0.");
+            }
             const sortBy = req.query.sortBy || 'createdAt';
+
+            if (!['name', 'createdAt', 'updatedAt'].includes(sortBy)) {
+                throw new MissingRequiredDataException("Invalid sortBy value. Must be 'name' or 'createdAt'.");
+            }
+
             const sortOrder = req.query.sortOrder || 'asc';
 
+            if (!['asc', 'desc'].includes(sortOrder)) {
+                throw new MissingRequiredDataException("Invalid sortOrder value. Must be 'asc' or 'desc'.");
+            }
+
             const { projects, total } = await ProjectService.getProjectsByUserId(userId, page, limit, sortBy, sortOrder);
+
             res.status(200).json({ projects, total, page, limit });
+
         } catch (error) {
             if (error instanceof NotFoundException) {
                 res.status(404).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else {
-                res.status(500).json({ message: (error as Error).message });
+                res.status(500).json({ message: "Internal Server Error, try again later" });
             }
         }
     }

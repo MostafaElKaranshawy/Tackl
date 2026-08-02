@@ -9,7 +9,7 @@ import ConfirmationModal from "../../ConfirmationModal";
 import { deleteProject } from "../../../services/projectService";
 import { useCurrentProjectContext } from "../../../contexts/CurrentProjectContext";
 
-export default function ProjectShow({ project, deleteRefresh }: { project: Project, deleteRefresh?: () => void }) {
+export default function ProjectShow({ project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const { setProjectId } = useCurrentProjectContext();
@@ -59,7 +59,7 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
 
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                         <p className="leading-7 text-gray-700">
-                            {project.description || (
+                            {project.description ? project.description : (
                                 <span className="italic text-gray-400">
                                     No description provided.
                                 </span>
@@ -131,8 +131,13 @@ export default function ProjectShow({ project, deleteRefresh }: { project: Proje
                     <ManageProjectCard
                         mode="edit"
                         project={project}
-                        onSuccess={() => {
+                        onSuccess={(project: Project | undefined) => {
                             setShowEditModal(false);
+                            setProjectId(project?.id || null);
+                            
+                            if (project && onUpdated) {
+                                onUpdated(project);
+                            }
                         }}
                         onClose={() => setShowEditModal(false)}
                     />
