@@ -4,6 +4,7 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
+    ForeignKey,
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
@@ -18,7 +19,8 @@ export default class TaskHistory extends Model<
 > {
     declare id: CreationOptional<string>;
     declare actionType: "created" | "updated" | "deleted";
-
+    declare taskId: ForeignKey<string>;
+    declare userId: ForeignKey<string>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
@@ -54,7 +56,14 @@ TaskHistory.init(
             type: DataTypes.ENUM("created", "updated", "deleted"),
             allowNull: false,
         },
-
+        taskId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+        },
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+        },
     },
     {
         sequelize,

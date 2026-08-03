@@ -5,6 +5,7 @@ import nameValidator from "../middlewares/nameValidator.js";
 
 import router from "express";
 import checkUser from "../middlewares/checkUser.js";
+import checkToken from "../middlewares/checkToken.js";
 
 
 const authRouter = router.Router();
@@ -104,6 +105,8 @@ authRouter.post("/login",
  *     summary: Confirm a user's email address using a token
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       "200":
  *         description: Email confirmed successfully.
@@ -114,7 +117,7 @@ authRouter.post("/login",
  */
 authRouter.get(
     "/confirmEmail",
-    checkUser,
+    checkToken,
     AuthController.confirmEmail
 );
 
@@ -157,6 +160,8 @@ authRouter.get(
  *     summary: Reset a user's password using a token
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -181,6 +186,7 @@ authRouter.get(
  */
 authRouter.put(
     "/resetPasswordFromLink",
+    checkToken,
     passwordValidator,
     AuthController.resetPassword
 );

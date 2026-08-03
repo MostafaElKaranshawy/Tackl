@@ -9,10 +9,12 @@ import ResetPasswordPage from './pages/resetPasswordPage/ResetPasswordPage'
 import EmailConfirmationPage from './pages/emailConfirmationPage/EmailConfirmationPage'
 import GetEmailConfirmationLinkPage from './pages/emailConfirmationPage/GetEmailConfirmationLinkPage'
 import HomePage from './pages/HomePage/HomePage'
+import { RefreshProvider } from './contexts/RefreshContext'
 
 function App() {
   return (
-    <div className="app container mx-auto p-4 bg-white min-h-screen flex flex-col items-center justify-center">
+    <div className="app container mx-auto bg-white min-h-screen flex flex-col items-center justify-center">
+      <RefreshProvider>
       <Router>
         <Routes>
           <Route path="/" element={<SignUpPage />} />
@@ -33,6 +35,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
+      </RefreshProvider>
     </div>
   )
 }

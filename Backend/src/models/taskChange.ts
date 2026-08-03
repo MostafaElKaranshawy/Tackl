@@ -4,6 +4,7 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
+    ForeignKey,
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
@@ -20,7 +21,7 @@ export default class TaskChange extends Model<
     declare fieldName: string;
     declare oldValue: CreationOptional<string | null>;
     declare newValue: CreationOptional<string | null>;
-
+    declare taskHistoryId: ForeignKey<string>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
@@ -52,7 +53,10 @@ TaskChange.init(
             type: DataTypes.TEXT,
             allowNull: true,
         },
-
+        taskHistoryId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+        }
     },
     {
         sequelize,

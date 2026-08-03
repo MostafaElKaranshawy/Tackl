@@ -4,6 +4,7 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
+    ForeignKey,
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
@@ -20,6 +21,7 @@ export default class TimeEntry extends Model<
     declare duration: number;
     declare date: Date;
     declare note: CreationOptional<string | null>;
+    declare taskId: ForeignKey<string>;
 
     declare readonly createdAt: CreationOptional<Date>;
     declare readonly updatedAt: CreationOptional<Date>;
@@ -51,6 +53,10 @@ TimeEntry.init(
         note: {
             type: DataTypes.TEXT,
             allowNull: true,
+        },
+        taskId: {
+            type: DataTypes.UUID,
+            allowNull: false,
         },
     },
     {
