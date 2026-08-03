@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import ManageProjectCard from "../ManageProjectCard";
 import ConfirmationModal from "../../ConfirmationModal";
 import { deleteProject } from "../../../services/projectService";
-import { useCurrentProjectContext } from "../../../contexts/CurrentProjectContext";
 import ManageTaskCard from "../../tasksComponents/ManageTaskCard";
 import type Task from "../../../types/task";
 import { getAllProjectTasks, getProjectTasks } from "../../../services/taskService";
@@ -17,9 +16,11 @@ import { TASKS_PAGE_SIZE } from "../../../constants";
 import { CiBoxList } from "react-icons/ci";
 import { MdViewKanban } from "react-icons/md";
 import TaskBoard from "../../tasksComponents/taskBoard/TaskBoard";
+import { useNavigate } from "react-router-dom";
 
 export default function ProjectShow(
     { project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
+    const navigate = useNavigate();
     const PAGE_SIZE = TASKS_PAGE_SIZE;
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -31,7 +32,6 @@ export default function ProjectShow(
     const [totalTasks, setTotalTasks] = useState(0);
     const [showSortOptions, setShowSortOptions] = useState(false);
     const attributesList = ["title", "dueDate", "priority", "createdAt", "updatedAt"];
-    const { setProjectId } = useCurrentProjectContext();
     const sortRef = useRef<HTMLDivElement>(null);
     const [currentSection, setCurrentSection] = useState<"list" | "board">("list");
 
@@ -72,8 +72,8 @@ export default function ProjectShow(
     const handleDeleteProject = async (id: string) => {
         try {
             await deleteProject(id);
-            setProjectId(null);
             deleteRefresh && deleteRefresh();
+            navigate("/");
         } catch (error) {
             alert("Failed to delete project. Please try again later.");
         }
@@ -294,7 +294,8 @@ export default function ProjectShow(
                         project={project}
                         onSuccess={(project: Project | undefined) => {
                             setShowEditModal(false);
-                            setProjectId(project?.id || null);
+                            // setProjectId(project?.id || null);
+                            navigate(`/home/${project?.id}`);
 
                             if (project && onUpdated) {
                                 onUpdated(project);

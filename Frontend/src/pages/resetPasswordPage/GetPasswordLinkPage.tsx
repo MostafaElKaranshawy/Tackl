@@ -3,8 +3,10 @@ import { getResetPasswordLink } from "../../services/authService";
 import FormComponent from "../../components/FormComponent";
 import FloatingInput from "../../components/FloatingInput";
 import { notify } from "../../utils/notify";
+import { useNavigate } from "react-router-dom";
 
 export default function GetPasswordLinkPage() {
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
 
@@ -13,7 +15,7 @@ export default function GetPasswordLinkPage() {
         try {
             await getResetPasswordLink(email);
             notify.success("Password reset link sent! Please check your email.");
-            window.location.href = '/login';
+            navigate("/login");
         } catch (error) {
             notify.error("Failed to send password reset link. Please try again.");
         }

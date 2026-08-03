@@ -1,19 +1,21 @@
-import { useCurrentProjectContext } from "../../../contexts/CurrentProjectContext";
 import { useEffect, useState } from "react";
 import { getProjectById } from "../../../services/projectService";
 import type Project from "../../../types/project";
 import ProjectShow from "./ProjectShow";
 import { notify } from "../../../utils/notify";
 import { useRefreshContext } from "../../../contexts/RefreshContext";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function ProjectBoard() {
-    const { projectId, setProjectId } = useCurrentProjectContext();
+    const navigate = useNavigate();
+    const { projectId } = useParams<{ projectId: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const { setKey } = useRefreshContext();
 
     useEffect(() => {
         if (!projectId) {
-            setProject(null);
+            navigate("/");
             return;
         }
 
@@ -28,8 +30,7 @@ export default function ProjectBoard() {
                 }
             } catch (error) {
                 if (!ignore) {
-                    setProjectId(null);
-                    setProject(null);
+                    navigate("/");
                     notify.error(
                         "Project not found or has been deleted. Please select another project."
                     );
@@ -44,9 +45,13 @@ export default function ProjectBoard() {
         };
     }, [projectId]);
 
+    const handleProjectDelete = () => {
+        navigate("/");
+        setKey(prev => prev === null ? 1 : (prev + 1) % 2);
+    }
     const handleProjectUpdate = (updatedProject: Project) => {
         setProject(updatedProject);
-        setKey(prev => prev === null ? 1 : (prev+1)%2);
+        setKey(prev => prev === null ? 1 : (prev + 1) % 2);
     };
     if (!project) {
         return (
@@ -57,6 +62,6 @@ export default function ProjectBoard() {
     }
 
     return (
-        <ProjectShow project={project} deleteRefresh={() => setProject(null)} onUpdated={handleProjectUpdate} />
+        <ProjectShow project={project} deleteRefresh={handleProjectDelete} onUpdated={handleProjectUpdate} />
     );
 }

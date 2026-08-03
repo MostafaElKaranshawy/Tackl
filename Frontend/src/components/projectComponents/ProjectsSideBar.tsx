@@ -9,7 +9,6 @@ import { notify } from "../../utils/notify";
 import type Project from "../../types/project";
 import SortByComponent from "./SortByComponent";
 import CreateProjectCard from "./ManageProjectCard";
-import { useCurrentProjectContext } from "../../contexts/CurrentProjectContext";
 import { IoReload } from "react-icons/io5";
 import { useRefreshContext } from "../../contexts/RefreshContext";
 import { PROJECTS_PAGE_SIZE } from "../../constants";
@@ -17,17 +16,23 @@ import { PROJECTS_PAGE_SIZE } from "../../constants";
 export default function ProjectsSideBar() {
     const PAGE_SIZE = PROJECTS_PAGE_SIZE;
     const sortMenuRef = useRef<HTMLDivElement>(null);
-    const { projectId } = useCurrentProjectContext();
+    const curSortBy = window.localStorage.getItem("sortedBy") || "createdAt";
+    const curSortOrder = window.localStorage.getItem("sortOrder") || "asc";
+    const projectId = window.location.pathname.split("/")[2] || null;
     const { key } = useRefreshContext();
     const [projects, setProjects] = useState<Project[]>([]);
-    const [sortOrder, setSortOrder] = useState("asc");
-    const [sortBy, setSortBy] = useState("createdAt");
+    const [sortOrder, setSortOrder] = useState(curSortOrder);
+    const [sortBy, setSortBy] = useState(curSortBy);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalProjects, setTotalProjects] = useState(0);
     const [showSortOptions, setShowSortOptions] = useState(false);
     const attributesList = ["name", "createdAt", "updatedAt"];
     const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
-
+    
+    useEffect(() => {
+        setSortBy(curSortBy);
+        setSortOrder(curSortOrder);
+    },[])
     useEffect(() => {
         fetchProjects();
     }, [sortOrder, sortBy, currentPage, key]);

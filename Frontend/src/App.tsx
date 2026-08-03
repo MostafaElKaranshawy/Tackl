@@ -15,26 +15,26 @@ function App() {
   return (
     <div className="app container mx-auto bg-white min-h-screen flex flex-col items-center justify-center">
       <RefreshProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<SignUpPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/reset-password" element={<GetPasswordLinkPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          <Route path="/confirm-email" element={<GetEmailConfirmationLinkPage />} />
-          <Route path="/confirm-email/:token" element={<EmailConfirmationPage />} />
-          <Route path="/home" element={<HomePage />} />
-        </Routes>
-      </Router>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        theme="light"
-      />
+        <Router>
+          <Routes>
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/reset-password" element={<GetPasswordLinkPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/confirm-email" element={<GetEmailConfirmationLinkPage />} />
+            <Route path="/confirm-email/:token" element={<EmailConfirmationPage />} />
+            <Route path="/:section?/:projectId?" element={<HomePage />} />
+          </Routes>
+        </Router>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnHover
+          theme="light"
+        />
       </RefreshProvider>
     </div>
   )

@@ -7,8 +7,10 @@ import { validateEmail } from '../../utils/validators';
 import { notify } from '../../utils/notify';
 import axios from 'axios';
 import { checkAuthentication } from '../../services/authService';
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
     const [password, setPassword] = useState('');
@@ -19,7 +21,7 @@ export default function LoginPage() {
             try {
                 const authenticated = await checkAuthentication();
                 if (authenticated) {
-                    window.location.href = '/home';
+                    navigate("/home");
                 }
             } finally {
             }
@@ -38,7 +40,7 @@ export default function LoginPage() {
         try {
             await login(email, password).then(() => {
                 resetForm();
-                window.location.href = '/home';
+                navigate("/home");
             });
         } catch (error) {
             // resetForm();
