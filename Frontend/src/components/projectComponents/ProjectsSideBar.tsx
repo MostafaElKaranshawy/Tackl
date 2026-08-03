@@ -12,28 +12,39 @@ import CreateProjectCard from "./ManageProjectCard";
 import { IoReload } from "react-icons/io5";
 import { useRefreshContext } from "../../contexts/RefreshContext";
 import { PROJECTS_PAGE_SIZE } from "../../constants";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function ProjectsSideBar() {
     const PAGE_SIZE = PROJECTS_PAGE_SIZE;
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const sortMenuRef = useRef<HTMLDivElement>(null);
-    const curSortBy = window.localStorage.getItem("sortedBy") || "createdAt";
-    const curSortOrder = window.localStorage.getItem("sortOrder") || "asc";
     const projectId = window.location.pathname.split("/")[2] || null;
     const { key } = useRefreshContext();
     const [projects, setProjects] = useState<Project[]>([]);
-    const [sortOrder, setSortOrder] = useState(curSortOrder);
-    const [sortBy, setSortBy] = useState(curSortBy);
+    const [sortOrder, setSortOrder] = useState("asc");
+    const [sortBy, setSortBy] = useState("createdAt");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalProjects, setTotalProjects] = useState(0);
     const [showSortOptions, setShowSortOptions] = useState(false);
     const attributesList = ["name", "createdAt", "updatedAt"];
     const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
-    
+
     useEffect(() => {
-        setSortBy(curSortBy);
-        setSortOrder(curSortOrder);
-    },[])
+        console.log(searchParams.toString());
+        const currentSortBy = searchParams.get("sortBy");
+        const currentSortOrder = searchParams.get("sortOrder");
+        if (currentSortBy && attributesList.includes(currentSortBy)) {
+            setSortBy(currentSortBy);
+        }
+        if (currentSortOrder && ["asc", "desc"].includes(currentSortOrder)) {
+            setSortOrder(currentSortOrder);
+        }
+    }, [])
     useEffect(() => {
+        navigate(
+            `/home/${projectId}?sortBy=${sortBy}&sortOrder=${sortOrder}`
+        );
         fetchProjects();
     }, [sortOrder, sortBy, currentPage, key]);
 
