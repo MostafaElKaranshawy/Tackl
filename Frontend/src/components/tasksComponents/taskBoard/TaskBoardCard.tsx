@@ -41,12 +41,23 @@ export default function TaskBoardCard({
             )}
 
             <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                <div className="flex items-center gap-1 text-sm text-gray-500">
+                <div className="left-side flex items-center gap-1">
+
                     <MdCalendarToday className="text-base" />
                     {task.dueDate
                         ? new Date(task.dueDate).toLocaleDateString()
                         : "No due date"}
                 </div>
+
+                {
+                    task.dueDate && new Date(task.dueDate) < new Date() && (
+                        <div className="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">
+                            <span>
+                                Overdue
+                            </span>
+                        </div>
+                    )
+                }
             </div>
         </div>
     );

@@ -1,8 +1,12 @@
+import { TaskPriority } from '../enums/taskPriority';
+import { TaskStatus } from '../enums/taskStatus';
 import ForbiddenException from '../exceptions/forbiddenException';
 import MissingRequiredDataException from '../exceptions/missingRequiredDataException';
 import NotFoundException from '../exceptions/notFoundException';
+import QueryParams from '../interfaces/QueryParams';
 import Task from '../models/task';
 import TaskService from '../services/taskService'
+import { checkQueryParams } from '../utils/checkQueryParams';
 
 export default class TaskController {
     
@@ -127,29 +131,37 @@ export default class TaskController {
         try {
             const userId = req.userId;
             const projectId = req.params.projectId;
-            const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 10;
+            const page = parseInt(req.query.page as string) || undefined;
+            const limit = parseInt(req.query.limit as string) || undefined;
             const sortBy = (req.query.sortBy as string) || 'createdAt';
             const sortOrder = (req.query.sortOrder as string) || 'asc';
 
-            if (page <= 0 || limit <= 0) {
-                throw new MissingRequiredDataException("Page and limit must be positive integers.");
-            }
+            // search and filter
+            const search = req.query.search as string | undefined;
+            const filterStatus = req.query.status as string | undefined;
+            const filterPriority = req.query.priority as string | undefined;
+            const filterOverDue = req.query.overdue === 'true' ? true : req.query.overdue === 'false' ? false : undefined;
 
-            if (["createdAt", "updatedAt", "title", "dueDate", "priority"].indexOf(sortBy) === -1) {
-                throw new MissingRequiredDataException("Invalid sortBy value. Must be one of: createdAt, updatedAt, title, dueDate, priority.");
-            }
-
-            if (["asc", "desc"].indexOf(sortOrder) === -1) {
-                throw new MissingRequiredDataException("Invalid sortOrder value. Must be 'asc' or 'desc'.");
-            }
             if (!projectId) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
+            const queryParams: QueryParams = {
+                page,
+                limit,
+                sortBy,
+                sortOrder,
+                search,
+                filterStatus,
+                filterPriority,
+                filterOverDue
+            };
 
-            const result = await TaskService.getProjectTasks(projectId, userId, page, limit, sortBy, sortOrder);
+            checkQueryParams(queryParams);
+
+            const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
+            console.error("Error in getProjectTasks:", error); // Debugging line
             if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else if (error instanceof NotFoundException) {

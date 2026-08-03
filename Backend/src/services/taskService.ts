@@ -4,6 +4,7 @@ import TaskRepository from "../repositories/taskRepository";
 import UserRepository from "../repositories/userRepository";
 import ProjectRepository from "../repositories/projectRepository";
 import NotFoundException from "../exceptions/notFoundException";
+import QueryParams from "../interfaces/QueryParams";
 
 export default class TaskService {
 
@@ -92,7 +93,7 @@ export default class TaskService {
         }
     }
 
-    static async getProjectTasks(projectId: string, userId: string, page: number, limit: number, sortBy: string, sortOrder: string): Promise<{ tasks: Task[], total: number }> {
+    static async getProjectTasks(projectId: string, userId: string, queryParams: QueryParams): Promise<{ tasks: Task[], total: number }> {
         try {
             const project = await ProjectRepository.getProjectById(projectId);
             if (!project) {
@@ -102,7 +103,7 @@ export default class TaskService {
                 throw new ForbiddenException("Access denied");
             }
 
-            const { tasks, total } = await TaskRepository.getProjectTasks(projectId, page, limit, sortBy, sortOrder);
+            const { tasks, total } = await TaskRepository.getProjectTasks(projectId, queryParams);
             return { tasks, total };
         } catch (error) {
             throw error;

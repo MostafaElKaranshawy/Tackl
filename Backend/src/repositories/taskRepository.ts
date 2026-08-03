@@ -1,5 +1,8 @@
+import { FindOptions } from "sequelize";
+import { Op } from "../config/database";
 import DBException from "../exceptions/dbException";
 import NotFoundException from "../exceptions/notFoundException";
+import QueryParams from "../interfaces/QueryParams";
 import Task from "../models/task";
 
 export default class TaskRepository {
@@ -12,7 +15,7 @@ export default class TaskRepository {
             return task;
         } catch (error) {
             throw new DBException("Failed to create task: " + (error as Error).message);
-        }   
+        }
     }
 
     static async getTaskById(taskId: string): Promise<Task | null> {
@@ -23,7 +26,7 @@ export default class TaskRepository {
             throw new DBException("Failed to retrieve task: " + (error as Error).message);
         }
     }
-    
+
     static async updateTask(taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
         try {
             const task = await Task.findByPk(taskId);
@@ -49,16 +52,54 @@ export default class TaskRepository {
         }
     }
 
-    static async getProjectTasks(projectId: string, page: number, limit: number, sortBy: string, sortOrder: string): Promise<{ tasks: Task[], total: number }> {
+    static async getProjectTasks(projectId: string, queryParams: QueryParams): Promise<{ tasks: Task[], total: number }> {
         try {
-            const tasks = await Task.findAll({
-                where: {
-                    projectId: projectId
-                },
-                offset: (page - 1) * limit,
-                limit: limit,
-                order: [[sortBy, sortOrder]]
-            });
+            const page = queryParams.page;
+            const limit = queryParams.limit;
+            const sortBy = queryParams.sortBy || 'createdAt';
+            const sortOrder = queryParams.sortOrder || 'ASC';
+
+            const where = {
+                projectId,
+                ...(queryParams.search && {
+                    [Op.or]: [
+                        {
+                            title: {
+                                [Op.iLike]: `%${queryParams.search}%`,
+                            },
+                        },
+                        {
+                            description: {
+                                [Op.iLike]: `%${queryParams.search}%`,
+                            },
+                        },
+                    ],
+                }),
+                ...(queryParams.filterStatus && {
+                    status: queryParams.filterStatus,
+                }),
+                ...(queryParams.filterPriority && {
+                    priority: queryParams.filterPriority,
+                }),
+                ...(queryParams.filterOverDue && {
+                    dueDate:
+                        queryParams.filterOverDue
+                            ? { [Op.lt]: new Date() }
+                            : { [Op.gte]: new Date() },
+                }),
+            };
+
+            const findOptions: FindOptions = {
+                where,
+                order: [[sortBy, sortOrder]],
+            };
+
+            if (page !== undefined && limit !== undefined) {
+                findOptions.offset = (page - 1) * limit;
+                findOptions.limit = limit;
+            }
+            const tasks = await Task.findAll(findOptions);
+
             const total = await Task.count({ where: { projectId } });
             return { tasks, total };
         } catch (error) {

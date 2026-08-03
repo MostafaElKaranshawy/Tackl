@@ -1,7 +1,7 @@
 import type Project from "../../../types/project";
 import { GoProjectRoadmap } from "react-icons/go";
 import { MdAccessTime, MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight, MdOutlineSort, MdUpdate } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaFilter } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 import ManageProjectCard from "../ManageProjectCard";
@@ -9,7 +9,7 @@ import ConfirmationModal from "../../ConfirmationModal";
 import { deleteProject } from "../../../services/projectService";
 import ManageTaskCard from "../../tasksComponents/ManageTaskCard";
 import type Task from "../../../types/task";
-import { getAllProjectTasks, getProjectTasks } from "../../../services/taskService";
+import { getProjectTasks } from "../../../services/taskService";
 import TasksList from "../../tasksComponents/TasksList";
 import SortByComponent from "../SortByComponent";
 import { TASKS_PAGE_SIZE } from "../../../constants";
@@ -17,6 +17,8 @@ import { CiBoxList } from "react-icons/ci";
 import { MdViewKanban } from "react-icons/md";
 import TaskBoard from "../../tasksComponents/taskBoard/TaskBoard";
 import { useNavigate } from "react-router-dom";
+import { IoSearchSharp } from "react-icons/io5";
+import ProjectsFilterMenu from "../ProjectsFilterMenu";
 
 export default function ProjectShow(
     { project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
@@ -33,12 +35,23 @@ export default function ProjectShow(
     const [showSortOptions, setShowSortOptions] = useState(false);
     const attributesList = ["title", "dueDate", "priority", "createdAt", "updatedAt"];
     const sortRef = useRef<HTMLDivElement>(null);
+    const filterRef = useRef<HTMLDivElement>(null);
     const [currentSection, setCurrentSection] = useState<"list" | "board">("list");
+    const [showFilterMenu, setShowFilterMenu] = useState(false);
+    const [filter, setFilter] = useState<{ status: string; priority: string; overdue: string }>({
+        status: "",
+        priority: "",
+        overdue: ""
+    });
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
                 setShowSortOptions(false);
+            }
+            if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+                setShowFilterMenu(false);
             }
         };
 
@@ -49,21 +62,22 @@ export default function ProjectShow(
     }, []);
 
     useEffect(() => {
-        if (currentSection !== "list") return
-
         fetchTasks();
-    }, [currentPage, sortBy, sortOrder, project.id]);
+    }, [currentPage, sortBy, sortOrder, filter, project.id, search]);
 
     const fetchTasks = async () => {
         try {
-            if (currentSection === "list") {
-                const response = await getProjectTasks(project.id, { page: currentPage, pageSize: PAGE_SIZE, sortBy, sortOrder });
-                setTaskList(response.tasks);
-                setTotalTasks(response.total);
-            } else {
-                const response = await getAllProjectTasks(project.id);
-                setTaskList(response);
-            }
+            const response = await getProjectTasks(project.id,
+                {
+                    page: currentSection === "list" ? currentPage : undefined,
+                    pageSize: currentSection === "list" ? PAGE_SIZE : undefined,
+                    sortBy,
+                    sortOrder,
+                    search,
+                    ...filter
+                });
+            setTaskList(response.tasks);
+            setTotalTasks(response.total);
         } catch (error) {
             console.error("Failed to fetch tasks:", error);
         }
@@ -110,7 +124,7 @@ export default function ProjectShow(
                 </div>
             </div>
 
-            <div className="space-y-8 mb-2">
+            <div className="space-y-8 mb-4">
                 <div>
                     <h2 className="mb-2 text-lg font-semibold uppercase tracking-wide text-gray-500">
                         Description
@@ -155,9 +169,8 @@ export default function ProjectShow(
                     </div>
                 </div>
             </div>
-
-            <div>
-                <div className="mb-3 flex items-center justify-between">
+            <div className="pt-4 border-t border-gray-200">
+                <div className="mb-3 flex items-center justify-between gap-3">
                     <h2 className="text-lg font-semibold uppercase tracking-wide text-gray-500">
                         Tasks
                     </h2>
@@ -185,6 +198,37 @@ export default function ProjectShow(
                             <MdViewKanban className="text-lg" />
                             Board
                         </button>
+                    </div>
+                    <div className="search-bar flex-1 max-w-[400px] relative">
+                        <IoSearchSharp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="p-2 min-w-full rounded bg-white text-lg text-gray-700 pl-10 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow shadow-blue-300"
+                            onChange={(e) => {
+                                const searchTerm = e.target.value.toLowerCase();
+                                setSearch(searchTerm);
+                            }}
+                        />
+                        <FaFilter
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg cursor-pointer hover:text-blue-500 transition ease duration-150"
+                            onClick={() => {
+                                setShowFilterMenu((prev) => !prev);
+                            }}
+                        />
+                        <div ref={filterRef} className="absolute right-0 top-full z-10 mt-2">
+                            {
+                                showFilterMenu && (
+                                    <ProjectsFilterMenu
+                                        filter={filter}
+                                        setFilter={setFilter}
+                                        onConfirm={() => {
+                                            setShowFilterMenu(false);
+                                        }}
+                                    />
+                                )
+                            }
+                        </div>
                     </div>
                     <button
                         className="rounded-md bg-blue-500 px-3 py-1 text-sm font-medium text-white cursor-pointer hover:bg-blue-600 transition ease duration-150"
@@ -284,7 +328,7 @@ export default function ProjectShow(
                             }
                         </div>
                     ) : (
-                        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8">
+                        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4">
                             <TaskBoard projectId={project.id} tasks={taskList} fetchTasks={fetchTasks} />
                         </div>
                     )

@@ -121,8 +121,46 @@ export default function TaskPage() {
                                 Details
                             </h2>
 
-                            <div className="divide-y">
+                            <div className="divide-y divide-gray-200">
 
+                                <div className="flex justify-between py-3">
+                                    <span className="text-gray-500">Status</span>
+                                    <span className={"font-medium text-right" + (task.status === "todo"
+                                        ? " text-gray-700"
+                                        : task.status === "in_progress"
+                                            ? " text-yellow-700"
+                                            : " text-green-700")}>
+                                        {task.status === "todo"
+                                            ? "To Do"
+                                            : task.status === "in_progress"
+                                                ? "In Progress"
+                                                : "Done"}
+                                    </span>
+                                </div>
+
+                                <div className="flex justify-between py-3">
+                                    <span className="text-gray-500">Priority</span>
+                                    <span className={"font-medium text-right" + (task.priority === "high"
+                                        ? " text-red-700"
+                                        : task.priority === "medium"
+                                            ? " text-yellow-700"
+                                            : " text-green-700")}>
+                                        {task.priority}
+                                    </span>
+                                </div>
+
+                                <div className="flex justify-between py-3 group relative">
+                                    <span
+                                        className="text-gray-500">
+                                        Overdue Date
+                                    </span>
+                                    <span className={"font-medium text-right" + (task.dueDate && new Date(task.dueDate) < new Date() ? " text-red-700" : " text-gray-700")}>
+                                        {task.dueDate && new Date(task.dueDate) < new Date() ? new Date(task.dueDate).toLocaleDateString() : "N/A"}
+                                    </span>
+                                    <div className="absolute top-0 left-1/2 mb-2 -translate-x-1/2 rounded bg-red-500 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                        Overdue
+                                    </div>
+                                </div>
                                 <div className="flex justify-between py-3">
                                     <span className="text-gray-500">Created</span>
                                     <span className="font-medium text-right">

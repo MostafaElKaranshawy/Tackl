@@ -45,20 +45,32 @@ export default function TaskListCard(
                     </span>
                 </div>
 
-                <div>
-                    <p className="text-gray-500">Due Date</p>
-                    <p className="mt-1 font-medium text-gray-800">
-                        {task.dueDate
-                            ? new Date(task.dueDate).toLocaleDateString()
-                            : "N/A"}
-                    </p>
+                <div className="flex items-center justify-between gap-2">
+                    <div>
+                        <p className="text-gray-500">Due Date</p>
+                        <p className="mt-1 font-medium text-gray-800">
+                            {task.dueDate
+                                ? new Date(task.dueDate).toLocaleDateString()
+                                : "N/A"}
+
+                        </p>
+                    </div>
+                    {
+                        task.dueDate && new Date(task.dueDate) < new Date() && (
+                            <div className="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">
+                                <span>
+                                    Overdue
+                                </span>
+                            </div>
+                        )
+                    }
                 </div>
 
                 <div className="col-span-2">
                     <p className="text-gray-500">Estimated Time</p>
                     <p className="mt-1 font-medium text-gray-800">
                         {task.estimatedTime
-                            ? `${task.estimatedTime} hour${task.estimatedTime !== 1 ? "s" : ""
+                            ? `${task.estimatedTime} min${task.estimatedTime !== 1 ? "s" : ""
                             }`
                             : "N/A"}
                     </p>

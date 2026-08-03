@@ -6,16 +6,23 @@ const API_URL = import.meta.env.VITE_API_URL + "/api/projects";
 
 const getProjectTasks = async (
     projectId: string,
-    options: { page: number; pageSize: number; sortBy: string; sortOrder: string })
+    options: { page?: number; pageSize?: number; sortBy: string; sortOrder: string, search: string, [key: string]: any })
     : Promise<{ total: number; tasks: Task[] }> => {
     try {
+        const params = {
+            page: options.page,
+            limit: options.pageSize,
+            sortBy: options.sortBy,
+            sortOrder: options.sortOrder,
+            search: options.search,
+            status: options.status,
+            priority: options.priority,
+            overdue: options.overdue
+        }
         const response = await axios.get(`${API_URL}/${projectId}/tasks`, {
             withCredentials: true,
             params: {
-                page: options.page,
-                limit: options.pageSize,
-                sortBy: options.sortBy,
-                sortOrder: options.sortOrder
+                ...params
             }
         });
         return response.data;
@@ -27,7 +34,7 @@ const getProjectTasks = async (
 const getAllProjectTasks = async (
     projectId: string,
     options?: { sortBy: string; sortOrder: string })
-    : Promise<Task[] > => {
+    : Promise<Task[]> => {
     try {
         const response = await axios.get(`${API_URL}/${projectId}/tasks/all`, {
             withCredentials: true,

@@ -188,7 +188,9 @@ export default function TaskShow() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <div
+                            className={"group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4" + (task.dueDate && new Date(task.dueDate) < new Date() ? " border-red-200 bg-red-100" : "")}
+                        >
                             <MdCalendarToday className="text-2xl text-blue-600" />
 
                             <div>
@@ -202,6 +204,9 @@ export default function TaskShow() {
                                         : "N/A"}
                                 </p>
                             </div>
+                            <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                Task overdue
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -214,7 +219,7 @@ export default function TaskShow() {
 
                                 <p className="font-medium text-gray-800">
                                     {task.estimatedTime
-                                        ? `${task.estimatedTime} hour${task.estimatedTime !== 1 ? "s" : ""
+                                        ? `${task.estimatedTime} min${task.estimatedTime !== 1 ? "s" : ""
                                         }`
                                         : "N/A"}
                                 </p>
