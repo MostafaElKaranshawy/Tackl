@@ -8,11 +8,11 @@ import { deleteTask } from "../../services/taskService";
 import { notify } from "../../utils/notify";
 
 export default function TaskCard(
-    { task, refresh }
-    : { task: Task; refresh: () => void }){
+    { task, refresh, onClick }
+        : { task: Task; refresh: () => void; onClick: () => void }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-    
+
     const handleDeleteTask = async () => {
         try {
             await deleteTask(task.id, task.projectId);
@@ -24,7 +24,9 @@ export default function TaskCard(
     }
 
     return (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md cursor-pointer"
+            onClick={onClick}
+        >
             <div className="mb-3 flex items-start justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">
                     {task.title}

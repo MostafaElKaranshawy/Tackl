@@ -1,10 +1,10 @@
-import { useCurrentProjectContext } from "../../contexts/CurrentProjectContext";
+import { useNavigate } from "react-router-dom";
 
 export default function ProjectCard({ project }: { project: { id: string; name: string; description: string | null } }) {
-    const { setProjectId } = useCurrentProjectContext();
+    const navigate = useNavigate();
 
     const handleProjectClick = () => {
-        setProjectId(project.id);
+        navigate(`/projects/${project.id}`);
     };
 
     return (

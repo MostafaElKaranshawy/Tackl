@@ -6,8 +6,10 @@ import FloatingInput from "../../components/FloatingInput";
 import { notify } from "../../utils/notify";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { validatePasswordRules, validatePassword } from "../../utils/validators";
+import { useNavigate } from "react-router-dom";
 
 export default function ResetPasswordPage() {
+    const navigate = useNavigate();
     const { token } = useParams<{ token: string }>();
 
     const [password, setPassword] = useState("");
@@ -36,7 +38,7 @@ export default function ResetPasswordPage() {
             setConfirmPassword("");
             notify.success("Password reset successful! You can now log in with your new password.");
             setTimeout(() => {
-                window.location.href = "/login";
+                navigate("/login");
             }, 3000);
         } catch (error) {
             notify.error("Failed to reset password. Please try again.");

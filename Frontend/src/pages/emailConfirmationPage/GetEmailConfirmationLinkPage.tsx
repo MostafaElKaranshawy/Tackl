@@ -3,8 +3,10 @@ import { getEmailConfirmationLink } from "../../services/authService";
 import FormComponent from "../../components/FormComponent";
 import FloatingInput from "../../components/FloatingInput";
 import {notify} from "../../utils/notify";
+import { useNavigate } from "react-router-dom";
 
 export default function GetEmailConfirmationLinkPage() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -13,7 +15,7 @@ export default function GetEmailConfirmationLinkPage() {
             await getEmailConfirmationLink(email);
             notify.success("Confirmation link has been sent if the email exists. Please check your inbox.");
             setTimeout(() => {
-                window.location.href = "/login";
+                navigate("/login");
             }, 3000);
         } catch (error) {
             notify.error("Error sending confirmation link. Please try again.");

@@ -6,8 +6,11 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import FloatingInput from '../../components/FloatingInput';
 import FormComponent from '../../components/FormComponent';
 import { validatePassword, validateName, validateEmail, validatePasswordRules } from '../../utils/validators';
+import { useNavigate } from "react-router-dom";
+
 
 export default function SignUpPage() {
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -21,7 +24,7 @@ export default function SignUpPage() {
             try {
                 const authenticated = await checkAuthentication();
                 if (authenticated) {
-                    window.location.href = '/home';
+                    navigate("/projects");
                 }
             } finally {
             }
@@ -29,7 +32,7 @@ export default function SignUpPage() {
 
         verifyAuthentication();
     }, []);
-    
+
     const resetForm = () => {
         setName('');
         setEmail('');
@@ -72,7 +75,7 @@ export default function SignUpPage() {
             subtitle="Create your account"
             submitText="Sign Up"
             validateForm={() => {
-                if(!validateForm()) {
+                if (!validateForm()) {
                     return false;
                 }
                 return true;
@@ -114,7 +117,7 @@ export default function SignUpPage() {
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
-                    { passwordError && <p className="text-xs text-red-500">{passwordError}</p> }
+                    {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
                     <div className="constraints mt-2 bg-yellow-100 p-2 rounded-md font-mono">
                         {validatePasswordRules.map((rule, index) => (
                             <p key={index} className={`text-xs ${rule.validate(password) ? "text-green-500" : "text-red-500"}`}>
