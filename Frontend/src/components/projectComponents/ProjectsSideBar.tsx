@@ -42,7 +42,7 @@ export default function ProjectsSideBar() {
     }, [])
     useEffect(() => {
         navigate(
-            `/projects/${projectId}?sortBy=${sortBy}&sortOrder=${sortOrder}`
+            `/projects${projectId ? `/${projectId}` : ''}?sortBy=${sortBy}&sortOrder=${sortOrder}`
         );
         fetchProjects();
     }, [sortOrder, sortBy, currentPage, key]);

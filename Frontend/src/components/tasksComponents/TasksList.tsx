@@ -1,5 +1,5 @@
 import type Task from "../../types/task";
-import TaskCard from "./TaskListCard";
+import TaskListCard from "./TaskListCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext";
 import { useEffect } from "react";
@@ -20,7 +20,7 @@ export default function TasksList({ tasks, refresh }: { tasks: Task[], refresh: 
     return (
         <div className="overflow-y-auto max-h-[300px] space-y-4">
             {tasks.map((task) => (
-                <TaskCard key={task.id} task={task} refresh={refresh} onClick={() => {
+                <TaskListCard key={task.id} task={task} onClick={() => {
                     handleTaskClick(task.id);
                 }}
                 />

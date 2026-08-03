@@ -1,6 +1,6 @@
 import type Task from "../../types/task";
 import { getTaskById } from "../../services/taskService";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdAccessTime, MdCalendarToday, MdDeleteForever, MdFlag, MdUpdate, MdOpenInNew } from "react-icons/md";
 import ManageTaskCard from "./ManageTaskCard";
@@ -22,6 +22,11 @@ export default function TaskShow() {
 
     const { setKey } = useTaskRefreshContext();
 
+    const closeTaskWindow = useCallback(() => {
+        setTask(null);
+        navigate(`/projects${projectId ? `/${projectId}` : ''}`, { replace: true });
+    }, [navigate, projectId]);
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
@@ -33,10 +38,11 @@ export default function TaskShow() {
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [selectedTaskRef]);
+    }, [closeTaskWindow]);
 
     useEffect(() => {
         if (!taskId || !projectId) {
@@ -44,13 +50,9 @@ export default function TaskShow() {
             return;
         }
         fetchTask();
-    }, [taskId]);
+    }, [taskId, projectId]);
 
-    const closeTaskWindow = () => {
-        taskId = "";
-        setTask(null);
-        navigate(`/projects/${projectId}`, { replace: true });
-    }
+
     const fetchTask = async () => {
         if (!taskId || !projectId || projectId === "undefined") {
             console.error("Task ID or Project ID is missing.");
