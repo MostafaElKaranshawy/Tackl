@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import ProjectBoard from "../../components/projectComponents/projectBoard/ProjectBoard";
 import ProjectsSideBar from "../../components/projectComponents/ProjectsSideBar";
-import TaskShow from "../../components/tasksComponents/TaskShow";
+import TaskShow from "../../components/tasksComponents/TaskShowModal";
 import { TaskRefreshProvider } from "../../contexts/TaskRefreshContext";
 
 export default function HomePage() {
