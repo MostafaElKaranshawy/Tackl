@@ -49,7 +49,7 @@ export default function TaskShow() {
     const closeTaskWindow = () => {
         taskId = "";
         setTask(null);
-        navigate(location.pathname, { state: { backgroundLocation: null } });
+        navigate(`/projects/${projectId}`, { replace: true });
     }
     const fetchTask = async () => {
         if (!taskId || !projectId || projectId === "undefined") {
@@ -60,7 +60,7 @@ export default function TaskShow() {
             const task = await getTaskById(taskId, projectId);
             setTask(task);
         } catch (error) {
-            navigate(location.pathname, { state: { backgroundLocation: null } });
+            closeTaskWindow();
             console.error("Failed to fetch task:", error);
         }
     };
@@ -142,7 +142,7 @@ export default function TaskShow() {
                                 title="Open Task in New Tab"
                                 className="rounded-full p-2 text-gray-500 transition hover:bg-green-100 hover:text-green-600 cursor-pointer"
                                 onClick={() => {
-                                    navigate(`/projects/${task.projectId}/tasks/${task.id}`);
+                                    navigate(`/projects/${task.projectId}/tasks/${task.id}`, { state: { backgroundLocation: `/projects/${task.projectId}` } });
                                 }}>
                                 <MdOpenInNew
                                     className="text-lg text-gray-500 transition hover:text-blue-600"

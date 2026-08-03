@@ -1,5 +1,5 @@
 import type Task from "../../types/task";
-import TaskCard from "./TaskCard";
+import TaskCard from "./TaskListCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext";
 import { useEffect } from "react";
@@ -11,7 +11,7 @@ export default function TasksList({ tasks, refresh }: { tasks: Task[], refresh: 
     const { key } = useTaskRefreshContext();
 
     const handleTaskClick = (taskId: string) => {
-        navigate(`${location.pathname}?taskId=${taskId}`, { state: { backgroundLocation: location } });
+        navigate(`${location.pathname}?taskId=${taskId}`);
     }
 
     useEffect(() => {
@@ -23,7 +23,7 @@ export default function TasksList({ tasks, refresh }: { tasks: Task[], refresh: 
                 <TaskCard key={task.id} task={task} refresh={refresh} onClick={() => {
                     handleTaskClick(task.id);
                 }}
-                 />
+                />
             ))}
         </div>
     );

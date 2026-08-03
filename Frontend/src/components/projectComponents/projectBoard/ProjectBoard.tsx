@@ -13,10 +13,17 @@ export default function ProjectBoard() {
     const [project, setProject] = useState<Project | null>(null);
     const { setKey } = useRefreshContext();
 
+    const returnToProjectsPage = () => {
+        setProject(null);
+        navigate({
+            pathname: "/projects",
+            search: location.search,
+        });
+    }
     useEffect(() => {
         if (!projectId || projectId === "undefined") {
             setProject(null);
-            navigate("/projects", { replace: true });
+            returnToProjectsPage();
             return;
         }
 
@@ -35,7 +42,7 @@ export default function ProjectBoard() {
                     notify.error(
                         "Project not found or has been deleted. Please select another project."
                     );
-                    navigate("/projects", { replace: true });
+                    returnToProjectsPage();
                 }
             }
         };
@@ -48,7 +55,7 @@ export default function ProjectBoard() {
     }, [projectId, navigate]);
 
     const handleProjectDelete = () => {
-        navigate("/projects");
+        returnToProjectsPage();
         setKey(prev => prev === null ? 1 : (prev + 1) % 2);
     }
     const handleProjectUpdate = (updatedProject: Project) => {
