@@ -9,13 +9,14 @@ import { useNavigate } from "react-router-dom";
 
 export default function ProjectBoard() {
     const navigate = useNavigate();
-    const { projectId } = useParams<{ projectId: string }>();
+    let { projectId } = useParams<{ projectId: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const { setKey } = useRefreshContext();
 
     useEffect(() => {
-        if (!projectId) {
-            navigate("/");
+        if (!projectId || projectId === "undefined") {
+            setProject(null);
+            navigate("/projects", { replace: true });
             return;
         }
 
@@ -28,12 +29,13 @@ export default function ProjectBoard() {
                 if (!ignore) {
                     setProject(projectDetails);
                 }
-            } catch (error) {
+            } catch {
                 if (!ignore) {
-                    navigate("/");
+                    setProject(null);
                     notify.error(
                         "Project not found or has been deleted. Please select another project."
                     );
+                    navigate("/projects", { replace: true });
                 }
             }
         };
@@ -43,10 +45,10 @@ export default function ProjectBoard() {
         return () => {
             ignore = true;
         };
-    }, [projectId]);
+    }, [projectId, navigate]);
 
     const handleProjectDelete = () => {
-        navigate("/");
+        navigate("/projects");
         setKey(prev => prev === null ? 1 : (prev + 1) % 2);
     }
     const handleProjectUpdate = (updatedProject: Project) => {

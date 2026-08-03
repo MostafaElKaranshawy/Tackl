@@ -21,7 +21,7 @@ export default function LoginPage() {
             try {
                 const authenticated = await checkAuthentication();
                 if (authenticated) {
-                    navigate("/home");
+                    navigate("/projects");
                 }
             } finally {
             }
@@ -40,7 +40,7 @@ export default function LoginPage() {
         try {
             await login(email, password).then(() => {
                 resetForm();
-                navigate("/home");
+                navigate("/projects");
             });
         } catch (error) {
             // resetForm();
@@ -65,7 +65,7 @@ export default function LoginPage() {
             subtitle="Sign in to your account"
             submitText="Login"
             validateForm={() => {
-                if(!validateEmail(email, setEmailError)) {
+                if (!validateEmail(email, setEmailError)) {
                     setEmailError("Please enter a valid email address.");
                     return false;
                 }
@@ -82,7 +82,7 @@ export default function LoginPage() {
                             setEmail(e.target.value);
                             setEmailError('');
                         }}
-                            />
+                    />
                     <span className="text-xs text-red-500">{emailError}</span>
                     <div className={inputGroupClassName}>
                         <FloatingInput

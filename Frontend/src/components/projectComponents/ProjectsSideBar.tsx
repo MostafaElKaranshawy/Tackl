@@ -12,14 +12,14 @@ import CreateProjectCard from "./ManageProjectCard";
 import { IoReload } from "react-icons/io5";
 import { useRefreshContext } from "../../contexts/RefreshContext";
 import { PROJECTS_PAGE_SIZE } from "../../constants";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 export default function ProjectsSideBar() {
     const PAGE_SIZE = PROJECTS_PAGE_SIZE;
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const sortMenuRef = useRef<HTMLDivElement>(null);
-    const projectId = window.location.pathname.split("/")[2] || null;
+    const { projectId } = useParams<{ projectId: string }>();
     const { key } = useRefreshContext();
     const [projects, setProjects] = useState<Project[]>([]);
     const [sortOrder, setSortOrder] = useState("asc");
@@ -31,7 +31,6 @@ export default function ProjectsSideBar() {
     const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
 
     useEffect(() => {
-        console.log(searchParams.toString());
         const currentSortBy = searchParams.get("sortBy");
         const currentSortOrder = searchParams.get("sortOrder");
         if (currentSortBy && attributesList.includes(currentSortBy)) {
@@ -43,7 +42,7 @@ export default function ProjectsSideBar() {
     }, [])
     useEffect(() => {
         navigate(
-            `/home/${projectId}?sortBy=${sortBy}&sortOrder=${sortOrder}`
+            `/projects/${projectId}?sortBy=${sortBy}&sortOrder=${sortOrder}`
         );
         fetchProjects();
     }, [sortOrder, sortBy, currentPage, key]);

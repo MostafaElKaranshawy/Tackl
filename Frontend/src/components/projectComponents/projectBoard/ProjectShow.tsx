@@ -73,7 +73,7 @@ export default function ProjectShow(
         try {
             await deleteProject(id);
             deleteRefresh && deleteRefresh();
-            navigate("/");
+            navigate("/projects");
         } catch (error) {
             alert("Failed to delete project. Please try again later.");
         }
@@ -294,8 +294,7 @@ export default function ProjectShow(
                         project={project}
                         onSuccess={(project: Project | undefined) => {
                             setShowEditModal(false);
-                            // setProjectId(project?.id || null);
-                            navigate(`/home/${project?.id}`);
+                            navigate(`/projects/${project?.id}`);
 
                             if (project && onUpdated) {
                                 onUpdated(project);

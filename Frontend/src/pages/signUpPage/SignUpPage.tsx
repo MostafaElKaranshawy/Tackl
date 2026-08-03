@@ -24,7 +24,7 @@ export default function SignUpPage() {
             try {
                 const authenticated = await checkAuthentication();
                 if (authenticated) {
-                    navigate("/home");
+                    navigate("/projects");
                 }
             } finally {
             }

@@ -1,54 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import type Task from "../../../types/task";
 import TaskBoardCard from "./TaskBoardCard";
-import TaskShow from "../../tasksComponents/TaskShow";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useTaskRefreshContext } from "../../../contexts/TaskRefreshContext";
 
 export default function TaskBoard({
     projectId,
     tasks,
-    fetchTasks,
-}: {
-    projectId: string;
-    tasks: Task[];
-    fetchTasks: () => void;
-}) {
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-    const selectedTaskRef = useRef<HTMLDivElement>(null);
+    fetchTasks }: { projectId: string; tasks: Task[]; fetchTasks: () => void; }) {
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                selectedTaskRef.current &&
-                !selectedTaskRef.current.contains(event.target as Node)
-            ) {
-                setSelectedTask(null);
-            }
-        };
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { key } = useTaskRefreshContext();
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [selectedTaskRef]);
     useEffect(() => {
         fetchTasks();
-    }, [projectId]);
+    }, [projectId, key]);
 
-    // const handleTaskStatusChange = async (taskId: string, newStatus: "todo" | "in_progress" | "done") => {
-    //     try {
-    //         let taskToUpdate = tasks.find((task) => task.id === taskId);
-    //         if (!taskToUpdate) {
-    //             console.error("Task not found:", taskId);
-    //             return;
-    //         }
-    //         let updatedTask: UpdateTaskDto = { ...taskToUpdate, status: newStatus };
-    //         await updateTask(taskId, updatedTask, projectId);
-    //         await fetchTasks();
-    //     } catch (error) {
-    //         console.error("Failed to update task status:", error);
-    //     }
-    // }
-
+    const handleTaskClick = (taskId: string) => {
+        navigate(`${location.pathname}?taskId=${taskId}`, { state: { backgroundLocation: location } });
+    }
     const todoTasks = tasks.filter((task) => task.status === "todo");
     const inProgressTasks = tasks.filter(
         (task) => task.status === "in_progress"
@@ -98,7 +69,9 @@ export default function TaskBoard({
                                 <TaskBoardCard
                                     key={task.id}
                                     task={task}
-                                    onClick={() => setSelectedTask(task)}
+                                    onClick={() => {
+                                        handleTaskClick(task.id);
+                                    }}
                                 />
                             ))
                         ) : (
@@ -109,21 +82,6 @@ export default function TaskBoard({
                     </div>
                 </div>
             ))}
-            {
-                selectedTask && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-                        <div className="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg" ref={selectedTaskRef}>
-                            <TaskShow taskId={selectedTask.id} projectId={selectedTask.projectId}
-                                refresh={async (close) => {
-                                    await fetchTasks();
-                                    if (close) {
-                                        setSelectedTask(null);
-                                    }
-                                }} />
-                        </div>
-                    </div>
-                )
-            }
         </div>
     );
 }

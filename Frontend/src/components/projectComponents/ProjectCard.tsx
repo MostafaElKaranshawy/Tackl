@@ -4,7 +4,7 @@ export default function ProjectCard({ project }: { project: { id: string; name: 
     const navigate = useNavigate();
 
     const handleProjectClick = () => {
-        navigate(`/home/${project.id}`);
+        navigate(`/projects/${project.id}`);
     };
 
     return (
