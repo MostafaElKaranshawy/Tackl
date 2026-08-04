@@ -58,7 +58,7 @@ export default class ProjectRepo {
                 offset: (page - 1) * limit,
                 limit: limit,
                 order: [[sortBy, sortOrder]]
-            }); 
+            });
             const total = await Project.count({
                 where: {
                     userId: userId
@@ -68,5 +68,19 @@ export default class ProjectRepo {
         } catch (error) {
             throw new DBException("Failed to retrieve user projects: " + (error as Error).message);
         }
+    }
+
+    static async getProjectUserId(projectId: string): Promise<string> {
+        const userId = (
+            await Project.findByPk(projectId, {
+                attributes: ["userId"],
+            })
+        )?.userId;
+
+        if (!userId) {
+            throw new NotFoundException("Project not found.");
+        }
+
+        return userId;
     }
 }

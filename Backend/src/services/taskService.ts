@@ -11,11 +11,7 @@ export default class TaskService {
     static async createTask(taskData: any, projectId: string, userId: string): Promise<Task> {
 
         try {
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
-            
+
             const project = await ProjectRepository.getProjectById(projectId);
             if (!project) {
                 throw new NotFoundException("Project not found.");
@@ -37,16 +33,13 @@ export default class TaskService {
                 throw new NotFoundException("Task not found.");
             }
 
-            const project = await ProjectRepository.getProjectById(task.projectId);
-            if (!project) {
-                throw new NotFoundException("Project not found.");
-            }
-            if (project.userId !== userId) {
+            if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
             return task;
         } catch (error) {
+            console.error("Error in getTaskById:", error);
             throw error;
         }
     }
@@ -58,11 +51,7 @@ export default class TaskService {
                 throw new NotFoundException("Task not found.");
             }
 
-            const project = await ProjectRepository.getProjectById(task.projectId);
-            if (!project) {
-                throw new NotFoundException("Project not found.");
-            }
-            if (project.userId !== userId) {
+            if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
@@ -79,11 +68,7 @@ export default class TaskService {
                 throw new NotFoundException("Task not found.");
             }
 
-            const project = await ProjectRepository.getProjectById(task.projectId);
-            if (!project) {
-                throw new NotFoundException("Project not found.");
-            }
-            if (project.userId !== userId) {
+            if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 

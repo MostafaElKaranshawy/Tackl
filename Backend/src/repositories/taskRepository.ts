@@ -4,6 +4,7 @@ import DBException from "../exceptions/dbException";
 import NotFoundException from "../exceptions/notFoundException";
 import QueryParams from "../interfaces/QueryParams";
 import Task from "../models/task";
+import Project from "../models/project";
 
 export default class TaskRepository {
     static async createTask(taskData: Task, projectId: string): Promise<Task> {
@@ -20,7 +21,17 @@ export default class TaskRepository {
 
     static async getTaskById(taskId: string): Promise<Task | null> {
         try {
-            const task = await Task.findByPk(taskId);
+            const task = await Task.findByPk(taskId,
+                {
+                    include: [
+                        {
+                            model: Project,
+                            as: "project",
+                            attributes: ["userId"],
+                        },
+                    ],
+                }
+            );
             return task;
         } catch (error) {
             throw new DBException("Failed to retrieve task: " + (error as Error).message);
@@ -29,7 +40,7 @@ export default class TaskRepository {
 
     static async updateTask(taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
         try {
-            const task = await Task.findByPk(taskId);
+            const task = await TaskRepository.getTaskById(taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
@@ -42,7 +53,7 @@ export default class TaskRepository {
 
     static async deleteTask(taskId: string): Promise<void> {
         try {
-            const task = await Task.findByPk(taskId);
+            const task = await TaskRepository.getTaskById(taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
@@ -98,7 +109,9 @@ export default class TaskRepository {
                 findOptions.offset = (page - 1) * limit;
                 findOptions.limit = limit;
             }
-            const tasks = await Task.findAll(findOptions);
+            const tasks = await Task.findAll({
+                ...findOptions,
+            });
 
             const total = await Task.count({ where: { projectId } });
             return { tasks, total };
@@ -118,6 +131,42 @@ export default class TaskRepository {
             return tasks;
         } catch (error) {
             throw new DBException("Failed to retrieve tasks: " + (error as Error).message);
+        }
+    }
+
+    static async getTaskProjectId(taskId: string): Promise<string | null> {
+        try {
+            const task = await Task.findByPk(taskId, {
+                attributes: ['projectId'],
+            });
+            if (!task) {
+                throw new NotFoundException("Task not found.");
+            }
+            return task.projectId;
+        } catch (error) {
+            throw new DBException("Failed to retrieve task project ID: " + (error as Error).message);
+        }
+    }
+
+    static async getTaskUserId(taskId: string): Promise<string | null> {
+        try {
+            const task = await Task.findByPk(taskId, {
+                include: [
+                    {
+                        model: Project,
+                        as: "project",
+                        attributes: ["userId"],
+                    },
+                ],
+            });
+
+            const userId = task?.project?.userId;
+            if (!userId) {
+                throw new NotFoundException("Task not found.");
+            }
+            return userId;
+        } catch (error) {
+            throw new DBException("Failed to retrieve task user ID: " + (error as Error).message);
         }
     }
 }

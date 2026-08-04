@@ -1,16 +1,10 @@
 import ForbiddenException from "../exceptions/forbiddenException";
 import NotFoundException from "../exceptions/notFoundException";
-import Project from "../models/project";
 import ProjectRepository from "../repositories/projectRepository";
-import UserRepository from "../repositories/userRepository";
 
 export default class ProjectService {
     static async createProject(projectData: any, userId: string) {
         try {
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
             return await ProjectRepository.createProject(projectData, userId);
         } catch (error) {
             throw error;
@@ -20,14 +14,10 @@ export default class ProjectService {
     static async getProjectById(projectId: string, userId: string) {
         try {
             const project = await ProjectRepository.getProjectById(projectId);
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
             if (!project) {
                 throw new NotFoundException("Project not found.");
             }
-            if (!user || project && project.userId !== userId) {
+            if (project && project.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
@@ -44,11 +34,7 @@ export default class ProjectService {
                 throw new NotFoundException("Project not found.");
             }
 
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
-            if (!user || project && project.userId !== userId) {
+            if (project && project.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
@@ -65,11 +51,7 @@ export default class ProjectService {
                 throw new NotFoundException("Project not found.");
             }
 
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
-            if (!user || project && project.userId !== userId) {
+            if (project && project.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
@@ -81,10 +63,6 @@ export default class ProjectService {
 
     static async getProjectsByUserId(userId: string, page: number, limit: number, sortBy: string, sortOrder: string) {
         try {
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
             return await ProjectRepository.getUserProjects(userId, page, limit, sortBy, sortOrder);
         } catch (error) {
             throw error;

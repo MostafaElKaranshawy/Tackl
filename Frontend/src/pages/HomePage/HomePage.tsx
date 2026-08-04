@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { checkAuthentication } from "../../services/authService";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
@@ -10,12 +10,16 @@ import { TaskRefreshProvider } from "../../contexts/TaskRefreshContext";
 export default function HomePage() {
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const verifyAuthentication = async () => {
             try {
                 const authenticated = await checkAuthentication();
                 setIsAuthenticated(authenticated);
+                if (!authenticated) {
+                    navigate("/login");
+                }
             } finally {
                 setLoading(false);
             }

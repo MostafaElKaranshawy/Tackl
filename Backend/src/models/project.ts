@@ -5,7 +5,9 @@ import {
     InferCreationAttributes,
     CreationOptional,
     ForeignKey,
+    NonAttribute,
 } from "sequelize";
+
 import { sequelize } from "../config/database";
 import { Models } from "./models";
 import User from "./user";
@@ -24,7 +26,8 @@ export default class Project extends Model<
     declare userId: ForeignKey<User["id"]>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
-
+    declare owner?: NonAttribute<User>;
+    declare tasks?: NonAttribute<Model[]>;
     static associate(models: Models) {
         Project.belongsTo(models.User, {
             foreignKey: "userId",
