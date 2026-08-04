@@ -25,7 +25,7 @@ export default function Header() {
     }, [logOutRef]);
 
     return (
-        <header className="w-full p-2 pr-4 pl-4 h-full flex items-center justify-between gap-4 relative">
+        <header className="w-full max-h-[70px] p-2 pr-4 pl-4 h-full flex items-center justify-between gap-4 relative">
             <p className="logo text-blue-500 text-4xl font-bold">Tackl</p>
             <div className="search-bar flex-1 max-w-[800px] relative">
                 <IoSearchSharp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />

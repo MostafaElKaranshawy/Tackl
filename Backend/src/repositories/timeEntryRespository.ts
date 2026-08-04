@@ -59,7 +59,8 @@ export default class TimeEntryRepository {
             const timeEntries = await TimeEntry.findAll({
                 where: {
                     taskId: taskId
-                }
+                },
+                order: [['date', 'asc'], ['createdAt', 'asc']]
             });
             return timeEntries;
         } catch (error) {

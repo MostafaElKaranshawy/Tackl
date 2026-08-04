@@ -8,6 +8,8 @@ import ConfirmationModal from "../ConfirmationModal";
 import { deleteTask } from "../../services/taskService";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext";
+import TimeEntriesList from "../timeEntriesComponents/TimeEntriesList";
+import { formatMinutes } from "../../utils/timeFormater";
 
 export default function TaskShow() {
     const [task, setTask] = useState<Task | null>(null);
@@ -19,6 +21,7 @@ export default function TaskShow() {
     const searchParams = new URLSearchParams(location.search);
     let taskId = searchParams.get("taskId") || "";
     let { projectId } = useParams<{ projectId: string }>();
+    const [totalLoggedTime, setTotalLoggedTime] = useState(0);
 
     const { setKey } = useTaskRefreshContext();
 
@@ -104,7 +107,7 @@ export default function TaskShow() {
 
     return (
         <div className="min-w-5xl fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div className="relative max-w-lg rounded-lg bg-white p-6 shadow-lg" ref={selectedTaskRef}>
+            <div className="relative w-[80%] rounded-lg bg-white p-6 shadow-lg " ref={selectedTaskRef}>
                 <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-md">
                     <div className="mb-8 flex items-start justify-between">
                         <div>
@@ -204,25 +207,41 @@ export default function TaskShow() {
                                         : "N/A"}
                                 </p>
                             </div>
-                            <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                Task overdue
-                            </div>
+                            {
+                                task.dueDate && new Date(task.dueDate) < new Date() && (
+                                    <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-red-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                        Task overdue
+                                    </div>
+                                )
+                            }
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <div
+                            className={
+                                "group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4"
+                                + (task.estimatedTime && totalLoggedTime > task.estimatedTime ? " border-red-200 bg-red-100" : "")
+                            }
+                        >
                             <MdAccessTime className="text-2xl text-purple-600" />
-
+                            {
+                                task.estimatedTime && totalLoggedTime > task.estimatedTime && (
+                                    <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-red-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                        Estimated Time Exceeded
+                                    </div>
+                                )
+                            }
                             <div>
                                 <p className="text-xs uppercase text-gray-500">
                                     Estimated Time
                                 </p>
 
-                                <p className="font-medium text-gray-800">
-                                    {task.estimatedTime
-                                        ? `${task.estimatedTime} min${task.estimatedTime !== 1 ? "s" : ""
-                                        }`
-                                        : "N/A"}
-                                </p>
+                                <div className="inline-block">
+                                    <p className="font-medium text-gray-800">
+                                        {task.estimatedTime
+                                            ? formatMinutes(task.estimatedTime)
+                                            : "N/A"}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -254,7 +273,7 @@ export default function TaskShow() {
                             </div>
                         </div>
                     </div>
-
+                    <TimeEntriesList taskId={task.id} currentScreen="task-modal" updateTotalTime={setTotalLoggedTime} />
                     {showEditModal && (
                         <ManageTaskCard
                             mode="edit"
@@ -286,6 +305,6 @@ export default function TaskShow() {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
