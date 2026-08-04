@@ -90,7 +90,6 @@ export default class TaskController {
             const task = await TaskService.updateTask(taskId, parsedTaskData, userId);
             res.status(200).json(task);
         } catch (error) {
-            console.log("Error in updateTask:", error);
             if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else if (error instanceof NotFoundException) {
