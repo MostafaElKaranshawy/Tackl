@@ -30,6 +30,8 @@ const projectRouter = router.Router();
  *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden.
  *       500:
  *         description: Internal server error.
  */
@@ -96,8 +98,12 @@ projectRouter.post("/", ProjectController.createProject);
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Project'
+ *       400:
+ *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden.
  *       500:
  *         description: Internal server error.
  */
@@ -132,6 +138,8 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden.
  *       404:
  *         description: Project not found.
  *       500:
@@ -174,6 +182,8 @@ projectRouter.get("/:id", ProjectController.getProjectById);
  *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden.
  *       404:
  *         description: Project not found.
  *       500:
@@ -206,6 +216,8 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *         description: ProjectId Required.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden.
  *       404:
  *         description: Project not found.
  *       500:
