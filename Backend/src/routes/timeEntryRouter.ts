@@ -53,6 +53,8 @@ const timeEntryRouter = router.Router({ mergeParams: true });
  *         description: Forbidden.
  *       404:
  *         description: Task not found.
+ *       500:
+ *         description: Internal server error.
  */
 timeEntryRouter.post(
     "/",
@@ -87,6 +89,8 @@ timeEntryRouter.post(
  *         description: Forbidden.
  *       404:
  *         description: Task not found.
+ *       500:
+ *         description: Internal server error.
  */
 timeEntryRouter.get(
     "/",
@@ -125,6 +129,8 @@ timeEntryRouter.get(
  *         description: Forbidden.
  *       404:
  *         description: Time entry not found.
+ *       500:
+ *         description: Internal server error.
  */
 timeEntryRouter.get(
     "/:timeEntryId",
@@ -181,6 +187,8 @@ timeEntryRouter.get(
  *         description: Forbidden.
  *       404:
  *         description: Time entry not found.
+ *       500:
+ *         description: Internal server error.
  */
 timeEntryRouter.put(
     "/:timeEntryId",
@@ -215,6 +223,8 @@ timeEntryRouter.put(
  *         description: Forbidden.
  *       404:
  *         description: Time entry not found.
+ *       500:
+ *         description: Internal server error.
  */
 timeEntryRouter.delete(
     "/:timeEntryId",
