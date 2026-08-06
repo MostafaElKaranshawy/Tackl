@@ -301,12 +301,8 @@ taskRouter.put("/:taskId", TaskController.updateTask);
  *           format: uuid
  *         description: Task ID.
  *     responses:
- *       200:
+ *       204:
  *         description: Task deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Task'
  *       400:
  *         description: Invalid request body.
  *       401:
