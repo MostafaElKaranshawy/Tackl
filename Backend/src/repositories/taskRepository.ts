@@ -12,7 +12,7 @@ export default class TaskRepository {
             return task;
         } catch (error) {
             throw new DBException("Failed to create task: " + (error as Error).message);
-        }   
+        }
     }
 
     static async getTaskById(taskId: string): Promise<Task | null> {
@@ -23,7 +23,7 @@ export default class TaskRepository {
             throw new DBException("Failed to retrieve task: " + (error as Error).message);
         }
     }
-    
+
     static async updateTask(taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
         try {
             const task = await Task.findByPk(taskId);
@@ -33,6 +33,9 @@ export default class TaskRepository {
             await task.update(updatedData);
             return task;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to update task: " + (error as Error).message);
         }
     }
@@ -45,6 +48,9 @@ export default class TaskRepository {
             }
             await task.destroy();
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to delete task: " + (error as Error).message);
         }
     }

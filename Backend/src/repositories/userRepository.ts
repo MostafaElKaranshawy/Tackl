@@ -17,24 +17,41 @@ export default class UserRepository {
             return user;
 
         } catch (error) {
+            if (error instanceof AlreadyExistsException) {
+                throw error;
+            }
             throw new DBException("Error creating user");
         }
     }
 
     static async getUserById(id: string): Promise<User> {
-        const user = await User.findByPk(id);
-        if (!user) {
-            throw new NotFoundException("User not found");
+        try {
+            const user = await User.findByPk(id);
+            if (!user) {
+                throw new NotFoundException("User not found");
+            }
+            return user;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new DBException("Error retrieving user");
         }
-        return user;
     }
 
     static async getUserByEmail(email: string): Promise<User> {
-        const user = await User.findOne({ where: { email } });
-        if (!user) {
-            throw new NotFoundException("User not found");
+        try {
+            const user = await User.findOne({ where: { email } });
+            if (!user) {
+                throw new NotFoundException("User not found");
+            }
+            return user;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new DBException("Error retrieving user");
         }
-        return user;
     }
 
     static async confirmUserEmail(id: string): Promise<void> {
@@ -46,6 +63,9 @@ export default class UserRepository {
             user.confirmed = true;
             await user.save();
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Error confirming user email");
         }
     }
@@ -59,6 +79,9 @@ export default class UserRepository {
             await user.update(updates);
             return user;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Error updating user");
         }
     }
@@ -71,6 +94,9 @@ export default class UserRepository {
         try {
             await user.destroy();
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Error deleting user");
         }
     }
