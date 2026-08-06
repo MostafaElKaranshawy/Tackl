@@ -93,12 +93,17 @@ export default class TaskRepository {
                     priority: queryParams.filterPriority,
                 }),
                 ...(queryParams.filterOverDue && {
-                    dueDate:
-                        queryParams.filterOverDue
-                            ? { [Op.lt]: new Date() }
-                            : { [Op.gte]: new Date() },
-                }),
-            };
+                    [Op.and]: [
+                        { status: { [Op.ne]: "done" } },
+                        {
+                            dueDate: queryParams.filterOverDue
+                                ? { [Op.lt]: new Date() }
+                                : { [Op.gte]: new Date() },
+                        },
+                    ],
+
+                })
+            }
 
             const findOptions: FindOptions = {
                 where,
@@ -113,7 +118,9 @@ export default class TaskRepository {
                 ...findOptions,
             });
 
-            const total = await Task.count({ where: { projectId } });
+            const total = await Task.count({
+                where: findOptions.where,
+            });
             return { tasks, total };
         } catch (error) {
             throw new DBException("Failed to retrieve tasks: " + (error as Error).message);

@@ -208,7 +208,7 @@ export default function TaskShow() {
                                 </p>
                             </div>
                             {
-                                task.dueDate && new Date(task.dueDate) < new Date() && (
+                                task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() && (
                                     <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-red-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
                                         Task overdue
                                     </div>
@@ -224,9 +224,13 @@ export default function TaskShow() {
                         >
                             <MdAccessTime className="text-2xl text-purple-600" />
                             {
-                                task.estimatedTime && totalLoggedTime > task.estimatedTime && (
-                                    <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-red-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                        Estimated Time Exceeded
+                                task.estimatedTime && (
+                                    <div className={
+                                        "pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                        + (totalLoggedTime > task.estimatedTime ? " bg-red-500" : " bg-gray-500")
+                                    }>
+                                        {totalLoggedTime > task.estimatedTime ? `Estimated Time Exceeded by ${formatMinutes(totalLoggedTime - task.estimatedTime)}` :
+                                            "Remaining Time: " + formatMinutes(task.estimatedTime - totalLoggedTime)}
                                     </div>
                                 )
                             }

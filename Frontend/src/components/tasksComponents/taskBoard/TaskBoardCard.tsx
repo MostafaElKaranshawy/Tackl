@@ -50,7 +50,7 @@ export default function TaskBoardCard({
                 </div>
 
                 {
-                    task.dueDate && new Date(task.dueDate) < new Date() && (
+                    task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() && (
                         <div className="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">
                             <span>
                                 Overdue

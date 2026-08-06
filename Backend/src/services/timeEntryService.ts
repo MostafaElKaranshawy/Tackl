@@ -7,7 +7,7 @@ export default class TimeEntryService {
     static async createTimeEntry(userId: string, timeEntryData: any): Promise<any> {
         try {
 
-            await TimeEntryService.validateUserAccess(userId, timeEntryData.taskId);
+            await TimeEntryService.validateUserAccess(userId, timeEntryData.projectId, timeEntryData.taskId);
 
             return await TimeEntryRepository.createTimeEntry(timeEntryData.taskId, timeEntryData);
         } catch (error) {
@@ -15,14 +15,20 @@ export default class TimeEntryService {
         }
     }
 
-    static async getTimeEntryById(timeEntryId: string, userId: string, taskId: string): Promise<any> {
+    static async getTimeEntryById(timeEntryId: string, userId: string, projectId: string, taskId: string): Promise<any> {
         try {
 
-            await TimeEntryService.validateUserAccess(userId, taskId);
+            await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-            return await TimeEntryRepository.getTimeEntryById(timeEntryId);
+            const timeEntry = await TimeEntryRepository.getTimeEntryById(timeEntryId);
+            if (!timeEntry) {
+                throw new NotFoundException("Time entry not found.");
+            }
+            if (timeEntry.taskId !== taskId) {
+                throw new ForbiddenException("Time entry does not belong to the specified task.");
+            }
+            return timeEntry;
         } catch (error) {
-            console.error("Error in getTimeEntryById:", error);
             throw error;
         }
     }
@@ -30,8 +36,14 @@ export default class TimeEntryService {
     static async updateTimeEntry(userId: string, updatedData: any): Promise<any> {
         try {
 
-            await TimeEntryService.validateUserAccess(userId, updatedData.taskId);
-
+            await TimeEntryService.validateUserAccess(userId, updatedData.projectId, updatedData.taskId);
+            const timeEntry = await TimeEntryRepository.getTimeEntryById(updatedData.timeEntryId);
+            if (!timeEntry) {
+                throw new NotFoundException("Time entry not found.");
+            }
+            if (timeEntry.taskId !== updatedData.taskId) {
+                throw new ForbiddenException("Time entry does not belong to the specified task.");
+            }
             return await TimeEntryRepository.updateTimeEntry(updatedData.timeEntryId, {
                 duration: updatedData.duration,
                 date: updatedData.date,
@@ -42,10 +54,17 @@ export default class TimeEntryService {
         }
     }
 
-    static async deleteTimeEntry(userId: string, timeEntryId: string): Promise<void> {
+    static async deleteTimeEntry(userId: string, projectId: string, taskId: string, timeEntryId: string): Promise<void> {
         try {
-            const taskId = (await TimeEntryRepository.getTimeEntryById(timeEntryId))?.taskId || '';
-            await TimeEntryService.validateUserAccess(userId, taskId);
+            const timeEntry = await TimeEntryRepository.getTimeEntryById(timeEntryId);
+            if (!timeEntry) {
+                throw new NotFoundException("Time entry not found.");
+            }
+
+            if(timeEntry.taskId !== taskId) {
+                throw new ForbiddenException("Time entry does not belong to the specified task.");
+            }
+            await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
             return await TimeEntryRepository.deleteTimeEntry(timeEntryId);
         } catch (error) {
@@ -53,10 +72,10 @@ export default class TimeEntryService {
         }
     }
 
-    static async getTaskTimeEntries(userId: string, taskId: string): Promise<any[]> {
+    static async getTaskTimeEntries(userId: string, projectId: string, taskId: string): Promise<any[]> {
         try {
 
-            await TimeEntryService.validateUserAccess(userId, taskId);
+            await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
             return await TimeEntryRepository.getTaskTimeEntries(taskId);
         } catch (error) {
@@ -64,11 +83,14 @@ export default class TimeEntryService {
         }
     }
 
-    private static async validateUserAccess(userId: string, taskId: string): Promise<void> {
+    private static async validateUserAccess(userId: string, projectId: string, taskId: string): Promise<void> {
         try {
             const task = await TaskRepository.getTaskById(taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
+            }
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
             }
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");

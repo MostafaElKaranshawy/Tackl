@@ -1,4 +1,5 @@
 import DBException from "../exceptions/dbException";
+import NotFoundException from "../exceptions/notFoundException";
 import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryRepository {
@@ -29,7 +30,7 @@ export default class TimeEntryRepository {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
-                throw new DBException("Time entry not found.", 404);
+                throw new NotFoundException("Time entry not found.", 404);
             }
             await timeEntry.update({
                 duration: updatedData.duration ?? timeEntry.duration,
@@ -46,7 +47,7 @@ export default class TimeEntryRepository {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
-                throw new DBException("Time entry not found.", 404);
+                throw new NotFoundException("Time entry not found.", 404);
             }
             await timeEntry.destroy();
         } catch (error) {

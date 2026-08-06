@@ -174,7 +174,7 @@ export default function TaskPage() {
                                             {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "N/A"}
                                         </span>
                                         {
-                                            task.dueDate && new Date(task.dueDate) < new Date() && (
+                                            task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() && (
                                                 <div className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-red-500 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap">
                                                     Overdue
                                                 </div>
@@ -193,9 +193,12 @@ export default function TaskPage() {
                                                 : "N/A"}
                                         </p>
                                         {
-                                            task.estimatedTime && totalLoggedTime > 0 && totalLoggedTime > task.estimatedTime && (
-                                                <div className="absolute w-[100px] bottom-full left-1/2 mb-2 -translate-x-1/2 rounded bg-red-500 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                                    Estimated Time Exceeded
+                                            task.estimatedTime && totalLoggedTime > 0 && (
+                                                <div className={"absolute w-[100px] bottom-full left-1/2 mb-2 -translate-x-1/2 rounded px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                                    + (totalLoggedTime > task.estimatedTime ? " bg-red-500" : " bg-gray-500")
+                                                }>
+                                                    {totalLoggedTime > task.estimatedTime ? `Estimated Time Exceeded by ${formatMinutes(totalLoggedTime - task.estimatedTime)}` :
+                                                        "Remaining Time: " + formatMinutes(task.estimatedTime - totalLoggedTime)}
                                                 </div>
                                             )
                                         }

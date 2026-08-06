@@ -160,7 +160,6 @@ export default class TaskController {
             const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
-            console.error("Error in getProjectTasks:", error); // Debugging line
             if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else if (error instanceof NotFoundException) {

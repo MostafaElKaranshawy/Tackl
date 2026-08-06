@@ -6,7 +6,6 @@ export default class Jwt {
         payload: object,
         expiresIn = process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"],
     ) {
-        console.log("JWT_EXPIRES_IN", process.env.JWT_EXPIRES_IN);
         return jwt.sign(payload, process.env.JWT_TOKEN_SECRET!, {
             expiresIn,
         });
