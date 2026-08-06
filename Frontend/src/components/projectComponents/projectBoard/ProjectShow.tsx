@@ -341,7 +341,7 @@ export default function ProjectShow(
                         project={project}
                         onSuccess={(project: Project | undefined) => {
                             setShowEditModal(false);
-                            navigate(`/projects/${project?.id}`);
+                            navigate({ pathname: `/projects/${project?.id}`, search: location.search });
 
                             if (project && onUpdated) {
                                 onUpdated(project);

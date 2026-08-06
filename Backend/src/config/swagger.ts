@@ -1,8 +1,8 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
-import {TaskStatus} from "../enums/taskStatus";
-import {TaskPriority} from "../enums/taskPriority";
+import { TaskStatus } from "../enums/taskStatus";
+import { TaskPriority } from "../enums/taskPriority";
 
 const appUrl = process.env.APP_SERVER + ":" + process.env.PORT;
 const options: swaggerJsdoc.Options = {
@@ -230,31 +230,57 @@ const options: swaggerJsdoc.Options = {
                     },
                 },
                 TimeEntry: {
-                    id: {
-                        type: "string",
-                        format: "uuid",
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string",
+                            format: "uuid",
+                        },
+                        duration: {
+                            type: "number",
+                            example: 120,
+                        },
+                        date: {
+                            type: "string",
+                            format: "date-time",
+                            example: "2026-08-04T10:00:00Z",
+                        },
+                        note: {
+                            type: "string",
+                            example: "Worked on API implementation.",
+                        },
+                        taskId: {
+                            type: "string",
+                            format: "uuid",
+                        },
+                        createdAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                        updatedAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
                     },
-                    duration: {
-                        type: "number",
-                    },
-                    date: {
-                        type: "string",
-                        format: "date-time",
-                    },
-                    note: {
-                        type: "string",
-                    },
-                    taskId: {
-                        type: "string",
-                        format: "uuid",
-                    },
-                    createdAt: {
-                        type: "string",
-                        format: "date-time",
-                    },
-                    updatedAt: {
-                        type: "string",
-                        format: "date-time",
+                },
+
+                TimeEntryInput: {
+                    type: "object",
+                    required: ["duration", "date"],
+                    properties: {
+                        duration: {
+                            type: "number",
+                            example: 120,
+                        },
+                        date: {
+                            type: "string",
+                            format: "date-time",
+                            example: "2026-08-04T10:00:00Z",
+                        },
+                        note: {
+                            type: "string",
+                            example: "Worked on API implementation.",
+                        },
                     },
                 },
             }

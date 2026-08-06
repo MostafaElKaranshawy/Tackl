@@ -3,17 +3,21 @@ import TimeEntryController from "../controllers/timeEntryController";
 
 const timeEntryRouter = router.Router({ mergeParams: true });
 
-
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries:
  *   post:
  *     summary: Create a time entry
  *     tags: [Time Entries]
  *     security:
-
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -25,21 +29,7 @@ const timeEntryRouter = router.Router({ mergeParams: true });
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - duration
- *               - date
- *             properties:
- *               duration:
- *                 type: number
- *                 example: 120
- *               date:
- *                 type: string
- *                 format: date-time
- *                 example: "2026-08-04T10:00:00Z"
- *               note:
- *                 type: string
- *                 example: Worked on API implementation.
+ *             $ref: '#/components/schemas/TimeEntryInput'
  *     responses:
  *       201:
  *         description: Time entry created successfully.
@@ -48,9 +38,11 @@ const timeEntryRouter = router.Router({ mergeParams: true });
  *             schema:
  *               $ref: '#/components/schemas/TimeEntry'
  *       400:
- *         description: Missing required data.
+ *         description: Missing Required Data.
+ *       401:
+ *         description: Unauthorized.
  *       403:
- *         description: Forbidden.
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Task not found.
  *       500:
@@ -63,13 +55,19 @@ timeEntryRouter.post(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries:
  *   get:
  *     summary: Get all time entries for a task
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -85,8 +83,12 @@ timeEntryRouter.post(
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/TimeEntry'
+ *       400:
+ *         description: Missing Required Data.
+ *       401:
+ *         description: Unauthorized.
  *       403:
- *         description: Forbidden.
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Task not found.
  *       500:
@@ -99,13 +101,19 @@ timeEntryRouter.get(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries/{timeEntryId}:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries/{timeEntryId}:
  *   get:
  *     summary: Get a time entry by ID
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -125,8 +133,12 @@ timeEntryRouter.get(
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/TimeEntry'
+ *       400:
+ *         description: Missing Required Data.
+ *       401:
+ *         description: Unauthorized.
  *       403:
- *         description: Forbidden.
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Time entry not found.
  *       500:
@@ -139,13 +151,19 @@ timeEntryRouter.get(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries/{timeEntryId}:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries/{timeEntryId}:
  *   put:
  *     summary: Update a time entry
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -163,28 +181,20 @@ timeEntryRouter.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               duration:
- *                 type: number
- *                 example: 180
- *               date:
- *                 type: string
- *                 format: date-time
- *               note:
- *                 type: string
- *                 example: Updated work log.
+ *             $ref: '#/components/schemas/TimeEntryInput'
  *     responses:
  *       200:
- *         description: Time entry updated.
+ *         description: Time entry updated successfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/TimeEntry'
  *       400:
- *         description: Missing required data.
+ *         description: Missing Required Data.
+ *       401:
+ *         description: Unauthorized.
  *       403:
- *         description: Forbidden.
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Time entry not found.
  *       500:
@@ -197,13 +207,19 @@ timeEntryRouter.put(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries/{timeEntryId}:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries/{timeEntryId}:
  *   delete:
  *     summary: Delete a time entry
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -218,9 +234,13 @@ timeEntryRouter.put(
  *           format: uuid
  *     responses:
  *       204:
- *         description: Time entry deleted.
+ *         description: Time entry deleted successfully.
+ *       400:
+ *         description: Missing Required Data.
+ *       401:
+ *         description: Unauthorized.
  *       403:
- *         description: Forbidden.
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Time entry not found.
  *       500:

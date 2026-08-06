@@ -16,6 +16,6 @@ baseRouter.use("/projects", projectRouter);
 
 baseRouter.use("/projects/:projectId/tasks", TaskRouter);
 
-baseRouter.use("/tasks/:taskId/time-entries", TimeEntryRouter);
+baseRouter.use("/projects/:projectId/tasks/:taskId/time-entries", TimeEntryRouter);
 
 export default baseRouter;

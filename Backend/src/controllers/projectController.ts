@@ -18,9 +18,7 @@ export default class ProjectController {
 
             res.status(201).json(project);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
+            if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else {
                 res.status(500).json({ message: "Internal Server Error, try again later" });
@@ -43,12 +41,13 @@ export default class ProjectController {
             res.status(200).json(project);
 
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
+            if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
+            }
+            else if (error instanceof ForbiddenException) {
+                res.status(403).json({ message: error.message });
+            } else if (error instanceof NotFoundException) {
+                res.status(404).json({ message: error.message });
             } else {
                 res.status(500).json({ message: "Internal Server Error, try again later" });
             }
@@ -72,12 +71,12 @@ export default class ProjectController {
             const project = await ProjectService.updateProject(projectId, { name: updatedData.name, description: updatedData.description }, userId);
             res.status(200).json(project);
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
+            if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
+            } else if (error instanceof NotFoundException) {
+                res.status(404).json({ message: error.message });
             } else {
                 res.status(500).json({ message: "Internal Server Error, try again later" });
             }
@@ -96,12 +95,12 @@ export default class ProjectController {
             res.status(204).send();
 
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
+            if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
+            } else if (error instanceof NotFoundException) {
+                res.status(404).json({ message: error.message });
             } else {
                 res.status(500).json({ message: "Internal Server Error, try again later" });
             }
@@ -136,8 +135,8 @@ export default class ProjectController {
             res.status(200).json({ projects, total, page, limit });
 
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
+            if (error instanceof MissingRequiredDataException) {
+                res.status(400).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
                 res.status(403).json({ message: error.message });
             } else {
