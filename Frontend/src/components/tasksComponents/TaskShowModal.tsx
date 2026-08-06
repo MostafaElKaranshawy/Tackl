@@ -27,7 +27,8 @@ export default function TaskShow() {
 
     const closeTaskWindow = useCallback(() => {
         setTask(null);
-        navigate(`/projects${projectId ? `/${projectId}` : ''}`, { replace: true });
+        // navigate(-1);
+        navigate({ pathname: `/projects${projectId ? `/${projectId}` : ''}`, search: location.search.replace(/(\?|&)taskId=[^&]*/, '') });
     }, [navigate, projectId]);
 
     useEffect(() => {
@@ -147,7 +148,8 @@ export default function TaskShow() {
                                 title="Open Task in New Tab"
                                 className="rounded-full p-2 text-gray-500 transition hover:bg-green-100 hover:text-green-600 cursor-pointer"
                                 onClick={() => {
-                                    navigate(`/projects/${task.projectId}/tasks/${task.id}`, { state: { backgroundLocation: `/projects/${task.projectId}` } });
+                                    console.log("current location", location.pathname + location.search);
+                                    navigate(`/projects/${task.projectId}/tasks/${task.id}`);
                                 }}>
                                 <MdOpenInNew
                                     className="text-lg text-gray-500 transition hover:text-blue-600"

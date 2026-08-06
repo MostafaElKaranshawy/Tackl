@@ -11,7 +11,7 @@ export default function TasksList({ tasks, refresh }: { tasks: Task[], refresh: 
     const { key } = useTaskRefreshContext();
 
     const handleTaskClick = (taskId: string) => {
-        navigate(`${location.pathname}?taskId=${taskId}`);
+        navigate({ pathname: location.pathname, search: `?taskId=${taskId}` + location.search.replace(/(\?|&)taskId=[^&]*/, '') });
     }
 
     useEffect(() => {

@@ -47,7 +47,7 @@ export default function TaskPage() {
         try {
             await deleteTask(taskId, projectId);
 
-            navigate(`/projects/${projectId}`);
+            navigate({ pathname: `/projects/${projectId}`, search: location.search.replace(/(\?|&)taskId=[^&]*/, '') });
         } catch (error) {
             console.error("Failed to delete task.", error);
         }
@@ -70,7 +70,9 @@ export default function TaskPage() {
             <div className="min-h-full min-w-full bg-gray-100 p-8">
                 <div className="back-button">
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => {
+                            navigate(-1);
+                        }}
                         className="rounded-lg bg-white px-4 py-2 text-gray-700 shadow-sm transition hover:bg-blue-50 hover:text-blue-600 cursor-pointer"
                     >
                         Back
