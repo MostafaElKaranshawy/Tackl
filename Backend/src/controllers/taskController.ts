@@ -48,87 +48,6 @@ export default class TaskController {
             if (!userId) {
                 throw new ForbiddenException("User ID is required.");
             }
-<<<<<<< HEAD
-=======
-            const task = await TaskService.getTaskById(taskId, userId);
-            res.status(200).json(task);
-        } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
-        }
-    }
-
-    static async updateTask(req: any, res: any) {
-        try {
-            const userId = req.userId;
-            const taskId = req.params.taskId;
-            const updatedData = req.body as Partial<Task>;
-
-            if (!taskId) {
-                throw new MissingRequiredDataException("Task ID is required.");
-            }
-            const parsedTaskData = {
-                ...(updatedData.title !== undefined && { title: updatedData.title }),
-                ...(updatedData.description !== undefined && { description: updatedData.description }),
-                ...(updatedData.status !== undefined && { status: updatedData.status }),
-                ...(updatedData.priority !== undefined && { priority: updatedData.priority }),
-                ...(updatedData.estimatedTime !== undefined && { estimatedTime: updatedData.estimatedTime }),
-                ...(updatedData.dueDate !== undefined && {
-                    dueDate: updatedData.dueDate ? new Date(updatedData.dueDate) : null,
-                }),
-            };
-
-            const task = await TaskService.updateTask(taskId, parsedTaskData, userId);
-            res.status(200).json(task);
-        } catch (error) {
-            console.log("Error in updateTask:", error);
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
-        }
-    }
-
-    static async deleteTask(req: any, res: any) {
-        try {
-            const userId = req.userId;
-            const taskId = req.params.taskId;
-
-            if (!taskId) {
-                throw new MissingRequiredDataException("Task ID is required.");
-            }
-
-            await TaskService.deleteTask(taskId, userId);
-            res.status(204).send();
-        } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
-        }
-    }
-
-    static async getProjectTasks(req: any, res: any) {
-        try {
-            const userId = req.userId;
->>>>>>> c4a99b5 (TT26-62 Optional Parameters Task Update)
             const projectId = req.params.projectId;
 
             if (!projectId || !(projectId && typeof projectId === 'string')) {
@@ -252,7 +171,19 @@ export default class TaskController {
             const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
+<<<<<<< HEAD
             ErrorHandler(error, req, res);
+=======
+            if (error instanceof ForbiddenException) {
+                res.status(403).json({ message: error.message });
+            } else if (error instanceof NotFoundException) {
+                res.status(404).json({ message: error.message });
+            } else if (error instanceof MissingRequiredDataException) {
+                res.status(400).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: (error as Error).message });
+            }
+>>>>>>> e6f8a58 (TT26-91 PR10 Requested Changes Resolved)
         }
     }
 
