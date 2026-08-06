@@ -47,6 +47,9 @@ export default class TaskRepository {
             await task.update(updatedData);
             return task;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to update task: " + (error as Error).message);
         }
     }
@@ -59,6 +62,9 @@ export default class TaskRepository {
             }
             await task.destroy();
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to delete task: " + (error as Error).message);
         }
     }

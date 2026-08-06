@@ -16,7 +16,7 @@ export default class TaskController {
             const taskData = req.body as Task;
             const projectId = req.params.projectId;
 
-            if (!taskData.title || !taskData.status || !taskData.priority) {
+            if (!taskData.title) {
                 throw new MissingRequiredDataException("Missing required task data.");
             }
 

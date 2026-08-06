@@ -33,6 +33,9 @@ export default class ProjectRepo {
             await project.update(updatedData);
             return project;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to update project: " + (error as Error).message);
         }
     }
@@ -45,6 +48,9 @@ export default class ProjectRepo {
             }
             await project.destroy();
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to delete project: " + (error as Error).message);
         }
     }
