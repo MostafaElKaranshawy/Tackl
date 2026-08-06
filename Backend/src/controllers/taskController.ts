@@ -5,7 +5,7 @@ import Task from '../models/task';
 import TaskService from '../services/taskService'
 
 export default class TaskController {
-    
+
     static async createTask(req: any, res: any) {
         try {
             const userId = req.userId
@@ -75,12 +75,14 @@ export default class TaskController {
                 throw new MissingRequiredDataException("Task ID is required.");
             }
             const parsedTaskData = {
-                title: updatedData.title,
-                description: updatedData.description || null,
-                status: updatedData.status || "todo",
-                priority: updatedData.priority || "medium",
-                estimatedTime: updatedData.estimatedTime || null,
-                dueDate: updatedData.dueDate ? new Date(updatedData.dueDate) : null,
+                ...(updatedData.title !== undefined && { title: updatedData.title }),
+                ...(updatedData.description !== undefined && { description: updatedData.description }),
+                ...(updatedData.status !== undefined && { status: updatedData.status }),
+                ...(updatedData.priority !== undefined && { priority: updatedData.priority }),
+                ...(updatedData.estimatedTime !== undefined && { estimatedTime: updatedData.estimatedTime }),
+                ...(updatedData.dueDate !== undefined && {
+                    dueDate: updatedData.dueDate ? new Date(updatedData.dueDate) : null,
+                }),
             };
 
             const task = await TaskService.updateTask(taskId, parsedTaskData, userId);
