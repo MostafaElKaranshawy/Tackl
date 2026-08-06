@@ -273,7 +273,7 @@ export default function TaskShow() {
                             </div>
                         </div>
                     </div>
-                    <TimeEntriesList taskId={task.id} currentScreen="task-modal" updateTotalTime={setTotalLoggedTime} />
+                    <TimeEntriesList projectId={task.projectId} taskId={task.id} currentScreen="task-modal" updateTotalTime={setTotalLoggedTime} />
                     {showEditModal && (
                         <ManageTaskCard
                             mode="edit"

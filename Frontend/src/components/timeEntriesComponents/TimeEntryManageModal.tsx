@@ -11,13 +11,14 @@ import { notify } from "../../utils/notify";
 import ConfirmationModal from "../ConfirmationModal";
 
 type Props = {
+    projectId: string;
     taskId: string;
     timeEntry?: TimeEntry;
     onClose: () => void;
     onUpdate: () => void;
 };
 
-export default function TimeEntryManageModal({ taskId, timeEntry, onClose, onUpdate, }: Props) {
+export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onClose, onUpdate, }: Props) {
     const [entry, setEntry] = useState<TimeEntry | undefined>(timeEntry);
     const [mode, setMode] = useState<"show" | "edit" | "create">(
         timeEntry ? "show" : "create"
@@ -54,7 +55,7 @@ export default function TimeEntryManageModal({ taskId, timeEntry, onClose, onUpd
             setIsSubmitting(true);
 
             if (mode === "create") {
-                const created = await createTimeEntry(taskId, {
+                const created = await createTimeEntry(projectId, taskId, {
                     duration,
                     date,
                     note,
@@ -63,7 +64,7 @@ export default function TimeEntryManageModal({ taskId, timeEntry, onClose, onUpd
                 setEntry(created);
                 setMode("show");
             } else if (entry) {
-                const updated = await updateTimeEntry(taskId, entry.id, {
+                const updated = await updateTimeEntry(projectId, taskId, entry.id, {
                     duration,
                     date,
                     note,
@@ -88,7 +89,7 @@ export default function TimeEntryManageModal({ taskId, timeEntry, onClose, onUpd
         try {
             setIsSubmitting(true);
 
-            await deleteTimeEntry(taskId, entry.id);
+            await deleteTimeEntry(projectId, taskId, entry.id);
 
             notify.success("Time entry deleted.");
 

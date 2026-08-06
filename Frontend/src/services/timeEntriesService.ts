@@ -2,12 +2,12 @@ import axios from 'axios';
 import type TimeEntry from '../types/timeEntry';
 
 
-const API_URL = import.meta.env.VITE_API_URL + "/api/tasks/";
+const API_URL = import.meta.env.VITE_API_URL + "/api/projects/";
 
-const getTaskTimeEntries = async (taskId: string): Promise<TimeEntry[]> => {
+const getTaskTimeEntries = async (projectId: string, taskId: string): Promise<TimeEntry[]> => {
     try {
         const response = await axios.get(
-            `${API_URL}${taskId}/time-entries`,
+            `${API_URL}${projectId}/tasks/${taskId}/time-entries`,
             { withCredentials: true }
         );
         return response.data;
@@ -16,10 +16,10 @@ const getTaskTimeEntries = async (taskId: string): Promise<TimeEntry[]> => {
     }
 }
 
-const updateTimeEntry = async (taskId: string, timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry> => {
+const updateTimeEntry = async (projectId: string, taskId: string, timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry> => {
     try {
         const response = await axios.put(
-            `${API_URL}${taskId}/time-entries/${timeEntryId}`,
+            `${API_URL}${projectId}/tasks/${taskId}/time-entries/${timeEntryId}`,
             updatedData,
             { withCredentials: true }
         );
@@ -29,10 +29,10 @@ const updateTimeEntry = async (taskId: string, timeEntryId: string, updatedData:
     }
 }
 
-const deleteTimeEntry = async (taskId: string, timeEntryId: string): Promise<void> => {
+const deleteTimeEntry = async (projectId: string, taskId: string, timeEntryId: string): Promise<void> => {
     try {
         await axios.delete(
-            `${API_URL}${taskId}/time-entries/${timeEntryId}`,
+            `${API_URL}${projectId}/tasks/${taskId}/time-entries/${timeEntryId}`,
             { withCredentials: true }
         );
     } catch (error) {
@@ -40,10 +40,10 @@ const deleteTimeEntry = async (taskId: string, timeEntryId: string): Promise<voi
     }
 }
 
-const createTimeEntry = async (taskId: string, newTimeEntry: Partial<TimeEntry>): Promise<TimeEntry> => {
+const createTimeEntry = async (projectId: string, taskId: string, newTimeEntry: Partial<TimeEntry>): Promise<TimeEntry> => {
     try {
         const response = await axios.post(
-            `${API_URL}${taskId}/time-entries`,
+            `${API_URL}${projectId}/tasks/${taskId}/time-entries`,
             newTimeEntry,
             { withCredentials: true }
         );
@@ -53,10 +53,10 @@ const createTimeEntry = async (taskId: string, newTimeEntry: Partial<TimeEntry>)
     }
 }
 
-const getTimeEntryById = async (taskId: string, timeEntryId: string): Promise<TimeEntry> => {
+const getTimeEntryById = async (projectId: string, taskId: string, timeEntryId: string): Promise<TimeEntry> => {
     try {
         const response = await axios.get(
-            `${API_URL}${taskId}/time-entries/${timeEntryId}`,
+            `${API_URL}${projectId}/tasks/${taskId}/time-entries/${timeEntryId}`,
             { withCredentials: true }
         );
         return response.data;

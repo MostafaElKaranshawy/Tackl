@@ -7,13 +7,14 @@ export default class TimeEntryController {
     static async createTimeEntry(req: any, res: any) {
         try {
             const { userId } = req;
-            const { taskId } = req.params;
+            const { projectId, taskId } = req.params;
             const timeEntryData = req.body;
 
-            if (!taskId || !timeEntryData.duration || !timeEntryData.date) {
+            if (!projectId || !taskId || !timeEntryData.duration || !timeEntryData.date) {
                 throw new MissingRequiredDataException("Missing required data for creating time entry.");
             }
             const filteredTimeEntryData = {
+                projectId: projectId,
                 taskId: taskId,
                 duration: timeEntryData.duration,
                 date: timeEntryData.date,
@@ -38,13 +39,13 @@ export default class TimeEntryController {
     static async getTimeEntryById(req: any, res: any) {
         try {
             const { userId } = req;
-            const { taskId, timeEntryId } = req.params;
+            const { projectId, taskId, timeEntryId } = req.params;
 
-            if (!taskId) {
-                throw new MissingRequiredDataException("Missing required data: taskId.");
+            if (!projectId || !taskId) {
+                throw new MissingRequiredDataException("Missing required data: projectId or taskId.");
             }
 
-            const timeEntry = await TimeEntryService.getTimeEntryById(timeEntryId, userId, taskId);
+            const timeEntry = await TimeEntryService.getTimeEntryById(timeEntryId, userId, projectId, taskId);
 
             if (!timeEntry) {
                 throw new NotFoundException("Time entry not found.");
@@ -67,13 +68,14 @@ export default class TimeEntryController {
     static async updateTimeEntry(req: any, res: any) {
         try {
             const { userId } = req;
-            const { taskId, timeEntryId } = req.params;
+            const { projectId, taskId, timeEntryId } = req.params;
             const updatedData = req.body;
 
-            if (!timeEntryId || !taskId) {
+            if (!timeEntryId || !taskId || !projectId) {
                 throw new MissingRequiredDataException("Missing required data for updating time entry.");
             }
             const filteredUpdatedData = {
+                projectId: projectId,
                 timeEntryId: timeEntryId,
                 taskId: taskId,
                 duration: updatedData.duration,
@@ -99,13 +101,13 @@ export default class TimeEntryController {
     static async deleteTimeEntry(req: any, res: any) {
         try {
             const { userId } = req;
-            const { timeEntryId } = req.params;
+            const { projectId, taskId, timeEntryId } = req.params;
 
-            if (!timeEntryId) {
+            if (!projectId || !taskId || !timeEntryId) {
                 throw new MissingRequiredDataException("Missing required data for deleting time entry.");
             }
 
-            await TimeEntryService.deleteTimeEntry(userId, timeEntryId);
+            await TimeEntryService.deleteTimeEntry(userId, projectId, taskId, timeEntryId);
 
             res.status(204).send();
         } catch (error) {
@@ -124,12 +126,12 @@ export default class TimeEntryController {
     static async getTaskTimeEntries(req: any, res: any) {
         try {
             const { userId } = req;
-            const { taskId } = req.params;
+            const { projectId, taskId } = req.params;
 
-            if (!taskId) {
-                throw new MissingRequiredDataException("Missing required data: taskId.");
+            if (!projectId || !taskId) {
+                throw new MissingRequiredDataException("Missing required data: projectId or taskId.");
             }
-            const timeEntries = await TimeEntryService.getTaskTimeEntries(userId, taskId);
+            const timeEntries = await TimeEntryService.getTaskTimeEntries(userId, projectId, taskId);
 
             res.status(200).json(timeEntries);
         } catch (error) {

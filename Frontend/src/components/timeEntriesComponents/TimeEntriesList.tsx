@@ -6,7 +6,7 @@ import { formatMinutes } from "../../utils/timeFormater";
 import TimeEntryManageModal from "./TimeEntryManageModal";
 import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext";
 
-export default function TimeEntriesList({ taskId, currentScreen, updateTotalTime }: { taskId: string, currentScreen: string, updateTotalTime: (totalMinutes: number) => void }) {
+export default function TimeEntriesList({ projectId, taskId, currentScreen, updateTotalTime }: { projectId: string, taskId: string, currentScreen: string, updateTotalTime: (totalMinutes: number) => void }) {
     const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
     const [currentTimeEntry, setCurrentTimeEntry] = useState<TimeEntry | null>(null);
     const [showCreateTimeEntryModal, setShowCreateTimeEntryModal] = useState(false);
@@ -14,7 +14,7 @@ export default function TimeEntriesList({ taskId, currentScreen, updateTotalTime
 
     const fetchTimeEntries = async () => {
         try {
-            const entries = await getTaskTimeEntries(taskId);
+            const entries = await getTaskTimeEntries(projectId, taskId);
             setTimeEntries(entries);
             updateTotalTime(entries.reduce((total, entry) => total + entry.duration, 0));
         } catch (error) {
@@ -23,9 +23,9 @@ export default function TimeEntriesList({ taskId, currentScreen, updateTotalTime
     };
 
     useEffect(() => {
-        if (!taskId) return;
+        if (!taskId || !projectId) return;
         fetchTimeEntries();
-    }, [taskId, key]);
+    }, [taskId, projectId, key]);
 
 
     return (
@@ -79,6 +79,7 @@ export default function TimeEntriesList({ taskId, currentScreen, updateTotalTime
             {
                 currentTimeEntry && (
                     <TimeEntryManageModal
+                        projectId={projectId}
                         taskId={taskId}
                         timeEntry={currentTimeEntry}
                         onClose={() => {
@@ -94,6 +95,7 @@ export default function TimeEntriesList({ taskId, currentScreen, updateTotalTime
             {
                 showCreateTimeEntryModal && (
                     <TimeEntryManageModal
+                        projectId={projectId}
                         taskId={taskId}
                         onClose={() => {
                             setShowCreateTimeEntryModal(false);

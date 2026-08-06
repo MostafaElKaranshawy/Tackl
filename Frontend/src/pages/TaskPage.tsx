@@ -217,7 +217,7 @@ export default function TaskPage() {
                             </aside>
                         </div>
                     </div>
-                    <TaskEntriesList taskId={task.id} currentScreen="task-page" updateTotalTime={setTotalLoggedTime} />
+                    <TaskEntriesList projectId={task.projectId} taskId={task.id} currentScreen="task-page" updateTotalTime={setTotalLoggedTime} />
                 </div>
                 {showEditModal && (
                     <ManageTaskCard

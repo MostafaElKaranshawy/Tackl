@@ -5,13 +5,19 @@ const timeEntryRouter = router.Router({ mergeParams: true });
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries:
  *   post:
  *     summary: Create a time entry
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -49,13 +55,19 @@ timeEntryRouter.post(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries:
  *   get:
  *     summary: Get all time entries for a task
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -89,13 +101,19 @@ timeEntryRouter.get(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries/{timeEntryId}:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries/{timeEntryId}:
  *   get:
  *     summary: Get a time entry by ID
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -133,13 +151,19 @@ timeEntryRouter.get(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries/{timeEntryId}:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries/{timeEntryId}:
  *   put:
  *     summary: Update a time entry
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
@@ -183,13 +207,19 @@ timeEntryRouter.put(
 
 /**
  * @swagger
- * /api/tasks/{taskId}/time-entries/{timeEntryId}:
+ * /api/projects/{projectId}/tasks/{taskId}/time-entries/{timeEntryId}:
  *   delete:
  *     summary: Delete a time entry
  *     tags: [Time Entries]
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
  *       - in: path
  *         name: taskId
  *         required: true
