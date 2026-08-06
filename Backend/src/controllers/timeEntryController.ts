@@ -105,6 +105,7 @@ export default class TimeEntryController {
 
             res.status(200).json(updatedTimeEntry);
         } catch (error) {
+            console.log(error);
             if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else if (error instanceof ForbiddenException) {
