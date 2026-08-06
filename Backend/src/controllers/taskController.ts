@@ -171,19 +171,7 @@ export default class TaskController {
             const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
-<<<<<<< HEAD
             ErrorHandler(error, req, res);
-=======
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
->>>>>>> e6f8a58 (TT26-91 PR10 Requested Changes Resolved)
         }
     }
 
