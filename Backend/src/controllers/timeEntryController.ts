@@ -1,3 +1,4 @@
+import ErrorHandler from "../exceptions/errorHandler";
 import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
