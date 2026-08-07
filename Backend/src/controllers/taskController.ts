@@ -1,5 +1,6 @@
 import { TaskPriority } from '../enums/taskPriority';
 import { TaskStatus } from '../enums/taskStatus';
+import ErrorHandler from '../exceptions/errorHandler';
 import ForbiddenException from '../exceptions/forbiddenException';
 import MissingRequiredDataException from '../exceptions/missingRequiredDataException';
 import NotFoundException from '../exceptions/notFoundException';
@@ -34,15 +35,7 @@ export default class TaskController {
             const task = await TaskService.createTask(parsedTaskData, projectId, userId);
             res.status(201).json(task);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
 
     }
@@ -57,15 +50,7 @@ export default class TaskController {
             const task = await TaskService.getTaskById(taskId, userId);
             res.status(200).json(task);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -92,15 +77,7 @@ export default class TaskController {
             const task = await TaskService.updateTask(taskId, parsedTaskData, userId);
             res.status(200).json(task);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -116,15 +93,7 @@ export default class TaskController {
             await TaskService.deleteTask(taskId, userId);
             res.status(204).send();
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -162,15 +131,7 @@ export default class TaskController {
             const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -195,15 +156,7 @@ export default class TaskController {
             const tasks = await TaskService.getAllProjectTasks(projectId, userId, sortBy, sortOrder);
             res.status(200).json(tasks);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 }

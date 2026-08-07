@@ -15,7 +15,6 @@ export default function ProjectBoard() {
 
     const returnToProjectsPage = () => {
         setProject(null);
-        console.log("Returning to projects page with search params:", location.search);
         navigate({
             pathname: "/projects",
             search: location.search,
@@ -57,7 +56,7 @@ export default function ProjectBoard() {
 
     const handleProjectDelete = () => {
         returnToProjectsPage();
-        setKey(prev => prev === null ? 1 : (prev + 1) % 2);
+        // setKey(prev => prev === null ? 1 : (prev + 1) % 2);
     }
     const handleProjectUpdate = (updatedProject: Project) => {
         setProject(updatedProject);

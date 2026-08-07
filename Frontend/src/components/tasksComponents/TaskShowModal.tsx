@@ -148,7 +148,6 @@ export default function TaskShow() {
                                 title="Open Task in New Tab"
                                 className="rounded-full p-2 text-gray-500 transition hover:bg-green-100 hover:text-green-600 cursor-pointer"
                                 onClick={() => {
-                                    console.log("current location", location.pathname + location.search);
                                     navigate(`/projects/${task.projectId}/tasks/${task.id}`);
                                 }}>
                                 <MdOpenInNew

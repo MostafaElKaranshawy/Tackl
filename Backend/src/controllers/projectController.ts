@@ -2,7 +2,7 @@ import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import ProjectService from "../services/projectService";
-
+import ErrorHandler from "../exceptions/errorHandler";
 export default class ProjectController {
     static async createProject(req: any, res: any) {
         try {
@@ -21,7 +21,7 @@ export default class ProjectController {
             if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else {
-                res.status(500).json({ message: "Internal Server Error, try again later" });
+                ErrorHandler(error, req, res);
             }
         }
     }
@@ -41,16 +41,7 @@ export default class ProjectController {
             res.status(200).json(project);
 
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            }
-            else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "Internal Server Error, try again later" });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -71,15 +62,7 @@ export default class ProjectController {
             const project = await ProjectService.updateProject(projectId, { name: updatedData.name, description: updatedData.description }, userId);
             res.status(200).json(project);
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "Internal Server Error, try again later" });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -95,15 +78,7 @@ export default class ProjectController {
             res.status(204).send();
 
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "Internal Server Error, try again later" });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -135,13 +110,7 @@ export default class ProjectController {
             res.status(200).json({ projects, total, page, limit });
 
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "Internal Server Error, try again later" });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 }

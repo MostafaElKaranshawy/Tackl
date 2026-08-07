@@ -1,3 +1,4 @@
+import ErrorHandler from "../exceptions/errorHandler";
 import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
@@ -34,15 +35,7 @@ export default class TimeEntryController {
 
             res.status(201).json(createdTimeEntry);
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -63,15 +56,7 @@ export default class TimeEntryController {
 
             res.status(200).json(timeEntry);
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -105,16 +90,7 @@ export default class TimeEntryController {
 
             res.status(200).json(updatedTimeEntry);
         } catch (error) {
-            console.log(error);
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -131,15 +107,7 @@ export default class TimeEntryController {
 
             res.status(204).send();
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 
@@ -155,15 +123,7 @@ export default class TimeEntryController {
 
             res.status(200).json(timeEntries);
         } catch (error) {
-            if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            ErrorHandler(error, req, res);
         }
     }
 }

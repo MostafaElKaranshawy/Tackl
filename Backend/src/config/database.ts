@@ -1,4 +1,5 @@
 import { Sequelize, DataTypes, Op } from "sequelize";
+import logger from "./logger";
 
 const sequelize = new Sequelize(
   process.env.DB_NAME as string,
@@ -15,10 +16,10 @@ const sequelize = new Sequelize(
 sequelize
   .authenticate()
   .then(() => {
-    console.log("Database connection has been established successfully.");
+    logger.info("Database connection has been established successfully.");
   })
   .catch((err: unknown) => {
-    console.error("Unable to connect to the database:", err);
+    logger.error("Unable to connect to the database:", err);
   });
 
 export { sequelize, DataTypes, Op };

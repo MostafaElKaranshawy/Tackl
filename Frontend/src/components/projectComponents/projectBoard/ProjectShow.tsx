@@ -87,10 +87,10 @@ export default function ProjectShow(
         try {
             await deleteProject(id);
             deleteRefresh && deleteRefresh();
-            navigate({
-                pathname: "/projects",
-                search: location.search,
-            });
+            // navigate({
+            //     pathname: "/projects",
+            //     search: location.search,
+            // });
         } catch (error) {
             alert("Failed to delete project. Please try again later.");
         }
