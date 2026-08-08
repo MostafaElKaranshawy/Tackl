@@ -26,13 +26,17 @@ export default class TaskService {
         }
     }
 
-    static async getTaskById(taskId: string, userId: string): Promise<Task | null> {
+    static async getTaskById(projectId: string, taskId: string, userId: string): Promise<Task | null> {
         try {
             const task = await TaskRepository.getTaskById(taskId);
+
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
 
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
+            }
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
@@ -44,13 +48,16 @@ export default class TaskService {
         }
     }
 
-    static async updateTask(taskId: string, updatedData: any, userId: string): Promise<Task | null> {
+    static async updateTask(projectId: string, taskId: string, updatedData: any, userId: string): Promise<Task | null> {
         try {
             const task = await TaskRepository.getTaskById(taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
 
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
+            }
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
@@ -61,13 +68,15 @@ export default class TaskService {
         }
     }
 
-    static async deleteTask(taskId: string, userId: string): Promise<void> {
+    static async deleteTask(projectId: string, taskId: string, userId: string): Promise<void> {
         try {
             const task = await TaskRepository.getTaskById(taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
-
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
+            }
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }

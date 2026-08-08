@@ -3,16 +3,28 @@ import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import TimeEntryService from "../services/timeEntryService";
-import { validateDate, validateTime } from "../utils/validateTime";
+import { Request, Response } from "express";
 
 export default class TimeEntryController {
-    static async createTimeEntry(req: any, res: any) {
+    static async createTimeEntry(req: Request, res: Response) {
         try {
             const { userId } = req;
+
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
             const { projectId, taskId } = req.params;
+
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
+                throw new MissingRequiredDataException("Task ID is required.");
+            }
             const timeEntryData = req.body;
 
-            if (!projectId || !taskId || !timeEntryData.duration || !timeEntryData.date) {
+            if (!timeEntryData.duration || !timeEntryData.date) {
                 throw new MissingRequiredDataException("Missing required data for creating time entry.");
             }
 
@@ -39,13 +51,24 @@ export default class TimeEntryController {
         }
     }
 
-    static async getTimeEntryById(req: any, res: any) {
+    static async getTimeEntryById(req: Request, res: Response) {
         try {
             const { userId } = req;
-            const { projectId, taskId, timeEntryId } = req.params;
 
-            if (!projectId || !taskId) {
-                throw new MissingRequiredDataException("Missing required data: projectId or taskId.");
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
+            const { projectId, taskId, timeEntryId } = req.params;
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
+                throw new MissingRequiredDataException("Task ID is required.");
+            }
+            if (!timeEntryId || !(timeEntryId && typeof timeEntryId === 'string')) {
+                throw new MissingRequiredDataException("Time entry ID is required.");
             }
 
             const timeEntry = await TimeEntryService.getTimeEntryById(timeEntryId, userId, projectId, taskId);
@@ -60,24 +83,28 @@ export default class TimeEntryController {
         }
     }
 
-    static async updateTimeEntry(req: any, res: any) {
+    static async updateTimeEntry(req: Request, res: Response) {
         try {
             const { userId } = req;
+
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
             const { projectId, taskId, timeEntryId } = req.params;
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
+                throw new MissingRequiredDataException("Task ID is required.");
+            }
+            if (!timeEntryId || !(timeEntryId && typeof timeEntryId === 'string')) {
+                throw new MissingRequiredDataException("Time entry ID is required.");
+            }
+
+
             const updatedData = req.body;
-
-            if (!timeEntryId || !taskId || !projectId) {
-                throw new MissingRequiredDataException("Missing required data for updating time entry.");
-            }
-
-            if (updatedData.duration && !validateTime(updatedData.duration)) {
-                throw new MissingRequiredDataException("Invalid duration format. Please use HH:mm format (00:00 to 23:59).");
-            }
-
-            if (updatedData.date && !validateDate(updatedData.date)) {
-                throw new MissingRequiredDataException("Invalid date format. Please use a valid date.");
-            }
-
             const filteredUpdatedData = {
                 projectId,
                 timeEntryId,
@@ -94,13 +121,24 @@ export default class TimeEntryController {
         }
     }
 
-    static async deleteTimeEntry(req: any, res: any) {
+    static async deleteTimeEntry(req: Request, res: Response) {
         try {
             const { userId } = req;
-            const { projectId, taskId, timeEntryId } = req.params;
 
-            if (!projectId || !taskId || !timeEntryId) {
-                throw new MissingRequiredDataException("Missing required data for deleting time entry.");
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
+            const { projectId, taskId, timeEntryId } = req.params;
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
+                throw new MissingRequiredDataException("Task ID is required.");
+            }
+            if (!timeEntryId || !(timeEntryId && typeof timeEntryId === 'string')) {
+                throw new MissingRequiredDataException("Time entry ID is required.");
             }
 
             await TimeEntryService.deleteTimeEntry(userId, projectId, taskId, timeEntryId);
@@ -111,14 +149,23 @@ export default class TimeEntryController {
         }
     }
 
-    static async getTaskTimeEntries(req: any, res: any) {
+    static async getTaskTimeEntries(req: Request, res: Response) {
         try {
             const { userId } = req;
-            const { projectId, taskId } = req.params;
 
-            if (!projectId || !taskId) {
-                throw new MissingRequiredDataException("Missing required data: projectId or taskId.");
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
             }
+
+            const { projectId, taskId } = req.params;
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
+                throw new MissingRequiredDataException("Task ID is required.");
+            }
+
             const timeEntries = await TimeEntryService.getTaskTimeEntries(userId, projectId, taskId);
 
             res.status(200).json(timeEntries);

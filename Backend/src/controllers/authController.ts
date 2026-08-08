@@ -7,6 +7,7 @@ import MissingRequiredDataException from "../exceptions/missingRequiredDataExcep
 import { Request, Response } from "express";
 import ForbiddenException from "../exceptions/forbiddenException";
 import Jwt from "../config/jwt";
+import logger from "../config/logger";
 
 export default class AuthController {
 
@@ -21,15 +22,18 @@ export default class AuthController {
         try {
             await AuthService.signUp(name, email, password);
             res.status(201).json({ message: "User created successfully" });
-        } catch (error: any) {
+        } catch (error) {
+            logger.error(`Error in signUp: ${error instanceof Error ? error.message : 'Unknown error'}`);
             if (error instanceof AlreadyExistsException) {
                 res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
             } else if (error instanceof MissingRequiredDataException) {
                 res.status(error.statusCode).json({ message: error.message });
-            } else {
+            } else if (error instanceof Error) {
                 res.status(400).json({ message: error.message });
+            } else {
+                res.status(400).json({ message: "An unknown error occurred" });
             }
         }
     }
@@ -54,15 +58,18 @@ export default class AuthController {
             });
 
             res.status(200).json({ message: "Login successful" });
-        } catch (error: any) {
+        } catch (error) {
+            logger.error(`Error in login: ${error instanceof Error ? error.message : 'Unknown error'}`);
             if (error instanceof WrongCredentialsException || error instanceof NotFoundException) {
                 res.status(error.statusCode).json({ message: "Invalid email or password" });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
             } else if (error instanceof MissingRequiredDataException) {
                 res.status(error.statusCode).json({ message: error.message });
-            } else {
+            } else if (error instanceof Error) {
                 res.status(400).json({ message: error.message });
+            } else {
+                res.status(400).json({ message: "An unknown error occurred" });
             }
         }
     }
@@ -79,11 +86,14 @@ export default class AuthController {
             await AuthService.confirmEmail(userId);
             res.status(200).json({ message: "Email confirmed successfully" });
 
-        } catch (error: any) {
+        } catch (error) {
+            logger.error(`Error in confirmEmail: ${error instanceof Error ? error.message : 'Unknown error'}`);
             if (error instanceof ForbiddenException) {
                 res.status(error.statusCode).json({ message: error.message });
-            } else {
+            } else if (error instanceof Error) {
                 res.status(400).json({ message: error.message });
+            } else {
+                res.status(400).json({ message: "An unknown error occurred" });
             }
         }
     }
@@ -98,17 +108,20 @@ export default class AuthController {
         try {
             await AuthService.getConfirmationLink(email);
             res.status(200).json({ message: "If an account with that email exists, a confirmation link has been sent." });
-        } catch (error: any) {
-            if (error.statusCode === 409 && error.message === "Confirmation link was sent recently. Please check your email.") {
-                res.status(409).json({ message: error.message });
+        } catch (error) {
+            logger.error(`Error in getConfirmationLink: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if ((error as AlreadyExistsException).statusCode === 409 && (error as Error).message === "Confirmation link was sent recently. Please check your email.") {
+                res.status(409).json({ message: (error as Error).message });
             } else if (error instanceof NotFoundException) {
                 res.status(200).json({ message: "If an account with that email exists, a confirmation link has been sent." });
             } else if (error instanceof AlreadyExistsException) {
                 res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
-            } else {
+            } else if (error instanceof Error) {
                 res.status(400).json({ message: error.message });
+            } else {
+                res.status(400).json({ message: "An unknown error occurred" });
             }
         }
     }
@@ -128,13 +141,16 @@ export default class AuthController {
         try {
             await AuthService.resetPassword(password, userId);
             res.status(200).json({ message: "Password reset successfully" });
-        } catch (error: any) {
+        } catch (error) {
+            logger.error(`Error in resetPassword: ${error instanceof Error ? error.message : 'Unknown error'}`);
             if (error instanceof NotFoundException) {
                 res.status(error.statusCode).json({ message: error.message });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
-            } else {
+            } else if (error instanceof Error) {
                 res.status(400).json({ message: error.message });
+            } else {
+                res.status(400).json({ message: "An unknown error occurred" });
             }
         }
     }
@@ -148,15 +164,18 @@ export default class AuthController {
         try {
             await AuthService.getResetPasswordLink(email);
             res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
-        } catch (error: any) {
+        } catch (error) {
+            logger.error(`Error in getResetPasswordLink: ${error instanceof Error ? error.message : 'Unknown error'}`);
             if (error instanceof AlreadyExistsException) {
                 res.status(409).json({ message: error.message });
             } else if (error instanceof NotFoundException || error instanceof WrongCredentialsException) {
                 res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
             } else if (error instanceof DBException) {
                 res.status(error.statusCode).json({ message: "Internal server error" });
-            } else {
+            } else if (error instanceof Error) {
                 res.status(400).json({ message: error.message });
+            } else {
+                res.status(400).json({ message: "An unknown error occurred" });
             }
         }
     }
@@ -175,6 +194,7 @@ export default class AuthController {
             }
             res.status(200).json({ message: "Authenticated", userId: tokenData.id });
         } catch (error) {
+            logger.error(`Error in checkAuthentication: ${error instanceof Error ? error.message : 'Unknown error'}`);
             res.status(403).json({ message: "Not authenticated" });
         }
     }
@@ -187,7 +207,8 @@ export default class AuthController {
                 sameSite: "strict",
             });
             res.status(200).json({ message: "Logged out successfully" });
-        } catch (error: any) {
+        } catch (error) {
+            logger.error(`Error in logout: ${error instanceof Error ? error.message : 'Unknown error'}`);
             res.status(500).json({ message: "Internal server error" });
         }
     }

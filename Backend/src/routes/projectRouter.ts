@@ -111,7 +111,7 @@ projectRouter.get("/", ProjectController.getUserProjects);
 
 /**
  * @openapi
- * /api/projects/{id}:
+ * /api/projects/{projectId}:
  *   get:
  *     summary: Get a project by ID
  *     description: Returns a single project if it belongs to the authenticated user.
@@ -121,7 +121,7 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *       - cookieAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: projectId
  *         required: true
  *         schema:
  *           type: string
@@ -145,11 +145,11 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *       500:
  *         description: Internal server error.
  */
-projectRouter.get("/:id", ProjectController.getProjectById);
+projectRouter.get("/:projectId", ProjectController.getProjectById);
 
 /**
  * @openapi
- * /api/projects/{id}:
+ * /api/projects/{projectId}:
  *   put:
  *     summary: Update a project
  *     description: Updates a project owned by the authenticated user.
@@ -159,7 +159,7 @@ projectRouter.get("/:id", ProjectController.getProjectById);
  *       - cookieAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: projectId
  *         required: true
  *         schema:
  *           type: string
@@ -189,11 +189,11 @@ projectRouter.get("/:id", ProjectController.getProjectById);
  *       500:
  *         description: Internal server error.
  */
-projectRouter.put("/:id", ProjectController.updateProject);
+projectRouter.put("/:projectId", ProjectController.updateProject);
 
 /**
  * @openapi
- * /api/projects/{id}:
+ * /api/projects/{projectId}:
  *   delete:
  *     summary: Delete a project
  *     description: Deletes a project owned by the authenticated user.
@@ -203,7 +203,7 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *       - cookieAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: projectId
  *         required: true
  *         schema:
  *           type: string
@@ -223,6 +223,6 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *       500:
  *         description: Internal server error.
  */
-projectRouter.delete("/:id", ProjectController.deleteProject);
+projectRouter.delete("/:projectId", ProjectController.deleteProject);
 
 export default projectRouter;
