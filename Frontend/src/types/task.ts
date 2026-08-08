@@ -12,3 +12,14 @@ export default interface Task {
 }
 export type CreateTaskDto = Omit<Task, "id" | "createdAt" | "updatedAt" | "projectId">;
 export type UpdateTaskDto = Partial<Task>;
+
+export type GetProjectTasksOptions = {
+    page?: number;
+    pageSize?: number;
+    sortBy: string;
+    sortOrder: string;
+    search: string;
+    status?: string;
+    priority?: string;
+    overdue?: boolean;
+};
