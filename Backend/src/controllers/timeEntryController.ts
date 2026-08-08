@@ -4,6 +4,7 @@ import MissingRequiredDataException from "../exceptions/missingRequiredDataExcep
 import NotFoundException from "../exceptions/notFoundException";
 import TimeEntryService from "../services/timeEntryService";
 import { Request, Response } from "express";
+import { validateDate, validateTime } from "../utils/validateTime";
 
 export default class TimeEntryController {
     static async createTimeEntry(req: Request, res: Response) {
@@ -37,13 +38,11 @@ export default class TimeEntryController {
             }
 
             const filteredTimeEntryData = {
-                projectId: projectId,
-                taskId: taskId,
-                duration: timeEntryData.duration || null,
-                date: timeEntryData.date || null,
+                duration: timeEntryData.duration,
+                date: timeEntryData.date,
                 note: timeEntryData.note || null
             };
-            const createdTimeEntry = await TimeEntryService.createTimeEntry(userId, filteredTimeEntryData);
+            const createdTimeEntry = await TimeEntryService.createTimeEntry(userId, projectId, taskId, filteredTimeEntryData);
 
             res.status(201).json(createdTimeEntry);
         } catch (error) {
@@ -106,14 +105,11 @@ export default class TimeEntryController {
 
             const updatedData = req.body;
             const filteredUpdatedData = {
-                projectId,
-                timeEntryId,
-                taskId,
-                ...(updatedData.duration !== undefined && { duration: updatedData.duration }),
-                ...(updatedData.date !== undefined && { date: updatedData.date }),
-                ...(updatedData.note !== undefined && { note: updatedData.note }),
+                duration: updatedData.duration,
+                date: updatedData.date,
+                note: updatedData.note
             };
-            const updatedTimeEntry = await TimeEntryService.updateTimeEntry(userId, filteredUpdatedData);
+            const updatedTimeEntry = await TimeEntryService.updateTimeEntry(userId, projectId, taskId, timeEntryId, filteredUpdatedData);
 
             res.status(200).json(updatedTimeEntry);
         } catch (error) {

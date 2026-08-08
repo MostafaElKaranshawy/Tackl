@@ -5,17 +5,28 @@ import NotFoundException from "../exceptions/notFoundException";
 import QueryParams from "../interfaces/QueryParams";
 import Task from "../models/task";
 import Project from "../models/project";
+import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 
 export default class TaskRepository {
-    static async createTask(taskData: Task, projectId: string): Promise<Task> {
+    static async createTask(taskData: Partial<Task>, projectId: string): Promise<Task> {
+        if (!taskData.title) {
+            throw new MissingRequiredDataException("Task title is required.");
+        }
+
         try {
             const task = await Task.create({
+                title: taskData.title,
                 ...taskData,
                 projectId,
             });
+
             return task;
         } catch (error) {
-            throw new DBException("Failed to create task: " + (error as Error).message);
+            const message = error instanceof Error
+                ? error.message
+                : "Unknown database error";
+
+            throw new DBException(`Failed to create task: ${message}`);
         }
     }
 

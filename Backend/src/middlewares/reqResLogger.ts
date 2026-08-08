@@ -11,14 +11,6 @@ export default function ReqResLogger(req: Request, res: Response, next: NextFunc
 
         const message = `${method} ${originalUrl} ${statusCode} - ${duration}ms`;
 
-        // const meta = {
-        //     method,
-        //     url: originalUrl,
-        //     statusCode,
-        //     duration,
-        //     message: res.statusMessage,
-        // };
-
         logger.info(message);
     });
 

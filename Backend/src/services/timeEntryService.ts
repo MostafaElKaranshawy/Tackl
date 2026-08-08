@@ -2,101 +2,63 @@ import TimeEntryRepository from "../repositories/timeEntryRespository";
 import TaskRepository from "../repositories/taskRepository";
 import NotFoundException from "../exceptions/notFoundException";
 import ForbiddenException from "../exceptions/forbiddenException";
+import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryService {
-    static async createTimeEntry(userId: string, timeEntryData: any): Promise<any> {
-        try {
+    static async createTimeEntry(userId: string, projectId: string, taskId: string, timeEntryData: Partial<TimeEntry>): Promise<TimeEntry | null> {
 
-            await TimeEntryService.validateUserAccess(userId, timeEntryData.projectId, timeEntryData.taskId);
+        await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-            return await TimeEntryRepository.createTimeEntry(timeEntryData.taskId, timeEntryData);
-        } catch (error) {
-            throw error;
-        }
+        return await TimeEntryRepository.createTimeEntry(taskId, timeEntryData);
     }
 
-    static async getTimeEntryById(timeEntryId: string, userId: string, projectId: string, taskId: string): Promise<any> {
-        try {
+    static async getTimeEntryById(timeEntryId: string, userId: string, projectId: string, taskId: string): Promise<TimeEntry | null> {
+        await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-            await TimeEntryService.validateUserAccess(userId, projectId, taskId);
-
-            const timeEntry = await TimeEntryRepository.getTimeEntryById(timeEntryId);
-            if (!timeEntry) {
-                throw new NotFoundException("Time entry not found.");
-            }
-            if (timeEntry.taskId !== taskId) {
-                throw new ForbiddenException("Time entry does not belong to the specified task.");
-            }
-            return timeEntry;
-        } catch (error) {
-            throw error;
-        }
+        return await TimeEntryRepository.getTimeEntryById(timeEntryId);
     }
 
-    static async updateTimeEntry(userId: string, updatedData: any): Promise<any> {
-        try {
+    static async updateTimeEntry(userId: string, projectId: string, taskId: string, timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry | null> {
 
-            await TimeEntryService.validateUserAccess(userId, updatedData.projectId, updatedData.taskId);
-            const timeEntry = await TimeEntryRepository.getTimeEntryById(updatedData.timeEntryId);
-            if (!timeEntry) {
-                throw new NotFoundException("Time entry not found.");
-            }
-            if (timeEntry.taskId !== updatedData.taskId) {
-                throw new ForbiddenException("Time entry does not belong to the specified task.");
-            }
-            return await TimeEntryRepository.updateTimeEntry(updatedData.timeEntryId, {
-                duration: updatedData.duration,
-                date: updatedData.date,
-                note: updatedData.note
-            });
-        } catch (error) {
-            throw error;
-        }
+        await TimeEntryService.validateUserAccess(userId, projectId, taskId);
+
+        return await TimeEntryRepository.updateTimeEntry(timeEntryId, {
+            duration: updatedData.duration,
+            date: updatedData.date,
+            note: updatedData.note
+        });
     }
 
     static async deleteTimeEntry(userId: string, projectId: string, taskId: string, timeEntryId: string): Promise<void> {
-        try {
-            const timeEntry = await TimeEntryRepository.getTimeEntryById(timeEntryId);
-            if (!timeEntry) {
-                throw new NotFoundException("Time entry not found.");
-            }
-
-            if(timeEntry.taskId !== taskId) {
-                throw new ForbiddenException("Time entry does not belong to the specified task.");
-            }
-            await TimeEntryService.validateUserAccess(userId, projectId, taskId);
-
-            return await TimeEntryRepository.deleteTimeEntry(timeEntryId);
-        } catch (error) {
-            throw error;
+        const timeEntry = await TimeEntryRepository.getTimeEntryById(timeEntryId);
+        if (!timeEntry) {
+            throw new NotFoundException("Time entry not found.");
         }
+
+        if (timeEntry.taskId !== taskId) {
+            throw new ForbiddenException("Time entry does not belong to the specified task.");
+        }
+        await TimeEntryService.validateUserAccess(userId, projectId, taskId);
+
+        return await TimeEntryRepository.deleteTimeEntry(timeEntryId);
     }
 
-    static async getTaskTimeEntries(userId: string, projectId: string, taskId: string): Promise<any[]> {
-        try {
+    static async getTaskTimeEntries(userId: string, projectId: string, taskId: string): Promise<TimeEntry[]> {
+        await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-            await TimeEntryService.validateUserAccess(userId, projectId, taskId);
-
-            return await TimeEntryRepository.getTaskTimeEntries(taskId);
-        } catch (error) {
-            throw error;
-        }
+        return await TimeEntryRepository.getTaskTimeEntries(taskId);
     }
 
     private static async validateUserAccess(userId: string, projectId: string, taskId: string): Promise<void> {
-        try {
-            const task = await TaskRepository.getTaskById(taskId);
-            if (!task) {
-                throw new NotFoundException("Task not found.");
-            }
-            if (task.projectId !== projectId) {
-                throw new ForbiddenException("Task does not belong to the specified project.");
-            }
-            if (task.project?.userId !== userId) {
-                throw new ForbiddenException("User does not have access to this task.");
-            }
-        } catch (error) {
-            throw error;
+        const task = await TaskRepository.getTaskById(taskId);
+        if (!task) {
+            throw new NotFoundException("Task not found.");
+        }
+        if (task.projectId !== projectId) {
+            throw new ForbiddenException("Task does not belong to the specified project.");
+        }
+        if (task.project?.userId !== userId) {
+            throw new ForbiddenException("User does not have access to this task.");
         }
     }
 }

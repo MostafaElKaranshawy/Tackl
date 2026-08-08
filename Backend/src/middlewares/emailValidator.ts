@@ -1,4 +1,6 @@
-export default async function emailValidator(req: any, res: any, next: any) {
+import { Request, Response } from "express";
+
+export default async function emailValidator(req: Request, res: Response, next: () => void) {
     const { email } = req.body;
     
     if (!email) {

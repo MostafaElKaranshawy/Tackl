@@ -1,10 +1,14 @@
 import DBException from "../exceptions/dbException";
+import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryRepository {
-    static async createTimeEntry(taskId: string, timeEntryData: TimeEntry): Promise<TimeEntry> {
+    static async createTimeEntry(taskId: string, timeEntryData: Partial<TimeEntry>): Promise<TimeEntry> {
         try {
+            if (!timeEntryData.duration || !timeEntryData.date) {
+                throw new MissingRequiredDataException("Missing required data for creating time entry.", 400);
+            }
             const timeEntry = await TimeEntry.create({
                 taskId: taskId,
                 duration: timeEntryData.duration,

@@ -1,4 +1,6 @@
-export default async function passwordValidator(req: any, res: any, next: any) {
+import { Request, Response } from "express";
+
+export default async function passwordValidator(req: Request, res: Response, next: () => void) {
     const { password } = req.body;
     
     if (!password) {

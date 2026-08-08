@@ -1,17 +1,29 @@
 import DBException from "../exceptions/dbException";
+import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import Project from "../models/project";
 
 export default class ProjectRepo {
-    static async createProject(projectData: Project, userId: string): Promise<Project> {
+    static async createProject(projectData: Partial<Project>, userId: string): Promise<Project> {
         try {
+            if (!projectData.name) {
+                throw new MissingRequiredDataException("Project name is required.");
+            }
             const project = await Project.create({
-                ...projectData,
+                name: projectData.name,
+                ...(projectData.description !== undefined && {
+                    description: projectData.description,
+                }),
                 userId,
             });
+
             return project;
         } catch (error) {
-            throw new DBException("Failed to create project: " + (error as Error).message);
+            const message = error instanceof Error
+                ? error.message
+                : "Unknown database error";
+
+            throw new DBException(`Failed to create project: ${message}`);
         }
     }
     static async getProjectById(projectId: string): Promise<Project | null> {

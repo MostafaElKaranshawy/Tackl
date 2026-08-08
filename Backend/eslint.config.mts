@@ -5,6 +5,10 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
   {
+    ignores: ["src/models/index.js", "src/config/config.cjs", "node_modules/**", "dist/**", "build/**", "coverage/**"],
+  },
+
+  {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     plugins: { js },
     extends: ["js/recommended"],
@@ -12,5 +16,6 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+
   tseslint.configs.recommended,
 ]);
