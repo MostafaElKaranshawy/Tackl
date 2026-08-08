@@ -3,7 +3,7 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { IoSearchSharp } from "react-icons/io5";
 import { logout } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import ConfirmationModal from "./ConfirmationModal";
+import ConfirmationModal from "./generalPurposeComponents/ConfirmationModal";
 
 export default function Header() {
     const [showLogout, setShowLogout] = useState(false);

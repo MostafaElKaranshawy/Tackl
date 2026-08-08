@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { notify } from "../../utils/notify";
 import { createTask, updateTask } from "../../services/taskService";
@@ -20,34 +20,16 @@ export default function ManageTaskCard({
     onSuccess,
     onClose,
 }: TaskFormModalProps) {
-    const [title, setTitle] = useState("");
+    const [title, setTitle] = useState(mode === "edit" && task ? task.title : "");
     const [titleError, setTitleError] = useState("");
 
-    const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
+    const [description, setDescription] = useState(mode === "edit" && task ? task.description ?? "" : "");
+    const [priority, setPriority] = useState<"low" | "medium" | "high">(task && mode === "edit" ? task.priority : "medium");
     const [status, setStatus] = useState<"todo" | "in_progress" | "done">("todo");
-    const [dueDate, setDueDate] = useState<string | null>(null);
-    const [estimatedTime, setEstimatedTime] = useState<number | null>(null);
+    const [dueDate, setDueDate] = useState<string | null>(task && mode === "edit" ? task.dueDate : null);
+    const [estimatedTime, setEstimatedTime] = useState<number | null>(task && mode === "edit" ? task.estimatedTime : null);
 
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (mode === "edit" && task) {
-            setTitle(task.title);
-            setDescription(task.description ?? "");
-            setPriority(task.priority);
-            setStatus(task.status);
-            setDueDate(task.dueDate);
-            setEstimatedTime(task.estimatedTime);
-        } else {
-            setTitle("");
-            setDescription("");
-            setPriority("medium");
-            setStatus("todo");
-            setDueDate(null);
-            setEstimatedTime(null);
-        }
-    }, [mode, task]);
 
     const handleSubmit = async () => {
         if (!title.trim()) {

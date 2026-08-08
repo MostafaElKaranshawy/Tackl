@@ -10,7 +10,7 @@ import type Project from "../../types/project";
 import SortByComponent from "./SortByComponent";
 import CreateProjectCard from "./ManageProjectCard";
 import { IoReload } from "react-icons/io5";
-import { useRefreshContext } from "../../contexts/RefreshContext";
+import { useRefreshContext } from "../../contexts/RefreshContext/useRefreshContext";
 import { PROJECTS_PAGE_SIZE } from "../../constants";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
@@ -22,49 +22,13 @@ export default function ProjectsSideBar() {
     const { projectId } = useParams<{ projectId: string }>();
     const { key } = useRefreshContext();
     const [projects, setProjects] = useState<Project[]>([]);
-    const [sortOrder, setSortOrder] = useState("asc");
-    const [sortBy, setSortBy] = useState("createdAt");
-    const [currentPage, setCurrentPage] = useState(1);
     const [totalProjects, setTotalProjects] = useState(0);
     const [showSortOptions, setShowSortOptions] = useState(false);
-    const attributesList = ["name", "createdAt", "updatedAt"];
+    const sortByAttributesList = ["name", "createdAt", "updatedAt"];
     const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
-
-    useEffect(() => {
-        const currentSortBy = searchParams.get("sortBy");
-        const currentSortOrder = searchParams.get("sortOrder");
-        if (currentSortBy && attributesList.includes(currentSortBy)) {
-            setSortBy(currentSortBy);
-        }
-        if (currentSortOrder && ["asc", "desc"].includes(currentSortOrder)) {
-            setSortOrder(currentSortOrder);
-        }
-    }, [])
-    useEffect(() => {
-        navigate(
-            { pathname: `/projects${projectId ? `/${projectId}` : ''}`, search: location.search.replace(/(\?|&)sortBy=[^&]*/, '').replace(/(\?|&)sortOrder=[^&]*/, '') + `?sortBy=${sortBy}&sortOrder=${sortOrder}` }
-        );
-        fetchProjects();
-    }, [sortOrder, sortBy, currentPage, key]);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
-                setShowSortOptions(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [sortMenuRef]);
-
-    useEffect(() => {
-        if (projectId) return;
-
-        fetchProjects();
-    }, [projectId]);
+    const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") === "asc" ? "asc" : "desc");
+    const [sortBy, setSortBy] = useState(searchParams.get("sortBy") && sortByAttributesList.includes(searchParams.get("sortBy")!) ? searchParams.get("sortBy")! : "createdAt");
+    const [currentPage, setCurrentPage] = useState(searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1);
 
     const fetchProjects = async () => {
         try {
@@ -88,6 +52,55 @@ export default function ProjectsSideBar() {
             }
         }
     };
+
+    useEffect(() => {
+        navigate(
+            { pathname: `/projects${projectId ? `/${projectId}` : ''}`, search: location.search.replace(/(\?|&)sortBy=[^&]*/, '').replace(/(\?|&)sortOrder=[^&]*/, '').replace(/(\?|&)page=[^&]*/, '') + `?sortBy=${sortBy}&sortOrder=${sortOrder}` + (currentPage > 1 ? `&page=${currentPage}` : '') }
+        );
+        let ignore = false;
+        const fetchData = async () => {
+            try {
+                const data = await getProjects({
+                    page: currentPage,
+                    pageSize: PAGE_SIZE,
+                    sortBy,
+                    sortOrder
+                });
+                setProjects(data.projects || []);
+                setTotalProjects(data.total || 0);
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 401) {
+                        notify.error("You are not authorized to view the projects. Please log in.");
+                    } else {
+                        notify.error("Failed to fetch projects. Please try again later.");
+                    }
+                } else {
+                    notify.error("An unexpected error occurred. Please try again later.");
+                }
+            }
+        };
+        if (!ignore) {
+            fetchData();
+        }
+
+        return () => {
+            ignore = true;
+        };
+    }, [sortOrder, sortBy, currentPage, key, PAGE_SIZE, projectId, navigate]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
+                setShowSortOptions(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [sortMenuRef]);
 
     return (
         <section className="projects-section bg-[linear-gradient(to_top,_#d9e8fd,_#ebf3fe)] rounded-lg min-w-[300px] max-w-[400px] flex-shrink-0 shadow-md shadow-blue-200 border border-gray-300">
@@ -118,7 +131,7 @@ export default function ProjectsSideBar() {
                             setSortBy={setSortBy}
                             sortOrder={sortOrder}
                             setSortOrder={setSortOrder}
-                            attributesList={attributesList}
+                            attributesList={sortByAttributesList}
                         />
                     )}
                 </div>

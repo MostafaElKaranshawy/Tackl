@@ -10,7 +10,7 @@ import GetEmailConfirmationLinkPage from './pages/emailConfirmationPage/GetEmail
 import HomePage from './pages/HomePage/HomePage'
 import TaskPage from './pages/TaskPage'
 
-import { RefreshProvider } from './contexts/RefreshContext'
+import { RefreshProvider } from './contexts/RefreshContext/RefreshProvider'
 
 function App() {
     return (

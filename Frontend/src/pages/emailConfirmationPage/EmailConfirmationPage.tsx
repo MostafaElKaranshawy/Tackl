@@ -12,8 +12,6 @@ export default function EmailConfirmationPage() {
     useEffect(() => {
 
         if (!token) {
-            setMessage("Invalid or missing confirmation token.");
-            setLoading(false);
             return;
         }
 

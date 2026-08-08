@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { getEmailConfirmationLink } from "../../services/authService";
-import FormComponent from "../../components/FormComponent";
-import FloatingInput from "../../components/FloatingInput";
-import {notify} from "../../utils/notify";
+import FormComponent from "../../components/generalPurposeComponents/FormComponent";
+import FloatingInput from "../../components/generalPurposeComponents/FloatingInput";
+import { notify } from "../../utils/notify";
 import { useNavigate } from "react-router-dom";
 
 export default function GetEmailConfirmationLinkPage() {
@@ -17,7 +17,7 @@ export default function GetEmailConfirmationLinkPage() {
             setTimeout(() => {
                 navigate("/login");
             }, 3000);
-        } catch (error) {
+        } catch {
             notify.error("Error sending confirmation link. Please try again.");
         }
     }

@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getTaskById } from "../services/taskService";
 import { useParams } from "react-router-dom";
 import { deleteTask } from "../services/taskService";
 
 import type Task from "../types/task";
-import ConfirmationModal from "../components/ConfirmationModal";
+import ConfirmationModal from "../components/generalPurposeComponents/ConfirmationModal";
 import ManageTaskCard from "../components/tasksComponents/ManageTaskCard";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { formatMinutes } from "../utils/timeFormater";
 import TaskEntriesList from "../components/timeEntriesComponents/TimeEntriesList";
-import { TaskRefreshProvider } from "../contexts/TaskRefreshContext";
+import { TaskRefreshProvider } from "../contexts/TaskRefreshContext/TaskRefreshProvider";
 
 export default function TaskPage() {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -26,20 +26,29 @@ export default function TaskPage() {
 
     const [task, setTask] = useState<Task | null>(null);
 
-    const fetchTask = useCallback(async () => {
+    useEffect(() => {
         if (!taskId || !projectId) return;
 
-        try {
-            const data = await getTaskById(taskId, projectId);
-            setTask(data);
-        } catch (error) {
-            console.error("Failed to fetch task.", error);
-        }
-    }, [projectId, taskId]);
+        let cancelled = false;
 
-    useEffect(() => {
-        fetchTask();
-    }, [fetchTask]);
+        const loadTask = async () => {
+            try {
+                const data = await getTaskById(taskId, projectId);
+
+                if (!cancelled) {
+                    setTask(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch task.", error);
+            }
+        };
+
+        loadTask();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [projectId, taskId]);
 
     const handleDeleteTask = async () => {
         if (!taskId || !projectId) return;

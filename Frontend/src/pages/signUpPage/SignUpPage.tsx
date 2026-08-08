@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import { notify } from "../../utils/notify";
 import { checkAuthentication, signUp } from '../../services/authService';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import FloatingInput from '../../components/FloatingInput';
-import FormComponent from '../../components/FormComponent';
+import FloatingInput from '../../components/generalPurposeComponents/FloatingInput';
+import FormComponent from '../../components/generalPurposeComponents/FormComponent';
 import { validatePassword, validateName, validateEmail, validatePasswordRules } from '../../utils/validators';
 import { useNavigate } from "react-router-dom";
-
 
 export default function SignUpPage() {
     const navigate = useNavigate();
@@ -21,17 +20,14 @@ export default function SignUpPage() {
 
     useEffect(() => {
         const verifyAuthentication = async () => {
-            try {
-                const authenticated = await checkAuthentication();
-                if (authenticated) {
-                    navigate("/projects");
-                }
-            } finally {
+            const authenticated = await checkAuthentication();
+            if (authenticated) {
+                navigate("/projects");
             }
         };
 
         verifyAuthentication();
-    }, []);
+    }, [navigate]);
 
     const resetForm = () => {
         setName('');

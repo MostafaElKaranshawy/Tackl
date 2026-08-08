@@ -1,24 +1,25 @@
-import type Project from "../../../types/project";
+import type Project from "../../types/project";
 import { GoProjectRoadmap } from "react-icons/go";
 import { MdAccessTime, MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight, MdOutlineSort, MdUpdate } from "react-icons/md";
 import { FaEdit, FaFilter } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
-import ManageProjectCard from "../ManageProjectCard";
-import ConfirmationModal from "../../ConfirmationModal";
-import { deleteProject } from "../../../services/projectService";
-import ManageTaskCard from "../../tasksComponents/ManageTaskCard";
-import type Task from "../../../types/task";
-import { getProjectTasks } from "../../../services/taskService";
-import TasksList from "../../tasksComponents/TasksList";
-import SortByComponent from "../SortByComponent";
-import { TASKS_PAGE_SIZE } from "../../../constants";
+import ManageProjectCard from "./ManageProjectCard";
+import ConfirmationModal from "../generalPurposeComponents/ConfirmationModal";
+import { deleteProject } from "../../services/projectService";
+import ManageTaskCard from "../tasksComponents/ManageTaskCard";
+import type Task from "../../types/task";
+import { getProjectTasks } from "../../services/taskService";
+import TasksList from "../tasksComponents/TasksList";
+import SortByComponent from "./SortByComponent";
+import { TASKS_PAGE_SIZE } from "../../constants";
 import { CiBoxList } from "react-icons/ci";
 import { MdViewKanban } from "react-icons/md";
-import TaskBoard from "../../tasksComponents/taskBoard/TaskBoard";
+import TaskBoard from "../tasksComponents/taskBoard/TaskBoard";
 import { useNavigate } from "react-router-dom";
 import { IoSearchSharp } from "react-icons/io5";
-import ProjectsFilterMenu from "../ProjectsFilterMenu";
+import ProjectsFilterMenu from "./ProjectsFilterMenu";
+import { notify } from "../../utils/notify";
 
 export default function ProjectShow(
     { project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
@@ -38,10 +39,10 @@ export default function ProjectShow(
     const filterRef = useRef<HTMLDivElement>(null);
     const [currentSection, setCurrentSection] = useState<"list" | "board">("list");
     const [showFilterMenu, setShowFilterMenu] = useState(false);
-    const [filter, setFilter] = useState<{ status: string; priority: string; overdue: string }>({
+    const [filter, setFilter] = useState<{ status: string; priority: string; overdue: boolean | false }>({
         status: "",
         priority: "",
-        overdue: ""
+        overdue: false
     });
     const [search, setSearch] = useState("");
 
@@ -61,10 +62,6 @@ export default function ProjectShow(
         };
     }, []);
 
-    useEffect(() => {
-        fetchTasks();
-    }, [currentPage, sortBy, sortOrder, filter, currentSection, project.id, search]);
-
     const fetchTasks = async () => {
         try {
             const response = await getProjectTasks(project.id,
@@ -78,21 +75,50 @@ export default function ProjectShow(
                 });
             setTaskList(response.tasks);
             setTotalTasks(response.total);
-        } catch (error) {
-            console.error("Failed to fetch tasks:", error);
+        } catch {
+            notify.error("Failed to fetch tasks. Please try again later.");
         }
     };
+
+    useEffect(() => {
+        let ignore = false;
+        if (!project.id) {
+            return;
+        }
+        const fetchData = async () => {
+            try {
+                const response = await getProjectTasks(project.id,
+                    {
+                        page: currentSection === "list" ? currentPage : undefined,
+                        pageSize: currentSection === "list" ? PAGE_SIZE : undefined,
+                        sortBy,
+                        sortOrder,
+                        search,
+                        ...filter
+                    });
+                if (!ignore) {
+                    setTaskList(response.tasks);
+                    setTotalTasks(response.total);
+                }
+            } catch {
+                if (!ignore) {
+                    notify.error("Failed to fetch tasks. Please try again later.");
+                }
+            }
+        };
+        fetchData();
+        return () => {
+            ignore = true;
+        };
+    }, [currentPage, sortBy, sortOrder, filter, project.id, search, PAGE_SIZE, currentSection]);
+
 
     const handleDeleteProject = async (id: string) => {
         try {
             await deleteProject(id);
-            deleteRefresh && deleteRefresh();
-            // navigate({
-            //     pathname: "/projects",
-            //     search: location.search,
-            // });
-        } catch (error) {
-            alert("Failed to delete project. Please try again later.");
+            if(deleteRefresh) deleteRefresh();
+        } catch {
+            notify.error("Failed to delete project. Please try again later.");
         }
     }
     return (

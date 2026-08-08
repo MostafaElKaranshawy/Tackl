@@ -21,5 +21,5 @@ export type GetProjectTasksOptions = {
     search: string;
     status?: string;
     priority?: string;
-    overdue?: boolean;
+    overdue: boolean | false;
 };

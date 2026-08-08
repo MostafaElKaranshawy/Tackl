@@ -8,7 +8,7 @@ import {
 } from "../../services/timeEntriesService";
 import type TimeEntry from "../../types/timeEntry";
 import { notify } from "../../utils/notify";
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../generalPurposeComponents/ConfirmationModal";
 
 type Props = {
     projectId: string;

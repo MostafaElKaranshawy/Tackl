@@ -6,12 +6,12 @@ export default function ProjectsFilterMenu({
     setFilter
 }: {
     onConfirm: () => void;
-    filter: { status: string; priority: string; overdue: string };
-    setFilter: React.Dispatch<React.SetStateAction<{ status: string; priority: string; overdue: string }>>;
+    filter: { status: string; priority: string; overdue: boolean | false };
+    setFilter: React.Dispatch<React.SetStateAction<{ status: string; priority: string; overdue: boolean | false }>>;
 }) {
     const [statusFilter, setStatusFilter] = useState(filter.status || "");
     const [priorityFilter, setPriorityFilter] = useState(filter.priority || "");
-    const [overdueFilter, setOverdueFilter] = useState(filter.overdue === "true" || false);
+    const [overdueFilter, setOverdueFilter] = useState(filter.overdue || false);
 
     return (
         <div className="mt-2 w-80 rounded-xl border border-gray-200 bg-white p-5 shadow-xl z-50">
@@ -99,7 +99,7 @@ export default function ProjectsFilterMenu({
                             setFilter({
                                 status: statusFilter,
                                 priority: priorityFilter,
-                                overdue: overdueFilter.toString(),
+                                overdue: overdueFilter,
                             });
                             onConfirm();
                         }}
