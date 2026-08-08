@@ -1,18 +1,16 @@
 import logger from '../config/logger';
-import AlreadyExistsError from './alreadyExistsException';
-import DBException from './dbException';
-import NotFoundException from './notFoundException';
-import MissingFieldException from './missingRequiredDataException';
+import { Request, Response } from 'express';
 
-export default function ErrorHandler(err: any, req: any, res: any) {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
-    const stack = err.stack || '';
+export default function ErrorHandler(err: unknown, req: Request, res: Response) {
+
+    const statusCode = err instanceof Error ? (err as { statusCode?: number }).statusCode : 500;
+    const message = err instanceof Error ? (err as { message?: string }).message : 'Internal Server Error';
+    const stack = err instanceof Error ? (err as { stack?: string }).stack : '';
 
     // Log the error details
     logger.error(`Error: ${message}, Stack: ${stack}`);
 
-    res.status(statusCode).json({
+    res.status(statusCode || 500).json({
         status: 'error',
         statusCode,
         message,
