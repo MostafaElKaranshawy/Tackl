@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import "./config/env";
 import cookieParser from "cookie-parser";
-import { sequelize } from "./config/database";
 import logger from "./config/logger";
 import "./models/models";
 import baseRouter from "./routes/baseRouter";
