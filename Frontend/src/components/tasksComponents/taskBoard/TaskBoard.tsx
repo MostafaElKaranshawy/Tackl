@@ -18,7 +18,7 @@ export default function TaskBoard({
     }, [projectId, key]);
 
     const handleTaskClick = (taskId: string) => {
-        navigate(`${location.pathname}?taskId=${taskId}`, { state: { backgroundLocation: location } });
+        navigate({ pathname: location.pathname, search: `?taskId=${taskId}` + location.search.replace(/(\?|&)taskId=[^&]*/, '') });
     }
     const todoTasks = tasks.filter((task) => task.status === "todo");
     const inProgressTasks = tasks.filter(
@@ -63,7 +63,7 @@ export default function TaskBoard({
                         </div>
                     </div>
 
-                    <div className="flex min-h-[300px] flex-col gap-3 p-4  overflow-y-scroll max-h-[300px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <div className="flex max-h-[300px] flex-col gap-3 p-2  overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                         {column.tasks.length > 0 ? (
                             column.tasks.map((task) => (
                                 <TaskBoardCard

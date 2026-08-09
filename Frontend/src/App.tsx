@@ -15,7 +15,7 @@ import { RefreshProvider } from './contexts/RefreshContext'
 
 function App() {
     return (
-        <div className="app container mx-auto bg-white min-h-screen flex flex-col items-center justify-center">
+        <div className="app container w-screen h-screen bg-white min-h-screen flex flex-col items-center justify-center">
             <RefreshProvider>
                 <Router>
                     <Routes>

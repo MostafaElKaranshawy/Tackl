@@ -180,6 +180,8 @@ taskRouter.get("/", TaskController.getProjectTasks);
  *                 $ref: '#/components/schemas/Task'
  *       400:
  *         description: Bad request. Missing required task data.
+ *       401:
+ *         description: Unauthorized.
  *       403:
  *         description: Forbidden. Access denied.
  *       404:
@@ -220,6 +222,8 @@ taskRouter.get("/all", TaskController.getAllProjectTasks);
  *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Task not found.
  *       500:
@@ -269,6 +273,8 @@ taskRouter.get("/:taskId", TaskController.getTaskById);
  *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Task not found.
  *       500:
@@ -301,6 +307,8 @@ taskRouter.put("/:taskId", TaskController.updateTask);
  *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
+ *       403:
+ *         description: Forbidden. Access denied.
  *       404:
  *         description: Task not found.
  *       500:

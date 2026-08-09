@@ -4,17 +4,14 @@ import TaskRepository from "../repositories/taskRepository";
 import UserRepository from "../repositories/userRepository";
 import ProjectRepository from "../repositories/projectRepository";
 import NotFoundException from "../exceptions/notFoundException";
+import QueryParams from "../interfaces/QueryParams";
 
 export default class TaskService {
 
     static async createTask(taskData: any, projectId: string, userId: string): Promise<Task> {
 
         try {
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new ForbiddenException("User not found");
-            }
-            
+
             const project = await ProjectRepository.getProjectById(projectId);
             if (!project) {
                 throw new NotFoundException("Project not found.");
@@ -36,16 +33,13 @@ export default class TaskService {
                 throw new NotFoundException("Task not found.");
             }
 
-            const project = await ProjectRepository.getProjectById(task.projectId);
-            if (!project) {
-                throw new NotFoundException("Project not found.");
-            }
-            if (project.userId !== userId) {
+            if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
             return task;
         } catch (error) {
+            console.error("Error in getTaskById:", error);
             throw error;
         }
     }
@@ -57,11 +51,7 @@ export default class TaskService {
                 throw new NotFoundException("Task not found.");
             }
 
-            const project = await ProjectRepository.getProjectById(task.projectId);
-            if (!project) {
-                throw new NotFoundException("Project not found.");
-            }
-            if (project.userId !== userId) {
+            if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
@@ -78,11 +68,7 @@ export default class TaskService {
                 throw new NotFoundException("Task not found.");
             }
 
-            const project = await ProjectRepository.getProjectById(task.projectId);
-            if (!project) {
-                throw new NotFoundException("Project not found.");
-            }
-            if (project.userId !== userId) {
+            if (task.project?.userId !== userId) {
                 throw new ForbiddenException("Access denied");
             }
 
@@ -92,7 +78,7 @@ export default class TaskService {
         }
     }
 
-    static async getProjectTasks(projectId: string, userId: string, page: number, limit: number, sortBy: string, sortOrder: string): Promise<{ tasks: Task[], total: number }> {
+    static async getProjectTasks(projectId: string, userId: string, queryParams: QueryParams): Promise<{ tasks: Task[], total: number }> {
         try {
             const project = await ProjectRepository.getProjectById(projectId);
             if (!project) {
@@ -102,7 +88,7 @@ export default class TaskService {
                 throw new ForbiddenException("Access denied");
             }
 
-            const { tasks, total } = await TaskRepository.getProjectTasks(projectId, page, limit, sortBy, sortOrder);
+            const { tasks, total } = await TaskRepository.getProjectTasks(projectId, queryParams);
             return { tasks, total };
         } catch (error) {
             throw error;

@@ -5,6 +5,7 @@ import {
     InferCreationAttributes,
     CreationOptional,
     ForeignKey,
+    NonAttribute,
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
@@ -23,7 +24,10 @@ export default class TaskHistory extends Model<
     declare userId: ForeignKey<string>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
-
+    declare task?: NonAttribute<Model>;
+    declare actionBy?: NonAttribute<Model>;
+    declare taskChanges?: NonAttribute<Model[]>;
+    
     static associate(models: Models) {
         TaskHistory.belongsTo(models.Task, {
             foreignKey: "taskId",

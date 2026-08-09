@@ -4,7 +4,7 @@ export default function ProjectCard({ project }: { project: { id: string; name: 
     const navigate = useNavigate();
 
     const handleProjectClick = () => {
-        navigate(`/projects/${project.id}`);
+        navigate({ pathname: `/projects/${project.id}`, search: location.search.replace(/(\?|&)taskId=[^&]*/, '') });
     };
 
     return (

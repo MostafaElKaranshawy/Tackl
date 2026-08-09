@@ -44,7 +44,7 @@ export default class AuthService {
                 throw new WrongCredentialsException("Email not confirmed. Please check your inbox for the confirmation email.");
             }
 
-            const token = Jwt.generateToken({ id: user.id, purpose: 'accessToken' }, '1h');
+            const token = Jwt.generateToken({ id: user.id, purpose: 'accessToken' });
             // await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${user.name},\n\nA new login was detected on your account.\n\nBest regards,\n\n\nTackl Team`);
             return token;
 
