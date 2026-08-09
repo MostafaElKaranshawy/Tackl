@@ -62,10 +62,6 @@ export default function ProjectShow(
         };
     }, []);
 
-    useEffect(() => {
-        fetchTasks();
-    }, [currentPage, sortBy, sortOrder, filter, currentSection, project.id, search]);
-
     const fetchTasks = async () => {
         try {
             const response = await getProjectTasks(project.id,
@@ -120,7 +116,7 @@ export default function ProjectShow(
     const handleDeleteProject = async (id: string) => {
         try {
             await deleteProject(id);
-            if(deleteRefresh) deleteRefresh();
+            if (deleteRefresh) deleteRefresh();
         } catch {
             notify.error("Failed to delete project. Please try again later.");
         }
