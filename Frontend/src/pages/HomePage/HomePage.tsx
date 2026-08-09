@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { checkAuthentication } from "../../services/authService";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import ProjectShowSection from "../../components/projectComponents/ProjectShowSection";
+import ProjectSection from "../../components/projectComponents/ProjectSection";
 import ProjectsSideBar from "../../components/projectComponents/ProjectsSideBar";
 import TaskShow from "../../components/tasksComponents/TaskShowModal";
 import { TaskRefreshProvider } from "../../contexts/TaskRefreshContext/TaskRefreshProvider";
@@ -59,7 +59,7 @@ export default function HomePage() {
             <TaskRefreshProvider>
                 <div className="main-section w-full flex flex-1 flex-row items-stretch p-2 gap-4">
                     <ProjectsSideBar />
-                    <ProjectShowSection />
+                    <ProjectSection />
                     <TaskShow />
                 </div>
             </TaskRefreshProvider>

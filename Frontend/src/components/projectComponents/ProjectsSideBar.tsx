@@ -38,6 +38,10 @@ export default function ProjectsSideBar() {
                 sortBy,
                 sortOrder
             });
+            if (data.projects.length === 0 && currentPage > 1) {
+                setCurrentPage((prev) => prev - 1);
+                return;
+            }
             setProjects(data.projects || []);
             setTotalProjects(data.total || 0);
         } catch (error) {
@@ -66,6 +70,10 @@ export default function ProjectsSideBar() {
                     sortBy,
                     sortOrder
                 });
+                if (data.projects.length === 0 && currentPage > 1) {
+                    setCurrentPage((prev) => prev - 1);
+                    return;
+                }
                 setProjects(data.projects || []);
                 setTotalProjects(data.total || 0);
             } catch (error) {
