@@ -5,6 +5,7 @@ import NotFoundException from "../exceptions/notFoundException";
 import TimeEntryService from "../services/timeEntryService";
 import { Request, Response } from "express";
 import { validateDate, validateTime } from "../utils/validateTime";
+import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryController {
     static async createTimeEntry(req: Request, res: Response) {
@@ -103,12 +104,20 @@ export default class TimeEntryController {
             }
 
 
-            const updatedData = req.body;
+            const updatedData = req.body as Partial<TimeEntry>;
+
             const filteredUpdatedData = {
-                duration: updatedData.duration,
-                date: updatedData.date,
-                note: updatedData.note
+                ...(updatedData.duration !== undefined && {
+                    duration: updatedData.duration
+                }),
+                ...(updatedData.date !== undefined && {
+                    date: updatedData.date
+                }),
+                ...(updatedData.note !== undefined && {
+                    note: updatedData.note
+                })
             };
+
             const updatedTimeEntry = await TimeEntryService.updateTimeEntry(userId, projectId, taskId, timeEntryId, filteredUpdatedData);
 
             res.status(200).json(updatedTimeEntry);
