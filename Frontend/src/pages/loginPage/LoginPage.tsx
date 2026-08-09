@@ -7,8 +7,10 @@ import { validateEmail } from '../../utils/validators';
 import { notify } from '../../utils/notify';
 import axios from 'axios';
 import { checkAuthentication } from '../../services/authService';
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
     const [password, setPassword] = useState('');
@@ -19,7 +21,7 @@ export default function LoginPage() {
             try {
                 const authenticated = await checkAuthentication();
                 if (authenticated) {
-                    window.location.href = '/home';
+                    navigate("/projects");
                 }
             } finally {
             }
@@ -38,7 +40,7 @@ export default function LoginPage() {
         try {
             await login(email, password).then(() => {
                 resetForm();
-                window.location.href = '/home';
+                navigate("/projects");
             });
         } catch (error) {
             // resetForm();
@@ -63,7 +65,7 @@ export default function LoginPage() {
             subtitle="Sign in to your account"
             submitText="Login"
             validateForm={() => {
-                if(!validateEmail(email, setEmailError)) {
+                if (!validateEmail(email, setEmailError)) {
                     setEmailError("Please enter a valid email address.");
                     return false;
                 }
@@ -80,7 +82,7 @@ export default function LoginPage() {
                             setEmail(e.target.value);
                             setEmailError('');
                         }}
-                            />
+                    />
                     <span className="text-xs text-red-500">{emailError}</span>
                     <div className={inputGroupClassName}>
                         <FloatingInput

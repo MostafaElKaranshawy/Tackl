@@ -128,6 +128,8 @@ projectRouter.get("/", ProjectController.getUserProjects);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Project'
+ *       400:
+ *         description: Invalid request body.
  *       401:
  *         description: Unauthorized.
  *       404:
@@ -200,6 +202,8 @@ projectRouter.put("/:id", ProjectController.updateProject);
  *     responses:
  *       204:
  *         description: Project deleted successfully.
+ *       400:
+ *         description: ProjectId Required.
  *       401:
  *         description: Unauthorized.
  *       404:

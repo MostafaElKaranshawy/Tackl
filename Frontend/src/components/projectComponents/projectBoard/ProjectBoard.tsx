@@ -1,19 +1,29 @@
-import { useCurrentProjectContext } from "../../../contexts/CurrentProjectContext";
 import { useEffect, useState } from "react";
 import { getProjectById } from "../../../services/projectService";
 import type Project from "../../../types/project";
 import ProjectShow from "./ProjectShow";
 import { notify } from "../../../utils/notify";
 import { useRefreshContext } from "../../../contexts/RefreshContext";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function ProjectBoard() {
-    const { projectId, setProjectId } = useCurrentProjectContext();
+    const navigate = useNavigate();
+    let { projectId } = useParams<{ projectId: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const { setKey } = useRefreshContext();
 
+    const returnToProjectsPage = () => {
+        setProject(null);
+        navigate({
+            pathname: "/projects",
+            search: location.search,
+        });
+    }
     useEffect(() => {
-        if (!projectId) {
+        if (!projectId || projectId === "undefined") {
             setProject(null);
+            returnToProjectsPage();
             return;
         }
 
@@ -26,13 +36,13 @@ export default function ProjectBoard() {
                 if (!ignore) {
                     setProject(projectDetails);
                 }
-            } catch (error) {
+            } catch {
                 if (!ignore) {
-                    setProjectId(null);
                     setProject(null);
                     notify.error(
                         "Project not found or has been deleted. Please select another project."
                     );
+                    returnToProjectsPage();
                 }
             }
         };
@@ -42,11 +52,15 @@ export default function ProjectBoard() {
         return () => {
             ignore = true;
         };
-    }, [projectId]);
+    }, [projectId, navigate]);
 
+    const handleProjectDelete = () => {
+        returnToProjectsPage();
+        setKey(prev => prev === null ? 1 : (prev + 1) % 2);
+    }
     const handleProjectUpdate = (updatedProject: Project) => {
         setProject(updatedProject);
-        setKey(prev => prev === null ? 1 : (prev+1)%2);
+        setKey(prev => prev === null ? 1 : (prev + 1) % 2);
     };
     if (!project) {
         return (
@@ -57,6 +71,6 @@ export default function ProjectBoard() {
     }
 
     return (
-        <ProjectShow project={project} deleteRefresh={() => setProject(null)} onUpdated={handleProjectUpdate} />
+        <ProjectShow project={project} deleteRefresh={handleProjectDelete} onUpdated={handleProjectUpdate} />
     );
 }

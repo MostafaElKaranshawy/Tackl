@@ -1,6 +1,8 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
+import {TaskStatus} from "../enums/taskStatus";
+import {TaskPriority} from "../enums/taskPriority";
 
 const appUrl = process.env.APP_SERVER + ":" + process.env.PORT;
 const options: swaggerJsdoc.Options = {
@@ -110,7 +112,18 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: ["todo", "in-progress", "done"],
+                            enum: TaskStatus,
+                        },
+                        priority: {
+                            type: "string",
+                            enum: TaskPriority,
+                        },
+                        estimatedTime: {
+                            type: "number",
+                        },
+                        dueDate: {
+                            type: "string",
+                            format: "date-time",
                         },
                         projectId: {
                             type: "string",
@@ -123,6 +136,39 @@ const options: swaggerJsdoc.Options = {
                         updatedAt: {
                             type: "string",
                             format: "date-time",
+                        },
+                    },
+                },
+                TaskInput: {
+                    type: "object",
+                    required: ["title"],
+                    properties: {
+                        title: {
+                            type: "string",
+                            example: "My Task",
+                        },
+                        description: {
+                            type: "string",
+                            example: "Task description",
+                        },
+                        priority: {
+                            type: "string",
+                            enum: TaskPriority,
+                            example: "medium",
+                        },
+                        status: {
+                            type: "string",
+                            enum: TaskStatus,
+                            example: "todo",
+                        },
+                        dueDate: {
+                            type: "string",
+                            format: "date-time",
+                            example: "2023-12-31T23:59:59Z",
+                        },
+                        estimatedTime: {
+                            type: "number",
+                            example: 120,
                         },
                     },
                 },
