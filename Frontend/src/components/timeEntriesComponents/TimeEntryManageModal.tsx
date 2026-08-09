@@ -182,8 +182,13 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Note
+                        <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                            <p>Note</p>
+                            {
+                                mode !== "show" && (
+                                    <p className="text-xs text-gray-500">(Optional)</p>
+                                )
+                            }
                         </label>
 
                         <textarea

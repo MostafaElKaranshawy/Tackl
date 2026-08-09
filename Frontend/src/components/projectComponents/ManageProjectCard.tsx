@@ -124,8 +124,9 @@ export default function ManageProjectCard({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Description
+                        <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                            <p>Description</p>
+                            <p className="text-xs text-gray-500">(Optional)</p>
                         </label>
 
                         <textarea
