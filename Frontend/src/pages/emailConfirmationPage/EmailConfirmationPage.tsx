@@ -20,8 +20,7 @@ export default function EmailConfirmationPage() {
                 await confirmEmail(token);
                 setSuccess(true);
                 setMessage("Email confirmed successfully! You can now log in.");
-            } catch (error) {
-                console.error("Error confirming email:", error);
+            } catch{
                 setSuccess(false);
                 setMessage(
                     "Failed to confirm your email. The link may be invalid or expired."

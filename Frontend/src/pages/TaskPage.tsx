@@ -12,6 +12,7 @@ import { MdDeleteForever } from "react-icons/md";
 import { formatMinutes } from "../utils/timeFormater";
 import TaskEntriesList from "../components/timeEntriesComponents/TimeEntriesList";
 import { TaskRefreshProvider } from "../contexts/TaskRefreshContext/TaskRefreshProvider";
+import { notify } from "../utils/notify";
 
 export default function TaskPage() {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -38,8 +39,8 @@ export default function TaskPage() {
                 if (!cancelled) {
                     setTask(data);
                 }
-            } catch (error) {
-                console.error("Failed to fetch task.", error);
+            } catch{
+                notify.error("Failed to fetch task.");
             }
         };
 
@@ -57,8 +58,8 @@ export default function TaskPage() {
             await deleteTask(taskId, projectId);
 
             navigate({ pathname: `/projects/${projectId}`, search: location.search.replace(/(\?|&)taskId=[^&]*/, '') });
-        } catch (error) {
-            console.error("Failed to delete task.", error);
+        } catch{
+            notify.error("Failed to delete task.");
         }
     };
 

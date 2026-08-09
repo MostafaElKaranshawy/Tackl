@@ -75,8 +75,7 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
             }
 
             onUpdate();
-        } catch (error) {
-            console.error(error);
+        } catch {
             notify.error("Failed to save time entry.");
         } finally {
             setIsSubmitting(false);
@@ -95,8 +94,7 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
 
             onUpdate();
             onClose();
-        } catch (error) {
-            console.error(error);
+        } catch {
             notify.error("Failed to delete time entry.");
         } finally {
             setIsSubmitting(false);

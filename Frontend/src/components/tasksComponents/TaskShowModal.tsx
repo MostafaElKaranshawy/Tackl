@@ -10,6 +10,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext/useTaskRefreshContext";
 import TimeEntriesList from "../timeEntriesComponents/TimeEntriesList";
 import { formatMinutes } from "../../utils/timeFormater";
+import { notify } from "../../utils/notify";
 
 export default function TaskShow() {
     const [task, setTask] = useState<Task | null>(null);
@@ -48,9 +49,8 @@ export default function TaskShow() {
                 if (!cancelled) {
                     setTask(task);
                 }
-            } catch (error) {
+            } catch{
                 if (!cancelled) {
-                    console.error("Failed to fetch task:", error);
                     closeTaskWindow();
                 }
             }
@@ -82,14 +82,14 @@ export default function TaskShow() {
 
     const handleDeleteTask = async () => {
         if (!taskId || !projectId || projectId === "undefined") {
-            console.error("Task ID or Project ID is missing.");
+            notify.error("Task ID or Project ID is missing.");
             return;
         }
         try {
             await deleteTask(taskId, projectId);
             refresh(true);
-        } catch (error) {
-            console.error("Failed to delete task:", error);
+        } catch {
+            notify.error("Failed to delete task.");
         }
     };
     const refresh = (close: boolean) => {
