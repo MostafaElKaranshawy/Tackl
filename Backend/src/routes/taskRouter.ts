@@ -82,7 +82,7 @@ taskRouter.post("/", TaskController.createTask);
  *         required: false
  *         schema:
  *           type: string
- *           enum: [name, createdAt]
+ *           enum: [title, createdAt, updatedAt, dueDate, priority, status]
  *           default: createdAt
  *         description: Field to sort by.
  *       - in: query
@@ -158,7 +158,7 @@ taskRouter.get("/", TaskController.getProjectTasks);
  *         required: false
  *         schema:
  *           type: string
- *           enum: [name, createdAt]
+ *           enum: [title, createdAt, updatedAt, dueDate, priority, status]
  *           default: createdAt
  *         description: Field to sort by.
  *       - in: query

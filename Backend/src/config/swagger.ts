@@ -141,7 +141,7 @@ const options: swaggerJsdoc.Options = {
                 },
                 TaskInput: {
                     type: "object",
-                    required: ["title", "priority", "status"],
+                    required: ["title"],
                     properties: {
                         title: {
                             type: "string",
