@@ -42,7 +42,7 @@ export default function TaskPage() {
                 const data = await getTaskById(taskId, projectId);
 
                 if (!cancelled) {
-                    setTask(data);
+                    setTask(data.task);
                 }
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status === 401) {
