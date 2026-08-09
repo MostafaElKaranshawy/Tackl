@@ -44,12 +44,11 @@ export default function TaskShow() {
 
         const loadTask = async () => {
             try {
-                const task = await getTaskById(taskId, projectId);
-
+                const data = await getTaskById(taskId, projectId);
                 if (!cancelled) {
-                    setTask(task);
+                    setTask(data.task);
                 }
-            } catch{
+            } catch {
                 if (!cancelled) {
                     closeTaskWindow();
                 }
