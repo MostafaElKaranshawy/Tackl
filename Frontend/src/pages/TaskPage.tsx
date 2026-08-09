@@ -37,9 +37,9 @@ export default function TaskPage() {
                 const data = await getTaskById(taskId, projectId);
 
                 if (!cancelled) {
-                    setTask(data);
+                    setTask(data.task);
                 }
-            } catch{
+            } catch {
                 notify.error("Failed to fetch task.");
             }
         };
@@ -58,7 +58,7 @@ export default function TaskPage() {
             await deleteTask(taskId, projectId);
 
             navigate({ pathname: `/projects/${projectId}`, search: location.search.replace(/(\?|&)taskId=[^&]*/, '') });
-        } catch{
+        } catch {
             notify.error("Failed to delete task.");
         }
     };

@@ -16,7 +16,7 @@ export default function TasksList({ tasks, refresh }: { tasks: Task[], refresh: 
 
     useEffect(() => {
         refresh();
-    }, [key, refresh]);
+    }, [key]);
     return (
         <div className="overflow-y-auto max-h-[300px] space-y-4">
             {tasks.map((task) => (

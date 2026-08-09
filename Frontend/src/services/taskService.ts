@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type Task from '../types/task';
 import type { CreateTaskDto, GetProjectTasksOptions, UpdateTaskDto } from '../types/task';
+import type TaskHistory from '../types/taskHistory';
 
 const API_URL = import.meta.env.VITE_API_URL + "/api/projects";
 
@@ -38,18 +39,18 @@ const getAllProjectTasks = async (
     return response.data;
 };
 
-const getTaskById = async (taskId: string, projectId: string): Promise<Task> => {
+const getTaskById = async (taskId: string, projectId: string): Promise<{ task: Task, taskHistories: TaskHistory[] }> => {
     const response = await axios.get(`${API_URL}/${projectId}/tasks/${taskId}`, { withCredentials: true });
-    return response.data;
+    return { task: response.data.task, taskHistories: response.data.taskHistories || [] };
 };
-const createTask = async (taskData: CreateTaskDto, projectId: string): Promise<Task> => {
+const createTask = async (taskData: CreateTaskDto, projectId: string): Promise<{ task: Task, taskHistories: TaskHistory[] }> => {
     const response = await axios.post(`${API_URL}/${projectId}/tasks`, taskData, { withCredentials: true });
-    return response.data;
+    return { task: response.data.task, taskHistories: response.data.taskHistories || [] };
 }
 
-const updateTask = async (taskId: string, updatedData: UpdateTaskDto, projectId: string): Promise<Task> => {
+const updateTask = async (taskId: string, updatedData: UpdateTaskDto, projectId: string): Promise<{ task: Task, taskHistories: TaskHistory[] }> => {
     const response = await axios.put(`${API_URL}/${projectId}/tasks/${taskId}`, updatedData, { withCredentials: true });
-    return response.data;
+    return { task: response.data.task, taskHistories: response.data.taskHistories || [] };
 }
 
 const deleteTask = async (taskId: string, projectId: string) => {

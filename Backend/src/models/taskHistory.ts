@@ -9,6 +9,7 @@ import {
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
+import { ActionType } from "../enums/actionType";
 
 export default class TaskHistory extends Model<
     InferAttributes<TaskHistory, {
@@ -19,15 +20,15 @@ export default class TaskHistory extends Model<
     }>
 > {
     declare id: CreationOptional<string>;
-    declare actionType: "created" | "updated" | "deleted";
     declare taskId: ForeignKey<string>;
     declare userId: ForeignKey<string>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+    declare actionType: CreationOptional<ActionType>;
     declare task?: NonAttribute<Model>;
     declare actionBy?: NonAttribute<Model>;
     declare taskChanges?: NonAttribute<Model[]>;
-    
+
     static associate(models: Models) {
         TaskHistory.belongsTo(models.Task, {
             foreignKey: "taskId",
@@ -56,10 +57,6 @@ TaskHistory.init(
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
         },
-        actionType: {
-            type: DataTypes.ENUM("created", "updated", "deleted"),
-            allowNull: false,
-        },
         taskId: {
             type: DataTypes.UUID,
             allowNull: false,
@@ -68,6 +65,11 @@ TaskHistory.init(
             type: DataTypes.UUID,
             allowNull: false,
         },
+        actionType: {
+            type: DataTypes.ENUM(...Object.values(ActionType)),
+            allowNull: false,
+            defaultValue: 'created',
+        }
     },
     {
         sequelize,

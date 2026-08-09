@@ -4,6 +4,7 @@ import { notify } from "../../utils/notify";
 import { createTask, updateTask } from "../../services/taskService";
 import type Task from "../../types/task";
 import type { CreateTaskDto, UpdateTaskDto } from "../../types/task";
+import type TaskHistory from "../../types/taskHistory";
 
 interface TaskFormModalProps {
     mode: "create" | "edit";
@@ -50,8 +51,8 @@ export default function ManageTaskCard({
                     estimatedTime: estimatedTime,
                 };
 
-                const createdTask = await createTask(taskData, projectId) as Task;
-                onSuccess(createdTask);
+                const createdTaskData = await createTask(taskData, projectId) as { task: Task, taskHistories: TaskHistory[] };
+                onSuccess(createdTaskData.task);
                 notify.success("Task created successfully!");
             } else {
                 if (!task) {
@@ -66,8 +67,8 @@ export default function ManageTaskCard({
                     dueDate: dueDate,
                     estimatedTime: estimatedTime,
                 };
-                const updatedTask = await updateTask(task.id, updatedTaskData, task.projectId) as Task;
-                onSuccess(updatedTask);
+                const data = await updateTask(task.id, updatedTaskData, task.projectId) as { task: Task, taskHistories: TaskHistory[] };
+                onSuccess(data.task);
                 notify.success("Task updated successfully!");
             }
 
