@@ -5,7 +5,6 @@ import Header from "../../components/Header";
 import ProjectSection from "../../components/projectComponents/ProjectSection";
 import ProjectsSideBar from "../../components/projectComponents/ProjectsSideBar";
 import TaskShow from "../../components/tasksComponents/TaskShowModal";
-import { TaskRefreshProvider } from "../../contexts/TaskRefreshContext/TaskRefreshProvider";
 
 export default function HomePage() {
     const [loading, setLoading] = useState(true);
@@ -56,13 +55,11 @@ export default function HomePage() {
     return (
         <div className="home container min-h-screen min-w-screen flex flex-col items-start justify-start relative">
             <Header />
-            <TaskRefreshProvider>
-                <div className="main-section w-full flex flex-1 flex-row items-stretch p-2 gap-4">
-                    <ProjectsSideBar />
-                    <ProjectSection />
-                    <TaskShow />
-                </div>
-            </TaskRefreshProvider>
+            <div className="main-section w-full flex flex-1 flex-row items-stretch p-2 gap-4">
+                <ProjectsSideBar />
+                <ProjectSection />
+                <TaskShow />
+            </div>
         </div>
     );
 }

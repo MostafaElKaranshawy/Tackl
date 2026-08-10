@@ -5,19 +5,21 @@ import ChangeDTO from "../dto/changeDTO";
 import { ActionType } from "../enums/actionType";
 
 export default class TaskHistoryRepository {
-    static async createTaskHistory(taskId: string, userId: string, actionType: ActionType, changes: ChangeDTO[]): Promise<TaskHistory> {
+    static async createTaskHistory(taskId: string, userId: string, actionType: ActionType, fieldName: string, changes: ChangeDTO[]): Promise<void> {
         try {
-            if (!taskId || !userId || !actionType || !changes || changes.length === 0) {
+            if (!taskId || !userId || !actionType || !fieldName || !changes) {
                 throw new Error("Missing required data for creating task history.");
             }
+            if (changes.length === 0 || !changes.some((c) => c.oldValue !== c.newValue)) return;
             const taskHistory = await TaskHistory.create({
                 taskId,
                 userId,
                 actionType,
-                
+                fieldName: fieldName
             });
 
             for (const change of changes) {
+                if (!change.fieldName || change.oldValue === change.newValue || !change.actionType) continue;
                 await TaskChange.create({
                     taskHistoryId: taskHistory.id,
                     fieldName: change.fieldName,
@@ -26,8 +28,6 @@ export default class TaskHistoryRepository {
                     actionType: change.actionType,
                 });
             }
-
-            return taskHistory;
 
         } catch (error) {
             throw new DBException("Failed to create task history: " + (error as Error).message);
