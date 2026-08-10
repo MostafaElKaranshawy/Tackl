@@ -5,11 +5,13 @@ import TimeEntryListCard from "./TimeEntryListCard";
 import { formatMinutes } from "../../utils/timeFormater";
 import TimeEntryManageModal from "./TimeEntryManageModal";
 import { notify } from "../../utils/notify";
+import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext/useTaskRefreshContext";
 
 export default function TimeEntriesList({ projectId, taskId, currentScreen, updateTotalTime }: { projectId: string, taskId: string, currentScreen: string, updateTotalTime: (totalMinutes: number) => void }) {
     const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
     const [currentTimeEntry, setCurrentTimeEntry] = useState<TimeEntry | null>(null);
     const [showCreateTimeEntryModal, setShowCreateTimeEntryModal] = useState(false);
+    const { setKey } = useTaskRefreshContext();
 
     const fetchTimeEntries = async () => {
         try {
@@ -96,6 +98,7 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
                         }}
                         onUpdate={() => {
                             fetchTimeEntries();
+                            setKey(prevKey => prevKey + 1);
                         }}
                     />
                 )
@@ -111,6 +114,7 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
                         }}
                         onUpdate={() => {
                             fetchTimeEntries();
+                            setKey(prevKey => prevKey + 1);
                         }}
                     />
                 )
