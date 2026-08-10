@@ -46,7 +46,7 @@ export default function TaskShow() {
             try {            
                 const data = await getTaskById(taskId, projectId);
                 if (!cancelled) {
-                    setTask(data.task);
+                    setTask(data);
                 }
             } catch {
                 if (!cancelled) {
