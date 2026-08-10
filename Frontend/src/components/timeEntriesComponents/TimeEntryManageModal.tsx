@@ -260,18 +260,18 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
                         </button>
                     )}
                 </div>
+                {
+                    showDeleteConfirmation && (
+                        <ConfirmationModal
+                            title="Delete Time Entry"
+                            message="Are you sure you want to delete this time entry? This action cannot be undone."
+                            onConfirm={handleDelete}
+                            danger={true}
+                            onCancel={() => setShowDeleteConfirmation(false)}
+                        />
+                    )
+                }
             </div>
-            {
-                showDeleteConfirmation && (
-                    <ConfirmationModal
-                        title="Delete Time Entry"
-                        message="Are you sure you want to delete this time entry? This action cannot be undone."
-                        onConfirm={handleDelete}
-                        danger={true}
-                        onCancel={() => setShowDeleteConfirmation(false)}
-                    />
-                )
-            }
         </div>
     );
 }

@@ -22,10 +22,11 @@ const updateTimeEntry = async (projectId: string, taskId: string, timeEntryId: s
 }
 
 const deleteTimeEntry = async (projectId: string, taskId: string, timeEntryId: string): Promise<void> => {
-    await axios.delete(
+    const response = await axios.delete(
         `${API_URL}${projectId}/tasks/${taskId}/time-entries/${timeEntryId}`,
         { withCredentials: true }
     );
+    console.log(`Time entry with ID ${timeEntryId} deleted successfully. `, response.data);
 }
 
 const createTimeEntry = async (projectId: string, taskId: string, newTimeEntry: Partial<TimeEntry>): Promise<TimeEntry> => {
