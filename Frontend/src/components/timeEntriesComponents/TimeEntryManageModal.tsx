@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import {
@@ -38,6 +38,24 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
     const [note, setNote] = useState(entry?.note ?? "");
 
     const readOnly = mode === "show";
+    const modalRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                modalRef.current &&
+                !modalRef.current.contains(event.target as Node)
+            ) {
+                onClose();
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [onClose]);
 
     const handleSubmit = async () => {
         if (!duration || !date) {
@@ -103,7 +121,7 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-md rounded-xl bg-white shadow-xl">
+            <div className="w-full max-w-md rounded-xl bg-white shadow-xl" ref={modalRef}>
                 <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
                     <h2 className="text-xl font-semibold text-gray-900">
                         {mode === "create"

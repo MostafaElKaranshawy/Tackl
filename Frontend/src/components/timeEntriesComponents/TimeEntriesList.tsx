@@ -11,7 +11,7 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
     const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
     const [currentTimeEntry, setCurrentTimeEntry] = useState<TimeEntry | null>(null);
     const [showCreateTimeEntryModal, setShowCreateTimeEntryModal] = useState(false);
-    const { key } = useTaskRefreshContext();
+    const { setKey } = useTaskRefreshContext();
 
     const fetchTimeEntries = async () => {
         try {
@@ -35,7 +35,7 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
             }
         };
         fetchData();
-    }, [taskId, projectId, key, updateTotalTime]);
+    }, [taskId, projectId]);
 
 
     return (
@@ -98,6 +98,7 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
                         }}
                         onUpdate={() => {
                             fetchTimeEntries();
+                            setKey(prevKey => prevKey + 1);
                         }}
                     />
                 )
@@ -113,6 +114,7 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
                         }}
                         onUpdate={() => {
                             fetchTimeEntries();
+                            setKey(prevKey => prevKey + 1);
                         }}
                     />
                 )

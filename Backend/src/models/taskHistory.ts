@@ -27,6 +27,7 @@ export default class TaskHistory extends Model<
     declare actionType: CreationOptional<ActionType>;
     declare task?: NonAttribute<Model>;
     declare actionBy?: NonAttribute<Model>;
+    declare fieldName: CreationOptional<string>;
     declare taskChanges?: NonAttribute<Model[]>;
 
     static associate(models: Models) {
@@ -63,6 +64,10 @@ TaskHistory.init(
         },
         userId: {
             type: DataTypes.UUID,
+            allowNull: false,
+        },
+        fieldName: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
         actionType: {

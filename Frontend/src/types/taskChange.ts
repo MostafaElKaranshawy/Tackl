@@ -3,6 +3,6 @@ export default interface TaskChange {
     fieldName: string;
     oldValue?: string | null;
     newValue?: string | null;
-    actionType: "CREATED" | "UPDATED" | "DELETED";
+    actionType: "created" | "updated" | "deleted";
     taskHistoryId: string;
 }
