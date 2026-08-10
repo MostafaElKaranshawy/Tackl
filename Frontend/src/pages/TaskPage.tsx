@@ -13,7 +13,6 @@ import { formatMinutes } from "../utils/timeFormater";
 import TaskEntriesList from "../components/timeEntriesComponents/TimeEntriesList";
 import { useTaskRefreshContext } from "../contexts/TaskRefreshContext/useTaskRefreshContext";
 import { notify } from "../utils/notify";
-import type TaskHistory from "../types/taskHistory";
 import TaskHistoryList from "../components/taskHistoryComponents/TaskHistoryList";
 import axios from "axios";
 
@@ -21,7 +20,6 @@ export default function TaskPage() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
-    const [taskHistory, setTaskHistory] = useState<TaskHistory[]>([]);
     const [showTaskHistory, setShowTaskHistory] = useState(false);
 
     const { key } = useTaskRefreshContext();
@@ -44,8 +42,7 @@ export default function TaskPage() {
                 const data = await getTaskById(taskId, projectId);
 
                 if (!cancelled) {
-                    setTask(data.task);
-                    setTaskHistory(data.taskHistories || []);
+                    setTask(data);
                 }
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -60,7 +57,7 @@ export default function TaskPage() {
         return () => {
             cancelled = true;
         };
-    }, [projectId, taskId, key]);
+    }, [projectId, taskId, key, navigate]);
 
     const handleDeleteTask = async () => {
         if (!taskId || !projectId) return;
@@ -263,8 +260,7 @@ export default function TaskPage() {
                     onClose={() => setShowEditModal(false)}
                     onSuccess={(updatedData) => {
                         if (updatedData) {
-                            setTask(updatedData.task);
-                            setTaskHistory(updatedData.taskHistories);
+                            setTask(updatedData);
                         }
 
                         setShowEditModal(false);
@@ -287,7 +283,8 @@ export default function TaskPage() {
             {
                 showTaskHistory && (
                     <TaskHistoryList
-                        historyData={taskHistory}
+                        taskId={task.id}
+                        projectId={task.projectId}
                         closeTaskHistoryList={() => setShowTaskHistory(false)}
                     />
                 )

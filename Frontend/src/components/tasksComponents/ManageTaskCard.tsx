@@ -10,7 +10,7 @@ interface TaskFormModalProps {
     mode: "create" | "edit";
     task?: Task;
     projectId: string;
-    onSuccess: (data?: { task: Task, taskHistories: TaskHistory[] }) => void;
+    onSuccess: (data?: Task) => void;
     onClose: () => void;
 }
 
@@ -51,8 +51,8 @@ export default function ManageTaskCard({
                     estimatedTime: estimatedTime,
                 };
 
-                const createdTaskData = await createTask(taskData, projectId) as { task: Task, taskHistories: TaskHistory[] };
-                onSuccess({task: createdTaskData.task, taskHistories: createdTaskData.taskHistories});
+                const createdTaskData = await createTask(taskData, projectId) as Task;
+                onSuccess(createdTaskData);
                 notify.success("Task created successfully!");
             } else {
                 if (!task) {
@@ -67,8 +67,8 @@ export default function ManageTaskCard({
                     dueDate: dueDate,
                     estimatedTime: estimatedTime,
                 };
-                const data = await updateTask(task.id, updatedTaskData, task.projectId) as { task: Task, taskHistories: TaskHistory[] };
-                onSuccess({task: data.task, taskHistories: data.taskHistories});
+                const data = await updateTask(task.id, updatedTaskData, task.projectId) as Task;
+                onSuccess(data);
                 notify.success("Task updated successfully!");
             }
 
