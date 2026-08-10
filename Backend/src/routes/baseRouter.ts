@@ -5,6 +5,7 @@ import projectRouter from "./projectRouter.js";
 import checkUser from "../middlewares/checkUser.js";
 import TaskRouter from "./taskRouter.js";
 import TimeEntryRouter from "./timeEntryRouter.js";
+import TaskHistoryRouter from "./taskHistoryRouter.js";
 
 const baseRouter = router.Router();
 
@@ -17,5 +18,7 @@ baseRouter.use("/projects", projectRouter);
 baseRouter.use("/projects/:projectId/tasks", TaskRouter);
 
 baseRouter.use("/projects/:projectId/tasks/:taskId/time-entries", TimeEntryRouter);
+
+baseRouter.use("/projects/:projectId/tasks/:taskId/history", TaskHistoryRouter);
 
 export default baseRouter;

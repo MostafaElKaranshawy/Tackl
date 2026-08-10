@@ -46,7 +46,7 @@ export default function TaskShow() {
             try {            
                 const data = await getTaskById(taskId, projectId);
                 if (!cancelled) {
-                    setTask(data.task);
+                    setTask(data);
                 }
             } catch {
                 if (!cancelled) {
@@ -296,7 +296,7 @@ export default function TaskShow() {
                             onClose={() => setShowEditModal(false)}
                             onSuccess={(updatedData) => {
                                 if (updatedData) {
-                                    setTask(updatedData.task);
+                                    setTask(updatedData);
                                 }
 
                                 setShowEditModal(false);

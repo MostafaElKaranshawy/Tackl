@@ -1,16 +1,33 @@
+import { useEffect, useState } from "react";
 import type TaskHistory from "../../types/taskHistory";
 import HistoryCard from "./HistoryCard";
 import { IoMdClose } from "react-icons/io";
+import { getTaskHistory } from "../../services/taskHistoryService";
 interface TaskHistoryListProps {
-    historyData: TaskHistory[];
+    taskId: string;
+    projectId: string;
     closeTaskHistoryList: () => void;
 }
 
 
 export default function TaskHistoryList({
-    historyData,
+    taskId,
+    projectId,
     closeTaskHistoryList,
 }: TaskHistoryListProps) {
+    const [historyData, setHistoryData] = useState<TaskHistory[]>([]);
+    useEffect(() => {
+        if (!taskId || !projectId) {
+            return;
+        }
+        const fetchTaskHistory = async () => {
+            const data = await getTaskHistory(projectId, taskId);
+            setHistoryData(data);
+        };
+
+        fetchTaskHistory();
+    }, [taskId, projectId]);
+
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
