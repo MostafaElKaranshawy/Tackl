@@ -36,9 +36,7 @@ describe("AuthService", () => {
         expect(result).toBe("mocked-jwt-token");
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Sign up with a new user", async () => {
         try {
             // Mock
@@ -62,9 +60,7 @@ describe("AuthService", () => {
             assert.fail("Sign up should not throw an error");
         }
     });
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Login with wrong credentials - wrong password", async () => {
         // Mock
         const hashedPassword = await bcrypt.hash("Mostafa1#", 10);
@@ -89,9 +85,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Login with wrong credentials - wrong email", async () => {
         // Mock
         vi.spyOn(User, "findOne").mockResolvedValue(null);
@@ -108,9 +102,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Login with unconfirmed email", async () => {
         // Mock
         vi.spyOn(User, "findOne").mockResolvedValue({
@@ -136,9 +128,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Sign up with an existing email", async () => {
         try {
             vi.spyOn(EmailService, "sendEmail").mockResolvedValue();
@@ -161,9 +151,7 @@ describe("AuthService", () => {
     });
 
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Confirm email for a user", async () => {
         try {
             // Mock
@@ -176,9 +164,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Confirm email with wrong ID", async () => {
         try {
             // Mock
@@ -192,9 +178,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get confirmation link for a user", async () => {
         try {
@@ -228,9 +212,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get confirmation link for a user who has confirmed their email", async () => {
         try {
@@ -256,9 +238,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get confirmation link for a user who has request a confirmation link recently", async () => {
         try {
@@ -284,9 +264,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get confirmation link for a user who has request a confirmation link recently", async () => {
         try {
@@ -312,9 +290,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
     it("Reset password link for a not found user", async () => {
         try {
             // Mock
@@ -332,9 +308,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Reset password for a not found user", async () => {
         try {
@@ -385,9 +359,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get reset password link for a user who has request a reset password link recently", async () => {
         try {
@@ -413,9 +385,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get reset password link for a user who has request a reset password link recently", async () => {
         try {
@@ -441,9 +411,7 @@ describe("AuthService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Reset password for a user", async () => {
         try {

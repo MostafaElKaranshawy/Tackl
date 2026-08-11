@@ -184,6 +184,7 @@ describe("TaskService", () => {
 
         const taskData = {
             title: "Updated Task",
+            dueDate: new Date("2026-08-22"),
         };
 
         const result = await TaskService.updateTask(

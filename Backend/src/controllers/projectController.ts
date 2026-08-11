@@ -105,7 +105,9 @@ export default class ProjectController {
                 throw new ForbiddenException("User ID is required.");
             }
 
-            const page = parseInt(req.query.page as string) || 1;
+            const page = req.query.page !== undefined
+                ? parseInt(req.query.page as string)
+                : 1;
 
             if (page < 1) {
                 throw new MissingRequiredDataException(
@@ -113,7 +115,9 @@ export default class ProjectController {
                 );
             }
 
-            const limit = parseInt(req.query.limit as string) || 10;
+            const limit = req.query.limit !== undefined
+                ? parseInt(req.query.limit as string)
+                : 10;
 
             if (limit < 1) {
                 throw new MissingRequiredDataException(
