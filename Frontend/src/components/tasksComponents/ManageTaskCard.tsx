@@ -4,7 +4,6 @@ import { notify } from "../../utils/notify";
 import { createTask, updateTask } from "../../services/taskService";
 import type Task from "../../types/task";
 import type { CreateTaskDto, UpdateTaskDto } from "../../types/task";
-import type TaskHistory from "../../types/taskHistory";
 
 interface TaskFormModalProps {
     mode: "create" | "edit";

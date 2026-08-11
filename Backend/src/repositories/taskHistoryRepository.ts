@@ -22,6 +22,8 @@ export default class TaskHistoryRepository {
 
             if (!changes || changes.length === 0) return;
 
+            if (!changes || changes.length === 0) return;
+
             for (const change of changes) {
                 if (!change.fieldName || change.oldValue === change.newValue || !change.actionType) continue;
                 await TaskChange.create({
