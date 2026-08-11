@@ -64,7 +64,7 @@ export default class TaskRepository {
 
     static async updateTask(userId: string, projectId: string, taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
         try {
-            const task = await Task.findByPk(taskId);
+            const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
@@ -77,7 +77,7 @@ export default class TaskRepository {
             await task.update(updatedData);
             return task;
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
             }
             throw new DBException("Failed to update task: " + (error as Error).message);
@@ -86,7 +86,7 @@ export default class TaskRepository {
 
     static async deleteTask(userId: string, projectId: string, taskId: string): Promise<void> {
         try {
-            const task = await Task.findByPk(taskId);
+            const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
