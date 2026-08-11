@@ -6,7 +6,7 @@ import TaskRepository from '../repositories/taskRepository';
 export default class TaskHistoryService {
 
     static async getTaskHistory(userId: string, projectId: string, taskId: string): Promise<TaskHistory[]> {
-        const task = await TaskRepository.getTaskById(taskId);
+        const task = await TaskRepository.getTaskById(userId, projectId, taskId);
         if (task == null) {
             throw new NotFoundException("Task not found.");
         }

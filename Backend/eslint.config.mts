@@ -5,7 +5,16 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
   {
-    ignores: ["src/models/index.js", "src/config/config.cjs", "node_modules/**", "dist/**", "build/**", "coverage/**", "/src/migrations/**", "/src/seeders/**"],
+    ignores: [
+      "src/models/index.js",
+      "src/config/config.cjs",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      "src/migrations/**",
+      "src/seeders/**"
+    ],
   },
 
   {

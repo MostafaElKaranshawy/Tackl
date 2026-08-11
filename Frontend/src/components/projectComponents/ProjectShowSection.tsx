@@ -7,11 +7,7 @@ import { useRefreshContext } from "../../contexts/RefreshContext/useRefreshConte
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-<<<<<<<< HEAD:Frontend/src/components/projectComponents/ProjectSection.tsx
-export default function ProjectSection() {
-========
 export default function ProjectShowSection() {
->>>>>>>> db0d89e (TT26-118 ES-Lint Frontend Files Edits):Frontend/src/components/projectComponents/ProjectShowSection.tsx
     const navigate = useNavigate();
     const { projectId } = useParams<{ projectId: string }>();
     const [project, setProject] = useState<Project | null>(null);

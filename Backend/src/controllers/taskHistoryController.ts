@@ -1,11 +1,10 @@
-import ErrorHandler from "../exceptions/errorHandler";
 import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import TaskHistoryService from "../services/taskHistoryService";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 export default class TaskHistoryController {
-    static async getTaskHistory(req: Request, res: Response) {
+    static async getTaskHistory(req: Request, res: Response, next: NextFunction) {
         const userId = req.userId;
 
         if (!userId) {
@@ -26,7 +25,7 @@ export default class TaskHistoryController {
             const taskHistory = await TaskHistoryService.getTaskHistory(userId, projectId, taskId);
             res.status(200).json(taskHistory);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 }

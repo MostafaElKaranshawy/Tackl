@@ -4,6 +4,10 @@ import TaskRepository from "../repositories/taskRepository";
 import ProjectRepository from "../repositories/projectRepository";
 import NotFoundException from "../exceptions/notFoundException";
 import QueryParams from "../interfaces/QueryParams";
+import ChangeDTO from "../dto/changeDTO";
+import { ActionType } from "../enums/actionType";
+import TaskHistoryRepository from "../repositories/taskHistoryRepository";
+import { compareDates } from "../utils/dateTimeUtils";
 
 export default class TaskService {
 
@@ -16,7 +20,34 @@ export default class TaskService {
             throw new ForbiddenException("Access denied");
         }
 
-        return await TaskRepository.createTask(taskData, projectId);
+        const task = await TaskRepository.createTask(taskData, projectId);
+        if (task) {
+            const changes: ChangeDTO[] = Object.entries(taskData)
+                .filter(([, value]) => value)
+                .map(([key, value]) => {
+                    return {
+                        fieldName: key,
+                        oldValue: null,
+                        newValue:
+                            value != null
+                                ? String(value)
+                                : null,
+
+                        actionType: ActionType.CREATED,
+                    };
+                });
+
+            if (changes.length > 0) {
+                await TaskHistoryRepository.createTaskHistory(
+                    task.id,
+                    userId,
+                    ActionType.CREATED,
+                    "Task",
+                    changes
+                );
+            }
+        }
+        return task;
     }
 
     static async getTaskById(projectId: string, taskId: string, userId: string): Promise<Task | null> {
@@ -25,7 +56,64 @@ export default class TaskService {
     }
 
     static async updateTask(projectId: string, taskId: string, updatedData: Partial<Task>, userId: string): Promise<Task | null> {
-        return await TaskRepository.updateTask(userId, projectId, taskId, updatedData);
+        const oldTask = await TaskRepository.getTaskById(userId, projectId, taskId);
+        if (!oldTask) {
+            throw new NotFoundException("Task not found.");
+        }
+        const updatedTask = await TaskRepository.updateTask(userId, projectId, taskId, updatedData);
+
+        if (updatedTask) {
+            const changes: ChangeDTO[] = Object.entries(updatedData)
+                .filter(([key, value]) => {
+                    const oldValue =
+                        oldTask[key as keyof Task];
+
+                    if (key === "date" && oldValue && value) {
+                        return !compareDates(
+                            oldValue as Date,
+                            value as Date
+                        );
+                    }
+
+                    return oldValue !== value;
+                })
+                .map(([key, value]) => {
+                    const oldValue =
+                        oldTask[key as keyof Task];
+
+                    return {
+                        fieldName: key,
+
+                        oldValue:
+                            oldValue != null
+                                ? String(oldValue)
+                                : null,
+
+                        newValue:
+                            value != null
+                                ? String(value)
+                                : null,
+
+                        actionType:
+                            !value
+                                ? ActionType.DELETED
+                                : !oldValue
+                                    ? ActionType.CREATED
+                                    : ActionType.UPDATED,
+                    };
+                });
+
+            if (changes.length > 0) {
+                await TaskHistoryRepository.createTaskHistory(
+                    taskId,
+                    userId,
+                    ActionType.UPDATED,
+                    "Task",
+                    changes
+                );
+            }
+        }
+        return updatedTask;
     }
 
     static async deleteTask(projectId: string, taskId: string, userId: string): Promise<void> {

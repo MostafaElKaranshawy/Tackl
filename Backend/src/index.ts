@@ -6,7 +6,7 @@ import "./models/models";
 import baseRouter from "./routes/baseRouter";
 import setupSwagger from "./config/swagger";
 import cors from "cors";
-
+import { sequelize } from "./config/database";
 import ReqResLogger from "./middlewares/reqResLogger";
 import errorHandler from "./middlewares/errorHandler";
 

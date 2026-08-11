@@ -34,7 +34,7 @@ export default class TimeEntryRepository {
             if (timeEntry.taskId !== taskId) {
                 throw new ForbiddenException("Time entry does not belong to the specified task.");
             }
-            return timeEntry;
+            return timeEntry.dataValues as TimeEntry;
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
