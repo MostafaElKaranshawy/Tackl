@@ -287,10 +287,8 @@ const options: swaggerJsdoc.Options = {
             }
         },
         security: [
-            {
-                cookieAuth: [],
-                bearerAuth: [],
-            },
+            { cookieAuth: [] },
+            { bearerAuth: [] },
         ],
     },
     apis: ["./src/routes/**/*.ts"], // location of your Swagger comments
