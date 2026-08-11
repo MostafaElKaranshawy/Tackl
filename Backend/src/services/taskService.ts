@@ -23,19 +23,17 @@ export default class TaskService {
         const task = await TaskRepository.createTask(taskData, projectId);
         if (task) {
             const changes: ChangeDTO[] = Object.entries(taskData)
-                .filter(([, value]) => value)
-                .map(([key, value]) => {
-                    return {
+                .filter(([key, value]) => {
+                    return String(key) == "title" || String(key) == "description" || String(key) == "status" || String(key) == "priority" || String(key) == "estimatedTime" || String(key) == "dueDate";
+                })
+                .map(
+                    ([key, value]) => ({
                         fieldName: key,
                         oldValue: null,
-                        newValue:
-                            value != null
-                                ? String(value)
-                                : null,
-
+                        newValue: value ? String(value) : null,
                         actionType: ActionType.CREATED,
-                    };
-                });
+                    })
+                );
 
             if (changes.length > 0) {
                 await TaskHistoryRepository.createTaskHistory(
@@ -65,41 +63,25 @@ export default class TaskService {
         if (updatedTask) {
             const changes: ChangeDTO[] = Object.entries(updatedData)
                 .filter(([key, value]) => {
-                    const oldValue =
-                        oldTask[key as keyof Task];
-
-                    if (key === "date" && oldValue && value) {
-                        return !compareDates(
-                            oldValue as Date,
-                            value as Date
-                        );
+                    const oldValue = oldTask[key as keyof Task];
+                    if (key === "dueDate" && oldValue && value) {
+                        return !compareDates(oldValue as Date, value as Date);
                     }
-
                     return oldValue !== value;
-                })
-                .map(([key, value]) => {
-                    const oldValue =
-                        oldTask[key as keyof Task];
+                }).filter(([key, value]) => {
+                    return String(key) == "title" || String(key) == "description" || String(key) == "status" || String(key) == "priority" || String(key) == "estimatedTime" || String(key) == "dueDate";
+                }).map(([key, value]) => {
+                    const oldValue = oldTask[key as keyof Task];
 
                     return {
                         fieldName: key,
-
-                        oldValue:
-                            oldValue != null
-                                ? String(oldValue)
-                                : null,
-
-                        newValue:
-                            value != null
-                                ? String(value)
-                                : null,
-
-                        actionType:
-                            !value
-                                ? ActionType.DELETED
-                                : !oldValue
-                                    ? ActionType.CREATED
-                                    : ActionType.UPDATED,
+                        oldValue: oldValue ? String(oldValue) : null,
+                        newValue: value ? String(value) : null,
+                        actionType: !value
+                            ? ActionType.DELETED
+                            : !oldValue
+                                ? ActionType.CREATED
+                                : ActionType.UPDATED,
                     };
                 });
 
