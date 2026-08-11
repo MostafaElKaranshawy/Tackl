@@ -11,9 +11,6 @@ export default defineConfig({
                 "html",
                 "lcov",
             ],
-            include: [
-                "src/**",
-            ],
             exclude: [
                 "tests/**",
                 "src/config/**",
