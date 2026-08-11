@@ -5,7 +5,7 @@ export function validateTime(time: number): boolean {
         logger.warn("Invalid time format. Expected an integer.");
         return false;
     }
-    return time >= 0 && time <= 2359;
+    return time > 0;
 }
 
 export function validateDate(date: Date): boolean {

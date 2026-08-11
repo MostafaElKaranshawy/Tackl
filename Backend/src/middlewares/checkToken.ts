@@ -1,8 +1,8 @@
 import Jwt from "../config/jwt";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import logger from "../config/logger";
 
-export default async function checkToken(req: Request, res: Response, next: () => void) {
+export default async function checkToken(req: Request, res: Response, next: NextFunction) {
     const token = req.cookies.accessToken || req.headers.authorization?.split("Bearer ")[1];
 
     if (!token) {

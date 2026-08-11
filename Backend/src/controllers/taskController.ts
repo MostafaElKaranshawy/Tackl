@@ -25,6 +25,11 @@ export default class TaskController {
             if (!projectId || !(projectId && typeof projectId === 'string')) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
+            
+            if (taskData.dueDate && isNaN(Date.parse(taskData.dueDate.toString()))) {
+                throw new MissingRequiredDataException("Invalid due date format.");
+            }
+
             const parsedTaskData = {
                 title: taskData.title,
                 description: taskData.description || null,
@@ -84,6 +89,10 @@ export default class TaskController {
                 throw new MissingRequiredDataException("Task ID is required.");
             }
             const updatedData = req.body as Partial<Task>;
+
+            if (updatedData.dueDate && isNaN(Date.parse(updatedData.dueDate.toString()))) {
+                throw new MissingRequiredDataException("Invalid due date format.");
+            }
 
             const parsedTaskData = {
                 ...(updatedData.title !== undefined && { title: updatedData.title }),

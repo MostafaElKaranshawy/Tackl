@@ -105,6 +105,18 @@ export default class TimeEntryController {
 
             const updatedData = req.body as Partial<TimeEntry>;
 
+            if (updatedData.duration && !validateTime(updatedData.duration)) {
+                throw new MissingRequiredDataException("Invalid duration format. Please use HH:mm format (00:00 to 23:59).");
+            }
+
+            if (updatedData.date && !validateDate(updatedData.date)) {
+                throw new MissingRequiredDataException("Invalid date format. Please use a valid date.");
+            }
+
+            if (!updatedData.duration && !updatedData.date && updatedData.note === undefined) {
+                throw new MissingRequiredDataException("At least one field (duration, date, or note) must be provided for update.");
+            }
+
             const filteredUpdatedData = {
                 ...(updatedData.duration !== undefined && {
                     duration: updatedData.duration

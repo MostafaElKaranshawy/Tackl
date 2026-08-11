@@ -9,7 +9,6 @@ import WrongCredentialsException from '../exceptions/wrongCredentialsException';
 import NotFoundException from '../exceptions/notFoundException';
 
 export default function ErrorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
-
     const statusCode = err instanceof Error ? (err as { statusCode?: number }).statusCode : 500;
     const message = err instanceof EmailAlreadyConfirmedException ? "Email is already confirmed, login instead" :
         err instanceof AlreadyExistsException ? "Resource already exists" :

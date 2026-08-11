@@ -1,13 +1,9 @@
 import AuthService from "../services/authService";
-import AlreadyExistsException from "../exceptions/alreadyExistsException";
-import DBException from "../exceptions/dbException";
 import NotFoundException from "../exceptions/notFoundException";
 import WrongCredentialsException from "../exceptions/wrongCredentialsException";
-import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import { NextFunction, Request, Response } from "express";
 import ForbiddenException from "../exceptions/forbiddenException";
 import Jwt from "../config/jwt";
-import logger from "../config/logger";
 
 export default class AuthController {
 
