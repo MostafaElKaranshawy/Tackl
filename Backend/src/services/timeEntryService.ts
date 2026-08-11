@@ -15,42 +15,32 @@ export default class TimeEntryService {
     static async getTimeEntryById(timeEntryId: string, userId: string, projectId: string, taskId: string): Promise<TimeEntry | null> {
         await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-        return await TimeEntryRepository.getTimeEntryById(timeEntryId);
+        return await TimeEntryRepository.getTimeEntryById(taskId, timeEntryId);
     }
 
     static async updateTimeEntry(userId: string, projectId: string, taskId: string, timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry | null> {
 
         await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-        return await TimeEntryRepository.updateTimeEntry(timeEntryId, {
-            duration: updatedData.duration,
-            date: updatedData.date,
-            note: updatedData.note
-        });
+        return await TimeEntryRepository.updateTimeEntry(taskId, timeEntryId, updatedData);
     }
 
     static async deleteTimeEntry(userId: string, projectId: string, taskId: string, timeEntryId: string): Promise<void> {
-        const timeEntry = await TimeEntryRepository.getTimeEntryById(timeEntryId);
-        if (!timeEntry) {
-            throw new NotFoundException("Time entry not found.");
-        }
 
-        if (timeEntry.taskId !== taskId) {
-            throw new ForbiddenException("Time entry does not belong to the specified task.");
-        }
         await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-        return await TimeEntryRepository.deleteTimeEntry(timeEntryId);
+        return await TimeEntryRepository.deleteTimeEntry(taskId, timeEntryId);
     }
 
     static async getTaskTimeEntries(userId: string, projectId: string, taskId: string): Promise<TimeEntry[]> {
+
         await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
         return await TimeEntryRepository.getTaskTimeEntries(taskId);
     }
 
     private static async validateUserAccess(userId: string, projectId: string, taskId: string): Promise<void> {
-        const task = await TaskRepository.getTaskById(taskId);
+        const task = await TaskRepository.getTaskById(userId, projectId, taskId);
         if (!task) {
             throw new NotFoundException("Task not found.");
         }

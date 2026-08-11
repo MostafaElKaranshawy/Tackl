@@ -20,51 +20,16 @@ export default class TaskService {
     }
 
     static async getTaskById(projectId: string, taskId: string, userId: string): Promise<Task | null> {
-        const task = await TaskRepository.getTaskById(taskId);
-
-        if (!task) {
-            throw new NotFoundException("Task not found.");
-        }
-
-        if (task.projectId !== projectId) {
-            throw new ForbiddenException("Task does not belong to the specified project.");
-        }
-        if (task.project?.userId !== userId) {
-            throw new ForbiddenException("Access denied");
-        }
-
+        const task = await TaskRepository.getTaskById(userId, projectId, taskId);
         return task;
     }
 
     static async updateTask(projectId: string, taskId: string, updatedData: Partial<Task>, userId: string): Promise<Task | null> {
-        const task = await TaskRepository.getTaskById(taskId);
-        if (!task) {
-            throw new NotFoundException("Task not found.");
-        }
-
-        if (task.projectId !== projectId) {
-            throw new ForbiddenException("Task does not belong to the specified project.");
-        }
-        if (task.project?.userId !== userId) {
-            throw new ForbiddenException("Access denied");
-        }
-
-        return await TaskRepository.updateTask(taskId, updatedData);
+        return await TaskRepository.updateTask(userId, projectId, taskId, updatedData);
     }
 
     static async deleteTask(projectId: string, taskId: string, userId: string): Promise<void> {
-        const task = await TaskRepository.getTaskById(taskId);
-        if (!task) {
-            throw new NotFoundException("Task not found.");
-        }
-        if (task.projectId !== projectId) {
-            throw new ForbiddenException("Task does not belong to the specified project.");
-        }
-        if (task.project?.userId !== userId) {
-            throw new ForbiddenException("Access denied");
-        }
-
-        await TaskRepository.deleteTask(taskId);
+        await TaskRepository.deleteTask(userId, projectId, taskId);
     }
 
     static async getProjectTasks(projectId: string, userId: string, queryParams: QueryParams): Promise<{ tasks: Task[], total: number }> {
