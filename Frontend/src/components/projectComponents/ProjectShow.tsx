@@ -62,10 +62,6 @@ export default function ProjectShow(
         };
     }, []);
 
-    useEffect(() => {
-        fetchTasks();
-    }, [currentPage, sortBy, sortOrder, filter, currentSection, project.id, search]);
-
     const fetchTasks = async () => {
         try {
             const response = await getProjectTasks(project.id,
