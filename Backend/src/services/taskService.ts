@@ -68,7 +68,7 @@ export default class TaskService {
                     const oldValue =
                         oldTask[key as keyof Task];
 
-                    if (key === "date" && oldValue && value) {
+                    if (key === "dueDate" && oldValue && value) {
                         return !compareDates(
                             oldValue as Date,
                             value as Date
