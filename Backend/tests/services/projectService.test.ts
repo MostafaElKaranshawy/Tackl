@@ -32,13 +32,9 @@ describe("ProjectService", () => {
         });
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get a valid project by Id", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -56,9 +52,7 @@ describe("ProjectService", () => {
             userId: "1",
         });
     });
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get a valid project by Id but with a different user", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -74,9 +68,7 @@ describe("ProjectService", () => {
             expect(error).toBeInstanceOf(ForbiddenException);
         }
     });
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get a project by wrong Id", async () => {
         vi.spyOn(Project, "findByPk").mockResolvedValue(null);
@@ -88,9 +80,7 @@ describe("ProjectService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Update a project", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -120,9 +110,7 @@ describe("ProjectService", () => {
             userId: "1",
         });
     });
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Update a project with invalid Id", async () => {
         vi.spyOn(Project, "findByPk").mockResolvedValue(null);
@@ -146,9 +134,7 @@ describe("ProjectService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Update a project with valid userId", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -170,9 +156,7 @@ describe("ProjectService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Delete a project", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -191,9 +175,7 @@ describe("ProjectService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Delete a project with invalid Id", async () => {
         vi.spyOn(Project, "findByPk").mockResolvedValue(null);
@@ -208,9 +190,7 @@ describe("ProjectService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Delete a project with valid userId", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -228,9 +208,7 @@ describe("ProjectService", () => {
         }
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    
 
     it("Get projects by userId", async () => {
         const mockResponse = {
