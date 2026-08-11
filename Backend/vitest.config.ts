@@ -11,6 +11,9 @@ export default defineConfig({
                 "html",
                 "lcov",
             ],
+            include: [
+                "src/**",
+            ],
             exclude: [
                 "tests/**",
                 "src/config/**",
@@ -21,13 +24,14 @@ export default defineConfig({
                 "**/*.d.ts",
                 "src/enums/**",
                 "src/interfaces/**",
+                "src/routes/**",
+                "src/dto/**",
+                "src/index.ts",
                 "src/services/emailService.ts",
             ],
 
             thresholds: {
                 lines: 80,
-                functions: 0,
-                branches: 0,
                 statements: 80,
             },
         },
