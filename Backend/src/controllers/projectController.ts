@@ -1,10 +1,9 @@
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import ProjectService from "../services/projectService";
-import ErrorHandler from "../exceptions/errorHandler";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import ForbiddenException from "../exceptions/forbiddenException";
 export default class ProjectController {
-    static async createProject(req: Request, res: Response) {
+    static async createProject(req: Request, res: Response, next: NextFunction) {
         try {
 
             const userId = req.userId;
@@ -24,12 +23,12 @@ export default class ProjectController {
             if (error instanceof MissingRequiredDataException) {
                 res.status(400).json({ message: error.message });
             } else {
-                ErrorHandler(error, req, res);
+                next(error);
             }
         }
     }
 
-    static async getProjectById(req: Request, res: Response) {
+    static async getProjectById(req: Request, res: Response, next: NextFunction) {
         try {
 
             const userId = req.userId;
@@ -48,11 +47,11 @@ export default class ProjectController {
             res.status(200).json(project);
 
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async updateProject(req: Request, res: Response) {
+    static async updateProject(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
             const projectId = req.params.projectId;
@@ -73,11 +72,11 @@ export default class ProjectController {
             const project = await ProjectService.updateProject(projectId, { name: updatedData.name, description: updatedData.description }, userId);
             res.status(200).json(project);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async deleteProject(req: Request, res: Response) {
+    static async deleteProject(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
             const projectId = req.params.projectId;
@@ -94,11 +93,11 @@ export default class ProjectController {
             res.status(204).send();
 
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async getUserProjects(req: Request, res: Response) {
+    static async getUserProjects(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
 
@@ -154,7 +153,7 @@ export default class ProjectController {
                 limit,
             });
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 }

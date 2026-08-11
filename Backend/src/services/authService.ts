@@ -7,6 +7,7 @@ import WrongCredentialsException from "../exceptions/wrongCredentialsException";
 import NotFoundException from "../exceptions/notFoundException";
 import EmailService from "./emailService";
 import AlreadyExistsException from "../exceptions/alreadyExistsException";
+import EmailAlreadyConfirmedException from "../exceptions/emailAlreadyConfirmed";
 
 export default class AuthService {
 
@@ -62,16 +63,16 @@ export default class AuthService {
     static async getConfirmationLink(email: string): Promise<void> {
         const user = await UserRepository.getUserByEmail(email);
         if (!user) {
-            throw new NotFoundException("User not found", 404);
+            throw new NotFoundException("User not found");
         }
         if (user.confirmed) {
-            throw new AlreadyExistsException("Email is already confirmed", 400);
+            throw new EmailAlreadyConfirmedException("Email is already confirmed, login instead");
         }
         if (user.lastLinkTime) {
             const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
             const oneHourInMilliseconds = 60 * 60 * 1000;
             if (timeSinceLastLink < oneHourInMilliseconds) {
-                throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.", 409);
+                throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.");
             }
         }
         await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });

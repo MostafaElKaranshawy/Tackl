@@ -1,15 +1,14 @@
-import ErrorHandler from '../exceptions/errorHandler';
 import ForbiddenException from '../exceptions/forbiddenException';
 import MissingRequiredDataException from '../exceptions/missingRequiredDataException';
 import QueryParams from '../interfaces/QueryParams';
 import Task from '../models/task';
 import TaskService from '../services/taskService'
 import { checkQueryParams } from '../utils/checkQueryParams';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 export default class TaskController {
 
-    static async createTask(req: Request, res: Response) {
+    static async createTask(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId
             const taskData = req.body as Task;
@@ -19,7 +18,7 @@ export default class TaskController {
                 throw new ForbiddenException("User ID is required.");
             }
 
-            if (!taskData.title || !taskData.status || !taskData.priority) {
+            if (!taskData.title) {
                 throw new MissingRequiredDataException("Missing required task data.");
             }
 
@@ -37,12 +36,12 @@ export default class TaskController {
             const task = await TaskService.createTask(parsedTaskData, projectId, userId);
             res.status(201).json(task);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
 
     }
 
-    static async getTaskById(req: Request, res: Response) {
+    static async getTaskById(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
             if (!userId) {
@@ -61,11 +60,11 @@ export default class TaskController {
             const task = await TaskService.getTaskById(projectId, taskId, userId);
             res.status(200).json(task);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async updateTask(req: Request, res: Response) {
+    static async updateTask(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
 
@@ -100,11 +99,11 @@ export default class TaskController {
             const task = await TaskService.updateTask(projectId, taskId, parsedTaskData, userId);
             res.status(200).json(task);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async deleteTask(req: Request, res: Response) {
+    static async deleteTask(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
 
@@ -126,11 +125,11 @@ export default class TaskController {
             await TaskService.deleteTask(projectId, taskId, userId);
             res.status(204).send();
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async getProjectTasks(req: Request, res: Response) {
+    static async getProjectTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
 
@@ -171,11 +170,11 @@ export default class TaskController {
             const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async getAllProjectTasks(req: Request, res: Response) {
+    static async getAllProjectTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
 
@@ -201,7 +200,7 @@ export default class TaskController {
             const tasks = await TaskService.getAllProjectTasks(projectId, userId, sortBy, sortOrder);
             res.status(200).json(tasks);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 }

@@ -1,14 +1,13 @@
-import ErrorHandler from "../exceptions/errorHandler";
 import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import TimeEntryService from "../services/timeEntryService";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { validateDate, validateTime } from "../utils/validateTime";
 import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryController {
-    static async createTimeEntry(req: Request, res: Response) {
+    static async createTimeEntry(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req;
 
@@ -47,11 +46,11 @@ export default class TimeEntryController {
 
             res.status(201).json(createdTimeEntry);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async getTimeEntryById(req: Request, res: Response) {
+    static async getTimeEntryById(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req;
 
@@ -79,11 +78,11 @@ export default class TimeEntryController {
 
             res.status(200).json(timeEntry);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async updateTimeEntry(req: Request, res: Response) {
+    static async updateTimeEntry(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req;
 
@@ -122,11 +121,11 @@ export default class TimeEntryController {
 
             res.status(200).json(updatedTimeEntry);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async deleteTimeEntry(req: Request, res: Response) {
+    static async deleteTimeEntry(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req;
 
@@ -150,11 +149,11 @@ export default class TimeEntryController {
 
             res.status(204).send();
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 
-    static async getTaskTimeEntries(req: Request, res: Response) {
+    static async getTaskTimeEntries(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req;
 
@@ -175,7 +174,7 @@ export default class TimeEntryController {
 
             res.status(200).json(timeEntries);
         } catch (error) {
-            ErrorHandler(error, req, res);
+            next(error);
         }
     }
 }
