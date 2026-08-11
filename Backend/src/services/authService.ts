@@ -28,10 +28,6 @@ export default class AuthService {
         try {
             const user = await UserRepository.getUserByEmail(email);
 
-            if (!user) {
-                throw new WrongCredentialsException("Invalid email or password");
-            }
-
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
                 throw new WrongCredentialsException("Invalid email or password");
@@ -62,9 +58,7 @@ export default class AuthService {
 
     static async getConfirmationLink(email: string): Promise<void> {
         const user = await UserRepository.getUserByEmail(email);
-        if (!user) {
-            throw new NotFoundException("User not found");
-        }
+
         if (user.confirmed) {
             throw new EmailAlreadyConfirmedException("Email is already confirmed, login instead");
         }
@@ -83,9 +77,6 @@ export default class AuthService {
 
     static async resetPassword(password: string, userId: string): Promise<void> {
         const user = await UserRepository.getUserById(userId);
-        if (!user) {
-            throw new NotFoundException("User not found", 404);
-        }
 
         const passwordSalt = randomInt(1, 15);
         const hashedPassword = await bcrypt.hash(password, passwordSalt);
@@ -95,9 +86,7 @@ export default class AuthService {
 
     static async getResetPasswordLink(email: string): Promise<string> {
         const user = await UserRepository.getUserByEmail(email);
-        if (!user) {
-            throw new NotFoundException("User not found", 404);
-        }
+
         if (user.lastLinkTime) {
             const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
             const oneHourInMilliseconds = 60 * 60 * 1000;
