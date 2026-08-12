@@ -10,7 +10,7 @@ type AuthFormProps = {
     footer?: ReactNode;
 };
 
-export default function AuthForm({
+export default function FormComponent({
     title,
     subtitle,
     submitText,
