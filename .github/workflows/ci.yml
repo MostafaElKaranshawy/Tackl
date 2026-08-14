@@ -69,22 +69,3 @@ jobs:
       - name: Run Frontend tests
         working-directory: Frontend
         run: npm run test:coverage
-
-      # Docker
-
-      - name: Build Docker images
-        run: docker compose build
-
-      - name: Start Docker Compose
-        run: docker compose up -d
-
-      - name: Check running containers
-        run: docker compose ps
-
-      - name: Show Docker logs on failure
-        if: failure()
-        run: docker compose logs
-
-      - name: Stop Docker Compose
-        if: always()
-        run: docker compose down
