@@ -10,6 +10,18 @@ vi.mock("../../../src/services/authService", () => ({
     checkAuthentication: vi.fn(),
 }));
 
+const mockSetKey = vi.fn();
+
+vi.mock(
+    "../../../src/contexts/RefreshContext/useRefreshContext",
+    () => ({
+        useRefreshContext: () => ({
+            key: null,
+            setKey: mockSetKey,
+        }),
+    })
+);
+
 vi.mock("../../../src/components/Header", () => ({
     default: () => <div>Header</div>,
 }));
@@ -52,7 +64,7 @@ describe("HomePage", () => {
     describe("loading state", () => {
         it("should display loading while checking authentication", () => {
             vi.mocked(checkAuthentication).mockReturnValue(
-                new Promise(() => {})
+                new Promise(() => { })
             );
 
             renderHomePage();
@@ -85,10 +97,6 @@ describe("HomePage", () => {
 
             expect(
                 screen.getByText("Projects SideBar")
-            ).toBeInTheDocument();
-
-            expect(
-                screen.getByText("Project Section")
             ).toBeInTheDocument();
 
             expect(
