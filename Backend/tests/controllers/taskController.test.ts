@@ -595,7 +595,7 @@ describe("TaskController", () => {
         vi.spyOn(TaskService, "getProjectTasks").mockResolvedValue(mockResult);
 
         vi.spyOn(
-            await import("../../src/utils/checkQueryParams"),
+            await import("../../src/utils/checkQueryParams.js"),
             "checkQueryParams"
         ).mockImplementation(() => undefined);
 
