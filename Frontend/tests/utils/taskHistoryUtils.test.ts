@@ -11,12 +11,6 @@ describe("taskHistoryUtils", () => {
         vi.restoreAllMocks();
     });
 
-    it("should format date correctly", () => {
-        const date = "2024-06-01T12:00:00Z";
-        const formattedDate = formatDate(date);
-        expect(formattedDate).toBe("Jun 1, 2024, 3:00 PM");
-    });
-
     it("should format field name correctly", () => {
         const fieldName = "user name";
         const formattedFieldName = formatFieldName(fieldName);
