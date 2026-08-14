@@ -41,3 +41,21 @@ setupSwagger(app);
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, Express with TypeScript!");
 });
+
+
+const shutdown = async (signal: string) => {
+  logger.info(`Received ${signal}. Shutting down server...`);
+
+  try {
+    await sequelize.close();
+    logger.info("Database connection closed.");
+
+    process.exit(0);
+  } catch (error) {
+    logger.error("Error during server shutdown:", error);
+    process.exit(1);
+  }
+};
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
