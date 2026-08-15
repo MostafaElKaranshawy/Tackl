@@ -24,7 +24,7 @@ export default function TaskShow() {
     const { projectId } = useParams<{ projectId: string }>();
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
 
-    const { key, setKey } = useTaskRefreshContext();
+    const { setKey } = useTaskRefreshContext();
 
     const closeTaskWindow = useCallback(() => {
         setTask(null);
@@ -33,6 +33,7 @@ export default function TaskShow() {
             pathname: `/projects${projectId ? `/${projectId}` : ""}`,
             search: location.search.replace(/(\?|&)taskId=[^&]*/, ""),
         });
+        setKey(prevKey => (prevKey + 1) % 2);
     }, [navigate, projectId, location.search]);
 
     useEffect(() => {
@@ -43,7 +44,7 @@ export default function TaskShow() {
         let cancelled = false;
 
         const loadTask = async () => {
-            try {            
+            try {
                 const data = await getTaskById(taskId, projectId);
                 if (!cancelled) {
                     setTask(data);
@@ -60,7 +61,7 @@ export default function TaskShow() {
         return () => {
             cancelled = true;
         };
-    }, [taskId, projectId, closeTaskWindow, key]);
+    }, [taskId, projectId, closeTaskWindow]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -92,9 +93,11 @@ export default function TaskShow() {
         }
     };
     const refresh = (close: boolean) => {
-        setKey(prevKey => (prevKey + 1) % 2);
         if (close) {
             closeTaskWindow();
+        }
+        else {
+            setKey(prevKey => (prevKey + 1) % 2);
         }
     }
     if (!task) {

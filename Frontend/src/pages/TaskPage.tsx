@@ -194,7 +194,7 @@ export default function TaskPage() {
                                 <div
                                     className={
                                         "group relative flex justify-between py-3"
-                                        + (task.dueDate && new Date(task.dueDate) < new Date() ? " bg-red-100" : "")
+                                        + (task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() ? " bg-red-100" : "")
                                     }>
                                     <span
                                         className="text-gray-500">

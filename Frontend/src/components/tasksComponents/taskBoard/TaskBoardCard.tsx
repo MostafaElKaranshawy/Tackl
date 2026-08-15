@@ -1,6 +1,7 @@
 import { MdCalendarToday, MdFlag } from "react-icons/md";
 import type Task from "../../../types/task";
-
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 interface TaskBoardCardProps {
     task: Task;
     onClick: () => void;
@@ -16,8 +17,26 @@ export default function TaskBoardCard({
         high: "bg-red-100 text-red-700",
     };
 
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({
+        id: task.id,
+    });
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
     return (
         <div className="cursor-pointer rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
             onClick={() => onClick()}
         >
             <div className="flex items-start justify-between gap-3">

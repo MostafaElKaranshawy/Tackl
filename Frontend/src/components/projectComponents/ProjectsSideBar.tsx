@@ -58,9 +58,20 @@ export default function ProjectsSideBar() {
     };
 
     useEffect(() => {
-        navigate(
-            { pathname: `/projects${projectId ? `/${projectId}` : ''}`, search: location.search.replace(/(\?|&)sortBy=[^&]*/, '').replace(/(\?|&)sortOrder=[^&]*/, '').replace(/(\?|&)page=[^&]*/, '') + `?sortBy=${sortBy}&sortOrder=${sortOrder}` + (currentPage > 1 ? `&page=${currentPage}` : '') }
-        );
+
+        searchParams.set("sortBy", sortBy);
+        searchParams.set("sortOrder", sortOrder);
+
+        if (currentPage > 1) {
+            searchParams.set("page", currentPage.toString());
+        } else {
+            searchParams.delete("page");
+        }
+
+        navigate({
+            pathname: `/projects${projectId ? `/${projectId}` : ""}`,
+            search: `?${searchParams.toString()}`,
+        });
         let ignore = false;
         const fetchData = async () => {
             try {
