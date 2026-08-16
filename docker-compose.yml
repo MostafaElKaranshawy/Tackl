@@ -3,10 +3,12 @@ services:
     image: postgres:18
     container_name: tackl-db
     restart: unless-stopped
+    secrets:
+      - db_password
     environment:
       POSTGRES_DB: tackl
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
     volumes:
       - postgres_data:/var/lib/postgresql
 
@@ -20,6 +22,8 @@ services:
       - ./Backend/.env
     environment:
       - PORT=4000
+      - DB_HOST=tackl-db
+      - NODE_ENV=deployment
     depends_on:
       - database
     ports:
@@ -31,12 +35,12 @@ services:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:4000
     container_name: tackl-frontend
     restart: unless-stopped
     env_file:
       - ./Frontend/.env
-    environment:
-      - VITE_API_URL=http://localhost:4000
     depends_on:
       - server
     ports:
@@ -44,3 +48,7 @@ services:
 
 volumes:
   postgres_data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt

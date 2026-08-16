@@ -51,13 +51,6 @@ jobs:
 
       - name: Run Backend tests
         working-directory: Backend
-        env:
-          NODE_ENV: test
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: tackl
-          DB_USER: postgres
-          DB_PASSWORD: root
         run: npm run test:coverage
 
       # Frontend

@@ -309,7 +309,7 @@ const options: swaggerJsdoc.Options = {
             { bearerAuth: [] },
         ],
     },
-    apis: ["./src/routes/**/*.ts"], // location of your Swagger comments
+    apis: ["./dist/routes/**/*.js", "./src/routes/**/*.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
