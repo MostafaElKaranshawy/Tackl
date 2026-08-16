@@ -98,7 +98,7 @@ export default class TaskRepository {
             }
             await task.destroy();
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
             }
             throw new DBException("Failed to delete task: " + (error as Error).message);
