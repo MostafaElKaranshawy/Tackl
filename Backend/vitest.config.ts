@@ -17,17 +17,10 @@ export default defineConfig({
             exclude: [
                 "tests/**",
                 "src/config/**",
-                "src/models/**",
                 "src/migrations/**",
                 "src/seeders/**",
-                "src/types/**",
                 "**/*.d.ts",
-                "src/enums/**",
-                "src/interfaces/**",
-                "src/routes/**",
-                "src/dto/**",
                 "src/index.ts",
-                "src/services/emailService.ts",
             ],
 
             thresholds: {
