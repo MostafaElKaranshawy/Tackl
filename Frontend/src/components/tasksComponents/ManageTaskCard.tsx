@@ -4,8 +4,8 @@ import { notify } from "../../utils/notify";
 import { createTask, updateTask } from "../../services/taskService";
 import type Task from "../../types/task";
 import type { CreateTaskDto, UpdateTaskDto } from "../../types/task";
-import { TaskStatus } from "../../types/taskStatus";
-import { getBoardColumnsByProjectId } from "../../services/boardColumnService";
+import { getProjectTaskStatusByProjectId } from "../../services/taskStatusService";
+import type { Column } from "../../types/column";
 
 interface TaskFormModalProps {
     mode: "create" | "edit";
@@ -15,27 +15,18 @@ interface TaskFormModalProps {
     onClose: () => void;
 }
 
-interface BoardColumnOption {
-    id: string;
-    name: string;
-    status: TaskStatus;
-    order: number;
-}
-
 export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClose, }: TaskFormModalProps) {
     const [title, setTitle] = useState(mode === "edit" && task ? task.title : "");
 
     const [titleError, setTitleError] = useState("");
 
-    const [boardColumns, setBoardColumns] = useState<BoardColumnOption[]>([]);
-
-    const [columnId, setColumnId] = useState<string | null>(mode === "edit" && task ? task.columnId ?? null : null);
+    const [taskStatuses, setTaskStatuses] = useState<Column[]>([]);
 
     const [description, setDescription] = useState(mode === "edit" && task ? task.description ?? "" : "");
 
     const [priority, setPriority] = useState<"low" | "medium" | "high">(task && mode === "edit" ? task.priority : "medium");
 
-    const [status, setStatus] = useState<TaskStatus>(task && mode === "edit" ? task.status : TaskStatus.Todo);
+    const [status, setStatus] = useState<string>(task && mode === "edit" ? task.status : "");
 
     const [dueDate, setDueDate] = useState<string | null>(task && mode === "edit" ? task.dueDate : null);
 
@@ -51,97 +42,79 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
         useState(true);
 
     useEffect(() => {
-        const fetchColumns = async () => {
+        let count = 0;
+        const fetchTaskStatuses = async () => {
             try {
                 setColumnsLoading(true);
 
-                const columns =
-                    await getBoardColumnsByProjectId(
+                const taskStatuses =
+                    await getProjectTaskStatusByProjectId(
                         projectId
                     );
 
-                const mainColumns: BoardColumnOption[] = [
-                    {
-                        id: TaskStatus.Todo,
-                        name: "To Do",
-                        status: TaskStatus.Todo,
-                        order: 0,
-                    },
-                    {
-                        id: TaskStatus.InProgress,
-                        name: "In Progress",
-                        status: TaskStatus.InProgress,
-                        order: 1,
-                    },
-                    {
-                        id: TaskStatus.Done,
-                        name: "Done",
-                        status: TaskStatus.Done,
-                        order: 2,
-                    },
-                ];
-
-                const customColumns =
-                    columns.filter(
-                        (column) =>
-                            column.id !==
-                            TaskStatus.Todo &&
-                            column.id !==
-                            TaskStatus.InProgress &&
-                            column.id !==
-                            TaskStatus.Done
-                    );
-
-                setBoardColumns([
-                    ...mainColumns,
-                    ...customColumns,
-                ]);
+                setTaskStatuses(taskStatuses);
+                setStatus(
+                    taskStatuses.length > 0
+                        ? taskStatuses[0].status
+                        : ""
+                );
             } catch (error) {
-                console.error(
-                    "Failed to fetch board columns:",
-                    error
-                );
-
-                notify.error(
-                    "Failed to load board columns."
-                );
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 404) {
+                        notify.error(
+                            "Task statuses not found"
+                        );
+                    } else if (error.response?.status === 401) {
+                        notify.error(
+                            "Unauthorized access"
+                        );
+                    } else {
+                        if (count < 3) {
+                            count++;
+                            fetchTaskStatuses();
+                        } else {
+                            notify.error(
+                                "Error fetching task statuses"
+                            );
+                        }
+                    }
+                } else {
+                    if (count < 3) {
+                        count++;
+                        fetchTaskStatuses();
+                    } else {
+                        notify.error(
+                            "Error fetching task statuses"
+                        );
+                    }
+                }
             } finally {
                 setColumnsLoading(false);
             }
         };
 
-        fetchColumns();
+        fetchTaskStatuses();
     }, [projectId]);
 
-    const handleColumnChange = (
-        selectedColumnId: string
-    ) => {
-        const selectedColumn = boardColumns.find(
-            (column) =>
-                column.id === selectedColumnId
+    const handleColumnChange = (selectedColumnStatus: string) => {
+        const selectedColumn = taskStatuses.find(
+            (status) =>
+                status.status === selectedColumnStatus
         );
 
         if (!selectedColumn) return;
 
         setStatus(selectedColumn.status);
-
-        const isMainColumn =
-            selectedColumn.id === TaskStatus.Todo ||
-            selectedColumn.id === TaskStatus.InProgress ||
-            selectedColumn.id === TaskStatus.Done;
-
-        setColumnId(
-            isMainColumn
-                ? null
-                : selectedColumn.id
-        );
     };
 
     const handleSubmit = async () => {
         if (!title.trim()) {
-            setTitleError(
-                "Task title cannot be empty."
-            );
+            setTitleError("Task title cannot be empty.");
+            return;
+        }
+
+        if (!status.trim()) {
+            notify.error("Task status is required.");
             return;
         }
 
@@ -153,8 +126,7 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
                     title: title.trim(),
                     description:
                         description.trim() || null,
-                    status,
-                    columnId,
+                    status: status.toLowerCase(),
                     priority,
                     dueDate,
                     estimatedTime,
@@ -183,8 +155,7 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
                     title: title.trim(),
                     description:
                         description.trim() || null,
-                    status,
-                    columnId,
+                    status: status.toLowerCase(),
                     priority,
                     dueDate,
                     estimatedTime,
@@ -357,7 +328,7 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
 
                             <select
                                 value={
-                                    columnId ?? status
+                                    status
                                 }
                                 onChange={(e) =>
                                     handleColumnChange(
@@ -374,18 +345,19 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
                                         Loading...
                                     </option>
                                 ) : (
-                                    boardColumns.map(
-                                        (column) => (
+                                    taskStatuses.map(
+                                        (status) => (
                                             <option
                                                 key={
-                                                    column.id
+                                                    status.status
                                                 }
                                                 value={
-                                                    column.id
+                                                    status.status
                                                 }
                                             >
                                                 {
-                                                    column.name
+                                                    status.status.substring(0, 1).toUpperCase() +
+                                                    status.status.substring(1).replace(/_/g, " ")
                                                 }
                                             </option>
                                         )

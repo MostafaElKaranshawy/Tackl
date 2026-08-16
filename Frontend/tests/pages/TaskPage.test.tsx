@@ -90,7 +90,7 @@ const task = {
     id: "task-1",
     title: "Test Task",
     description: "Test task description",
-    status: "todo",
+    status: "to do",
     priority: "medium",
     estimatedTime: 120,
     dueDate: "2099-01-01T00:00:00.000Z",
@@ -149,7 +149,7 @@ describe("TaskPage", () => {
             ).toBeInTheDocument();
 
             expect(
-                screen.getByText("To Do")
+                screen.getByText("To do")
             ).toBeInTheDocument();
 
             expect(

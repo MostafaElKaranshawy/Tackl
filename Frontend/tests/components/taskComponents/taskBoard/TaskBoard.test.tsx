@@ -20,9 +20,9 @@ describe("TaskBoard", () => {
     const tasks: Task[] = [
         {
             id: "task-1",
-            title: "Todo Task",
-            description: "Todo description",
-            status: "todo",
+            title: "to do Task",
+            description: "to do description",
+            status: "to do",
             priority: "high",
             estimatedTime: 120,
             dueDate: null,
@@ -91,7 +91,7 @@ describe("TaskBoard", () => {
 
             renderTaskBoard();
 
-            expect(screen.getByText("To Do")).toBeInTheDocument();
+            expect(screen.getByText("To do")).toBeInTheDocument();
             expect(screen.getByText("In Progress")).toBeInTheDocument();
             expect(screen.getByText("Done")).toBeInTheDocument();
         });
@@ -104,7 +104,7 @@ describe("TaskBoard", () => {
 
             renderTaskBoard();
 
-            expect(screen.getByText("Todo Task")).toBeInTheDocument();
+            expect(screen.getByText("to do Task")).toBeInTheDocument();
             expect(screen.getByText("In Progress Task")).toBeInTheDocument();
             expect(screen.getByText("Done Task")).toBeInTheDocument();
         });
@@ -144,9 +144,9 @@ describe("TaskBoard", () => {
             renderTaskBoard([
                 {
                     id: "task-1",
-                    title: "Todo Task",
-                    description: "Todo description",
-                    status: "todo",
+                    title: "to do Task",
+                    description: "to do description",
+                    status: "to do",
                     priority: "high",
                     estimatedTime: 120,
                     dueDate: null,

@@ -25,7 +25,7 @@ export default class TaskController {
             if (!projectId || !(projectId && typeof projectId === 'string')) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
-            
+
             if (taskData.dueDate && isNaN(Date.parse(taskData.dueDate.toString()))) {
                 throw new MissingRequiredDataException("Invalid due date format.");
             }
@@ -33,8 +33,7 @@ export default class TaskController {
             const parsedTaskData = {
                 title: taskData.title,
                 description: taskData.description || null,
-                status: taskData.status || "todo",
-                boardColumnId: taskData.columnId || null,
+                status: taskData.status || "to do",
                 priority: taskData.priority || "medium",
                 estimatedTime: taskData.estimatedTime || null,
                 dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
@@ -104,7 +103,7 @@ export default class TaskController {
                 ...(updatedData.dueDate !== undefined && {
                     dueDate: updatedData.dueDate ? new Date(updatedData.dueDate) : null,
                 }),
-                ...(updatedData.columnId !== undefined && { columnId: updatedData.columnId }),
+                ...(updatedData.status !== undefined && { status: updatedData.status }),
             };
 
             const task = await TaskService.updateTask(projectId, taskId, parsedTaskData, userId);

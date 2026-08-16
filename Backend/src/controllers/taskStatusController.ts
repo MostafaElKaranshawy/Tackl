@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
-import BoardColumnService from "../services/boardColumnService";
-import { TaskStatus } from "../enums/taskStatus";
+import TaskStatusService from "../services/taskStatusService";
+import { MainTaskStatus } from "../enums/mainTaskStatus";
 
-export default class BoardColumnController {
-    static async createBoardColumn(req: Request, res: Response, next: NextFunction) {
+export default class TaskStatusController {
+    static async createTaskStatus(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
             const { projectId } = req.params;
-            const boardColumnData = req.body;
+            const taskStatusData = req.body;
 
             if (!userId) {
                 throw new ForbiddenException("User ID is required.");
@@ -21,51 +21,37 @@ export default class BoardColumnController {
                 );
             }
 
-            if (!boardColumnData || typeof boardColumnData !== "object") {
+            if (!taskStatusData || typeof taskStatusData !== "object") {
                 throw new MissingRequiredDataException(
-                    "Board column data is required."
+                    "Request body is required."
                 );
             }
 
-            if (!boardColumnData.name) {
+            if (!taskStatusData.status) {
                 throw new MissingRequiredDataException(
-                    "Board column name is required."
+                    "Task status is required."
                 );
             }
 
-            if (boardColumnData.order === undefined) {
-                throw new MissingRequiredDataException(
-                    "Board column order is required."
-                );
-            }
-
-            if (!boardColumnData.status || !Object.values(TaskStatus).includes(boardColumnData.status)) {
-                throw new MissingRequiredDataException(
-                    "Board column status is required."
-                );
-            }
-
-            const boardColumn =
-                await BoardColumnService.createBoardColumn(
+            const taskStatus =
+                await TaskStatusService.createTaskStatus(
                     userId,
                     projectId,
                     {
-                        name: boardColumnData.name,
-                        status: boardColumnData.status,
-                        order: boardColumnData.order,
+                        status: taskStatusData.status,
                     }
                 );
 
-            res.status(201).json(boardColumn);
+            res.status(201).json(taskStatus);
         } catch (error) {
             next(error);
         }
     }
 
-    static async getBoardColumnById(req: Request, res: Response, next: NextFunction) {
+    static async getTaskStatusById(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
-            const { projectId, boardId } = req.params;
+            const { projectId, taskStatusId } = req.params;
 
             if (!userId) {
                 throw new ForbiddenException("User ID is required.");
@@ -77,26 +63,26 @@ export default class BoardColumnController {
                 );
             }
 
-            if (!boardId || typeof boardId !== "string") {
+            if (!taskStatusId || typeof taskStatusId !== "string") {
                 throw new MissingRequiredDataException(
-                    "Board column ID is required."
+                    "Task status ID is required."
                 );
             }
 
-            const boardColumn =
-                await BoardColumnService.getBoardColumnById(
+            const taskStatus =
+                await TaskStatusService.getTaskStatusByPK(
                     userId,
                     projectId,
-                    boardId
+                    taskStatusId
                 );
 
-            res.status(200).json(boardColumn);
+            res.status(200).json(taskStatus);
         } catch (error) {
             next(error);
         }
     }
 
-    static async getBoardColumnsByProjectId(req: Request, res: Response, next: NextFunction) {
+    static async getTaskStatusesByProjectId(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
             const { projectId } = req.params;
@@ -111,22 +97,22 @@ export default class BoardColumnController {
                 );
             }
 
-            const boardColumns =
-                await BoardColumnService.getBoardColumnsByProjectId(
+            const taskStatuses =
+                await TaskStatusService.getTaskStatusesByProjectId(
                     userId,
                     projectId
                 );
 
-            res.status(200).json(boardColumns);
+            res.status(200).json(taskStatuses);
         } catch (error) {
             next(error);
         }
     }
 
-    static async updateBoardColumn(req: Request, res: Response, next: NextFunction) {
+    static async updateTaskStatus(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
-            const { projectId, boardColumnId } = req.params;
+            const { projectId, taskStatusId } = req.params;
             const updatedData = req.body;
 
             if (!userId) {
@@ -139,44 +125,42 @@ export default class BoardColumnController {
                 );
             }
 
-            if (!boardColumnId || typeof boardColumnId !== "string") {
+            if (!taskStatusId || typeof taskStatusId !== "string") {
                 throw new MissingRequiredDataException(
-                    "Board column ID is required."
+                    "Task status ID is required."
                 );
             }
 
             if (
-                updatedData?.name === undefined &&
                 updatedData?.status === undefined &&
                 updatedData?.order === undefined
             ) {
                 throw new MissingRequiredDataException(
-                    "At least one field (name, status, or order) must be provided for update."
+                    "At least one field (status, or order) must be provided for update."
                 );
             }
 
-            const boardColumn =
-                await BoardColumnService.updateBoardColumn(
+            const taskStatus =
+                await TaskStatusService.updateTaskStatus(
                     userId,
                     projectId,
-                    boardColumnId,
+                    taskStatusId,
                     {
-                        name: updatedData.name,
                         status: updatedData.status,
                         order: updatedData.order,
                     }
                 );
 
-            res.status(200).json(boardColumn);
+            res.status(200).json(taskStatus);
         } catch (error) {
             next(error);
         }
     }
 
-    static async deleteBoardColumn(req: Request, res: Response, next: NextFunction) {
+    static async deleteTaskStatus(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
-            const { projectId, boardColumnId } = req.params;
+            const { projectId, taskStatusId } = req.params;
 
             if (!userId) {
                 throw new ForbiddenException("User ID is required.");
@@ -188,16 +172,16 @@ export default class BoardColumnController {
                 );
             }
 
-            if (!boardColumnId || typeof boardColumnId !== "string") {
+            if (!taskStatusId || typeof taskStatusId !== "string") {
                 throw new MissingRequiredDataException(
-                    "Board column ID is required."
+                    "Task status ID is required."
                 );
             }
 
-            await BoardColumnService.deleteBoardColumn(
+            await TaskStatusService.deleteTaskStatus(
                 userId,
                 projectId,
-                boardColumnId
+                taskStatusId
             );
 
             res.status(204).send();

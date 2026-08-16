@@ -11,8 +11,6 @@ import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext/useTask
 import TimeEntriesList from "../timeEntriesComponents/TimeEntriesList";
 import { formatMinutes } from "../../utils/timeFormater";
 import { notify } from "../../utils/notify";
-import type { Column } from "../../types/column";
-import { getBoardColumnsByProjectId } from '../../services/boardColumnService';
 
 export default function TaskShow() {
     const [task, setTask] = useState<Task | null>(null);
@@ -25,7 +23,6 @@ export default function TaskShow() {
     const taskId = searchParams.get("taskId") || "";
     const { projectId } = useParams<{ projectId: string }>();
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
-    const [boardColumns, setBoardColumns] = useState<Column[]>([]);
     const { setKey } = useTaskRefreshContext();
 
     const closeTaskWindow = useCallback(() => {
@@ -64,33 +61,6 @@ export default function TaskShow() {
             cancelled = true;
         };
     }, [taskId, projectId, closeTaskWindow]);
-
-    useEffect(() => {
-        if (!projectId || projectId === "undefined") {
-            return;
-        }
-
-        let cancelled = false;
-
-        const loadBoardColumns = async () => {
-            try {
-                const data = await getBoardColumnsByProjectId(projectId);
-                if (!cancelled) {
-                    setBoardColumns(data);
-                }
-            } catch {
-                if (!cancelled) {
-                    notify.error("Failed to load board columns.");
-                }
-            }
-        };
-
-        loadBoardColumns();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [projectId]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -134,11 +104,13 @@ export default function TaskShow() {
     }
 
     const statusClasses =
-        task.status === "todo"
+        task.status === "to do"
             ? "bg-gray-100 text-gray-700"
-            : task.status === "in_progress"
+            : task.status === "in progress"
                 ? "bg-yellow-100 text-yellow-700"
-                : "bg-green-100 text-green-700";
+                : task.status === "done" ?
+                    "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700";
 
     const priorityClasses =
         task.priority === "high"
@@ -161,13 +133,7 @@ export default function TaskShow() {
                                 className={`mt-3 inline-flex rounded-full px-3 py-1 text-sm font-medium ${statusClasses}`}
                             >
                                 {
-                                    task.columnId ? boardColumns.find(column => column.id === task.columnId)?.name
-                                        :
-                                        task.status === "todo"
-                                            ? "To Do"
-                                            : task.status === "in_progress"
-                                                ? "In Progress"
-                                                : "Done"
+                                    task.status.charAt(0).toUpperCase() + task.status.slice(1).replace("_", " ")
                                 }
                             </span>
                         </div>

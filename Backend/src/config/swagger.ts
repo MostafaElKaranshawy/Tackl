@@ -1,7 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
-import { TaskStatus } from "../enums/taskStatus";
 import { TaskPriority } from "../enums/taskPriority";
 import logger from "./logger";
 import { ActionType } from "../enums/actionType";
@@ -114,7 +113,6 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: TaskStatus,
                         },
                         priority: {
                             type: "string",
@@ -128,10 +126,6 @@ const options: swaggerJsdoc.Options = {
                             format: "date-time",
                         },
                         projectId: {
-                            type: "string",
-                            format: "uuid",
-                        },
-                        columnId: {
                             type: "string",
                             format: "uuid",
                         },
@@ -164,12 +158,7 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: TaskStatus,
-                            example: "todo",
-                        },
-                        columnId: {
-                            type: "string",
-                            format: "uuid",
+                            example: "to do",
                         },
                         dueDate: {
                             type: "string",
@@ -310,7 +299,7 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
-                BoardColumn: {
+                TaskStatus: {
                     type: "object",
                     properties: {
                         id: {
@@ -322,7 +311,6 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: TaskStatus,
                         },
                         order: {
                             type: "number",
@@ -341,7 +329,7 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
-                BoardColumnInput: {
+                TaskStatusInput: {
                     type: "object",
                     required: ["name", "status", "order"],
                     properties: {
@@ -351,8 +339,7 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: TaskStatus,
-                            example: "todo",
+                            example: "to do",
                         },
                         order: {
                             type: "number",

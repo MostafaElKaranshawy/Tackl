@@ -10,7 +10,7 @@ import {
 import { sequelize } from "../config/database";
 import { Models } from "./models";
 import Project from "./project";
-import { TaskStatus } from "../enums/taskStatus";
+import { MainTaskStatus } from "../enums/mainTaskStatus";
 import { TaskPriority } from "../enums/taskPriority";
 
 export default class Task extends Model<
@@ -27,10 +27,9 @@ export default class Task extends Model<
     declare priority: CreationOptional<TaskPriority>;
     declare estimatedTime: CreationOptional<number | null>;
     declare dueDate: CreationOptional<Date | null>;
-    declare status: CreationOptional<TaskStatus>;
+    declare status: CreationOptional<string>;
 
     declare projectId: ForeignKey<Project["id"]>;
-    declare columnId?: CreationOptional<string>;
 
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
@@ -57,12 +56,6 @@ export default class Task extends Model<
             as: "taskHistories",
             onDelete: "CASCADE",
         });
-
-        Task.belongsTo(models.BoardColumn, {
-            foreignKey: "columnId",
-            as: "boardColumn",
-            onDelete: "SET NULL",
-        });
     }
 }
 
@@ -82,12 +75,8 @@ Task.init(
             allowNull: true,
         },
         status: {
-            type: DataTypes.ENUM(...Object.values(TaskStatus)),
-            defaultValue: "todo",
-        },
-        columnId: {
-            type: DataTypes.UUID,
-            allowNull: true,
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         priority: {
             type: DataTypes.ENUM(...Object.values(TaskPriority)),

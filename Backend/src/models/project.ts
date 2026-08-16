@@ -42,9 +42,9 @@ export default class Project extends Model<
         });
 
 
-        Project.hasMany(models.BoardColumn, {
+        Project.hasMany(models.TaskStatus, {
             foreignKey: "projectId",
-            as: "boardColumns",
+            as: "taskStatuses",
             onDelete: "CASCADE",
         });
     }

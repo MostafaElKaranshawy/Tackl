@@ -1,16 +1,16 @@
 import router from "express";
-import BoardColumnController from "../controllers/boardColumnController";
+import TaskStatusController from "../controllers/taskStatusController";
 
-const boardColumnRouter = router.Router({mergeParams: true});
+const taskStatusRouter = router.Router({mergeParams: true});
 
 /**
  * @openapi
- * /api/projects/{projectId}/board-columns:
+ * /api/projects/{projectId}/task-statuses:
  *   post:
- *     summary: Create a new board column
- *     description: Creates a new board column for a project owned by the authenticated user.
+ *     summary: Create a new task status
+ *     description: Creates a new task status for a project owned by the authenticated user.
  *     tags:
- *       - Board Columns
+ *       - Task Statuses
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -26,14 +26,14 @@ const boardColumnRouter = router.Router({mergeParams: true});
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/BoardColumnInput'
+ *             $ref: '#/components/schemas/TaskStatusInput'
  *     responses:
  *       201:
- *         description: Board column created successfully.
+ *         description: Task status created successfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/BoardColumn'
+ *               $ref: '#/components/schemas/TaskStatus'
  *       400:
  *         description: Invalid request body.
  *       401:
@@ -45,19 +45,19 @@ const boardColumnRouter = router.Router({mergeParams: true});
  *       500:
  *         description: Internal server error.
  */
-boardColumnRouter.post(
+taskStatusRouter.post(
     "/",
-    BoardColumnController.createBoardColumn
+    TaskStatusController.createTaskStatus
 );
 
 /**
  * @openapi
- * /api/projects/{projectId}/board-columns:
+ * /api/projects/{projectId}/task-statuses:
  *   get:
- *     summary: Get all board columns
- *     description: Returns all board columns belonging to a project owned by the authenticated user.
+ *     summary: Get all task statuses
+ *     description: Returns all task statuses belonging to a project owned by the authenticated user.
  *     tags:
- *       - Board Columns
+ *       - Task Statuses
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -70,13 +70,13 @@ boardColumnRouter.post(
  *         description: Project ID.
  *     responses:
  *       200:
- *         description: List of board columns.
+ *         description: List of task statuses.
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/BoardColumn'
+ *                 $ref: '#/components/schemas/TaskStatus'
  *       400:
  *         description: Project ID is required.
  *       401:
@@ -88,19 +88,19 @@ boardColumnRouter.post(
  *       500:
  *         description: Internal server error.
  */
-boardColumnRouter.get(
+taskStatusRouter.get(
     "/",
-    BoardColumnController.getBoardColumnsByProjectId
+    TaskStatusController.getTaskStatusesByProjectId
 );
 
 /**
  * @openapi
- * /api/projects/{projectId}/board-columns/{boardColumnId}:
+ * /api/projects/{projectId}/task-statuses/{status}:
  *   get:
- *     summary: Get a board column by ID
- *     description: Returns a single board column belonging to the specified project.
+ *     summary: Get a task status by status name
+ *     description: Returns a single task status belonging to the specified project.
  *     tags:
- *       - Board Columns
+ *       - Task Statuses
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -112,19 +112,18 @@ boardColumnRouter.get(
  *           format: uuid
  *         description: Project ID.
  *       - in: path
- *         name: id
+ *         name: status
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: Board column ID.
+ *         description: Task status name.
  *     responses:
  *       200:
- *         description: Board column retrieved successfully.
+ *         description: Task status retrieved successfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/BoardColumn'
+ *               $ref: '#/components/schemas/TaskStatus'
  *       400:
  *         description: Invalid request.
  *       401:
@@ -132,23 +131,23 @@ boardColumnRouter.get(
  *       403:
  *         description: Forbidden.
  *       404:
- *         description: Board column or project not found.
+ *         description: Task status or project not found.
  *       500:
  *         description: Internal server error.
  */
-boardColumnRouter.get(
-    "/:boardColumnId",
-    BoardColumnController.getBoardColumnById
+taskStatusRouter.get(
+    "/:taskStatusId",
+    TaskStatusController.getTaskStatusById
 );
 
 /**
  * @openapi
- * /api/projects/{projectId}/board-columns/{boardColumnId}:
+ * /api/projects/{projectId}/task-statuses/{status}:
  *   put:
- *     summary: Update a board column
- *     description: Updates a board column belonging to a project owned by the authenticated user.
+ *     summary: Update a task status
+ *     description: Updates a task status belonging to a project owned by the authenticated user.
  *     tags:
- *       - Board Columns
+ *       - Task Statuses
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -160,25 +159,24 @@ boardColumnRouter.get(
  *           format: uuid
  *         description: Project ID.
  *       - in: path
- *         name: id
+ *         name: status
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: Board column ID.
+ *         description: Task status name.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/BoardColumnInput'
+ *             $ref: '#/components/schemas/TaskStatusInput'
  *     responses:
  *       200:
- *         description: Board column updated successfully.
+ *         description: Task status updated successfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/BoardColumn'
+ *               $ref: '#/components/schemas/TaskStatus'
  *       400:
  *         description: Invalid request body.
  *       401:
@@ -186,23 +184,23 @@ boardColumnRouter.get(
  *       403:
  *         description: Forbidden.
  *       404:
- *         description: Board column or project not found.
+ *         description: Task status or project not found.
  *       500:
  *         description: Internal server error.
  */
-boardColumnRouter.put(
-    "/:boardColumnId",
-    BoardColumnController.updateBoardColumn
+taskStatusRouter.put(
+    "/:taskStatusId",
+    TaskStatusController.updateTaskStatus
 );
 
 /**
  * @openapi
- * /api/projects/{projectId}/board-columns/{boardColumnId}:
+ * /api/projects/{projectId}/task-statuses/{status}:
  *   delete:
- *     summary: Delete a board column
- *     description: Deletes a board column belonging to a project owned by the authenticated user.
+ *     summary: Delete a task status
+ *     description: Deletes a task status belonging to a project owned by the authenticated user.
  *     tags:
- *       - Board Columns
+ *       - Task Statuses
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -214,15 +212,14 @@ boardColumnRouter.put(
  *           format: uuid
  *         description: Project ID.
  *       - in: path
- *         name: id
+ *         name: status
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: Board column ID.
+ *         description: Task status name.
  *     responses:
  *       204:
- *         description: Board column deleted successfully.
+ *         description: Task status deleted successfully.
  *       400:
  *         description: Invalid request.
  *       401:
@@ -230,13 +227,13 @@ boardColumnRouter.put(
  *       403:
  *         description: Forbidden.
  *       404:
- *         description: Board column or project not found.
+ *         description: Task status or project not found.
  *       500:
  *         description: Internal server error.
  */
-boardColumnRouter.delete(
-    "/:boardColumnId",
-    BoardColumnController.deleteBoardColumn
+taskStatusRouter.delete(
+    "/:taskStatusId",
+    TaskStatusController.deleteTaskStatus
 );
 
-export default boardColumnRouter;
+export default taskStatusRouter;

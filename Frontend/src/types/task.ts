@@ -1,15 +1,12 @@
-import type { TaskStatus } from "./taskStatus";
-
 export default interface Task {
     id: string;
     title: string;
     description: string | null;
-    status: TaskStatus;
+    status: string;
     priority: "low" | "medium" | "high";
     dueDate: string | null;
     estimatedTime: number | null;
     projectId: string;
-    columnId: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -24,6 +21,5 @@ export type GetProjectTasksOptions = {
     search: string;
     status?: string;
     priority?: string;
-    columnId?: string;
     overdue: boolean | false;
 };

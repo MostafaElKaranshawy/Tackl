@@ -1,17 +1,13 @@
 import { useState } from "react";
 import ConfirmationModal from "../../generalPurposeComponents/ConfirmationModal";
 
-import type { TaskStatus } from "../../../types/taskStatus";
-
 interface BoardColumnModalProps {
     editingColumn: boolean;
-    columnName: string;
-    columnStatus: TaskStatus;
+    columnStatus: string;
     creatingColumn: boolean;
     updatingColumn: boolean;
     deletingColumn: boolean;
-    onNameChange: (name: string) => void;
-    onStatusChange: (status: TaskStatus) => void;
+    onStatusChange: (status: string) => void;
     onClose: () => void;
     onSubmit: () => void;
     onDelete: () => void;
@@ -19,12 +15,10 @@ interface BoardColumnModalProps {
 
 export default function BoardColumnModal({
     editingColumn,
-    columnName,
     columnStatus,
     creatingColumn,
     updatingColumn,
     deletingColumn,
-    onNameChange,
     onStatusChange,
     onClose,
     onSubmit,
@@ -76,53 +70,20 @@ export default function BoardColumnModal({
                         htmlFor="column-name"
                         className="mb-2 block text-sm font-medium"
                     >
-                        Name
+                        Status
                     </label>
 
                     <input
                         id="column-name"
                         type="text"
-                        value={columnName}
+                        value={columnStatus}
                         onChange={(event) =>
-                            onNameChange(
+                            onStatusChange(
                                 event.target.value
                             )
                         }
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                     />
-                </div>
-
-                <div className="mb-6">
-                    <label
-                        htmlFor="column-status"
-                        className="mb-2 block text-sm font-medium"
-                    >
-                        Status
-                    </label>
-
-                    <select
-                        id="column-status"
-                        value={columnStatus}
-                        onChange={(event) =>
-                            onStatusChange(
-                                event.target
-                                    .value as TaskStatus
-                            )
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                    >
-                        <option value="todo">
-                            To Do
-                        </option>
-
-                        <option value="in_progress">
-                            In Progress
-                        </option>
-
-                        <option value="done">
-                            Done
-                        </option>
-                    </select>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -158,7 +119,7 @@ export default function BoardColumnModal({
                             type="button"
                             disabled={
                                 isDisabled ||
-                                !columnName.trim()
+                                !columnStatus.trim()
                             }
                             onClick={onSubmit}
                             className="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed"
@@ -175,7 +136,7 @@ export default function BoardColumnModal({
             {showDeleteConfirmation && (
                 <div onMouseDown={(e) => e.stopPropagation()}>
                     <ConfirmationModal
-                        message={`Are you sure you want to delete "${columnName}"?`}
+                        message={`Are you sure you want to delete "${columnStatus}"?`}
                         danger={true}
                         confirmText="Delete"
                         cancelText="Cancel"

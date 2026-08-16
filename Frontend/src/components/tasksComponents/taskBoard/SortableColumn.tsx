@@ -19,7 +19,7 @@ export default function SortableColumn({
         transform,
         transition,
     } = useSortable({
-        id: column.id,
+        id: column.status,
     });
 
     const style = {
@@ -31,7 +31,7 @@ export default function SortableColumn({
         <div
             ref={setNodeRef}
             style={style}
-            data-sortable-id={column.id}
+            data-sortable-id={column.status}
             className="w-[300px] shrink-0"
         >
             <TaskBoardColumn

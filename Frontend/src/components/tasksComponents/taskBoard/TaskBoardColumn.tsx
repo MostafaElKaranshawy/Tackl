@@ -23,7 +23,7 @@ export default function TaskBoardColumn({
     };
 }) {
     const { setNodeRef } = useDroppable({
-        id: column.id,
+        id: column.status,
     });
 
     return (
@@ -42,7 +42,7 @@ export default function TaskBoardColumn({
             >
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-gray-800">
-                        {column.name.substring(0, 1).toUpperCase() + column.name.substring(1).replace("_", " ")}
+                        {column.status.substring(0, 1).toUpperCase() + column.status.substring(1).replace("_", " ")}
                     </h2>
 
                     <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">

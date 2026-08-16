@@ -260,7 +260,7 @@ const tasks: Task[] = [
         id: "task-1",
         title: "First Task",
         description: "First task description",
-        status: "todo",
+        status: "to do",
         priority: "high",
         estimatedTime: 120,
         dueDate: "2026-08-20",

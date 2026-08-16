@@ -240,12 +240,12 @@ export default class TaskRepository {
         }
     }
 
-    static async getTaskByColumnId(projectId: string, columnId: string): Promise<Task[]> {
+    static async getTaskByTaskStatus(projectId: string, status: string): Promise<Task[]> {
         try {
             const tasks = await Task.findAll({
                 where: {
                     projectId: projectId,
-                    columnId: columnId
+                    status: status
                 }
             });
             return tasks;
