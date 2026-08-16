@@ -10,9 +10,8 @@ import {
 import { sequelize } from "../config/database";
 import { Models } from "./models";
 import Project from "./project";
-
-export type TaskStatus = "todo" | "in_progress" | "done";
-export type TaskPriority = "low" | "medium" | "high";
+import { TaskStatus } from "../enums/taskStatus";
+import { TaskPriority } from "../enums/taskPriority";
 
 export default class Task extends Model<
     InferAttributes<Task, {
@@ -25,16 +24,21 @@ export default class Task extends Model<
     declare id: CreationOptional<string>;
     declare title: string;
     declare description: CreationOptional<string | null>;
-    declare status: CreationOptional<TaskStatus>;
     declare priority: CreationOptional<TaskPriority>;
     declare estimatedTime: CreationOptional<number | null>;
     declare dueDate: CreationOptional<Date | null>;
+    declare status: CreationOptional<TaskStatus>;
+
     declare projectId: ForeignKey<Project["id"]>;
+    declare columnId?: CreationOptional<string>;
+
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+
     declare project?: NonAttribute<Project>;
     declare timeEntries?: NonAttribute<Model[]>;
     declare taskHistories?: NonAttribute<Model[]>;
+
     static associate(models: Models) {
         Task.belongsTo(models.Project, {
             foreignKey: "projectId",
@@ -52,6 +56,12 @@ export default class Task extends Model<
             foreignKey: "taskId",
             as: "taskHistories",
             onDelete: "CASCADE",
+        });
+
+        Task.belongsTo(models.BoardColumn, {
+            foreignKey: "columnId",
+            as: "boardColumn",
+            onDelete: "SET NULL",
         });
     }
 }
@@ -72,11 +82,15 @@ Task.init(
             allowNull: true,
         },
         status: {
-            type: DataTypes.ENUM("todo", "in_progress", "done"),
+            type: DataTypes.ENUM(...Object.values(TaskStatus)),
             defaultValue: "todo",
         },
+        columnId: {
+            type: DataTypes.UUID,
+            allowNull: true,
+        },
         priority: {
-            type: DataTypes.ENUM("low", "medium", "high"),
+            type: DataTypes.ENUM(...Object.values(TaskPriority)),
             defaultValue: "medium",
         },
         estimatedTime: {

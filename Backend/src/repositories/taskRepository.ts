@@ -239,4 +239,18 @@ export default class TaskRepository {
             throw new DBException("Failed to retrieve task user ID: " + (error as Error).message);
         }
     }
+
+    static async getTaskByColumnId(projectId: string, columnId: string): Promise<Task[]> {
+        try {
+            const tasks = await Task.findAll({
+                where: {
+                    projectId: projectId,
+                    columnId: columnId
+                }
+            });
+            return tasks;
+        } catch (error) {
+            throw new DBException("Failed to retrieve tasks by column ID: " + (error as Error).message);
+        }
+    }
 }

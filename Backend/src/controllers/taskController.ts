@@ -34,6 +34,7 @@ export default class TaskController {
                 title: taskData.title,
                 description: taskData.description || null,
                 status: taskData.status || "todo",
+                boardColumnId: taskData.columnId || null,
                 priority: taskData.priority || "medium",
                 estimatedTime: taskData.estimatedTime || null,
                 dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
@@ -103,6 +104,7 @@ export default class TaskController {
                 ...(updatedData.dueDate !== undefined && {
                     dueDate: updatedData.dueDate ? new Date(updatedData.dueDate) : null,
                 }),
+                ...(updatedData.columnId !== undefined && { columnId: updatedData.columnId }),
             };
 
             const task = await TaskService.updateTask(projectId, taskId, parsedTaskData, userId);

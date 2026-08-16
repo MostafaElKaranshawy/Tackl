@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import { MdCalendarToday, MdFlag } from "react-icons/md";
 import type Task from "../../../types/task";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
 interface TaskBoardCardProps {
     task: Task;
     onClick: () => void;
@@ -9,7 +11,7 @@ interface TaskBoardCardProps {
 
 export default function TaskBoardCard({
     task,
-    onClick
+    onClick,
 }: TaskBoardCardProps) {
     const priorityColors = {
         low: "bg-green-100 text-green-700",
@@ -17,30 +19,47 @@ export default function TaskBoardCard({
         high: "bg-red-100 text-red-700",
     };
 
+    const wasDragging = useRef(false);
+
     const {
         attributes,
         listeners,
         setNodeRef,
         transform,
         transition,
+        isDragging,
     } = useSortable({
         id: task.id,
     });
+
+    if (isDragging) {
+        wasDragging.current = true;
+    }
+
+    const handleClick = () => {
+        if (wasDragging.current) {
+            wasDragging.current = false;
+            return;
+        }
+        onClick();
+    };
+
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
     };
 
     return (
-        <div className="cursor-pointer rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        <div
             ref={setNodeRef}
             style={style}
             {...attributes}
             {...listeners}
-            onClick={() => onClick()}
+            className="cursor-grab rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing"
+            onClick={handleClick}
         >
             <div className="flex items-start justify-between gap-3">
-                <h3 className="font-semibold text-gray-800 line-clamp-2">
+                <h3 className="line-clamp-2 font-semibold text-gray-800">
                     {task.title}
                 </h3>
 
@@ -60,23 +79,24 @@ export default function TaskBoardCard({
             )}
 
             <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                <div className="left-side flex items-center gap-1">
-
+                <div className="flex items-center gap-1">
                     <MdCalendarToday className="text-base" />
+
                     {task.dueDate
-                        ? new Date(task.dueDate).toLocaleDateString()
+                        ? new Date(
+                            task.dueDate
+                        ).toLocaleDateString()
                         : "No due date"}
                 </div>
 
-                {
-                    task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() && (
+                {task.status !== "done" &&
+                    task.dueDate &&
+                    new Date(task.dueDate) <
+                    new Date() && (
                         <div className="ml-2 rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">
-                            <span>
-                                Overdue
-                            </span>
+                            Overdue
                         </div>
-                    )
-                }
+                    )}
             </div>
         </div>
     );

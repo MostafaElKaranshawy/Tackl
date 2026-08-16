@@ -125,7 +125,7 @@ export default function ProjectShow(
         }
     }
     return (
-        <section className="flex-1 rounded-xl border border-gray-200 bg-white p-8 shadow-md">
+        <section className="flex-1 rounded-xl border border-gray-200 bg-white p-4 shadow-md">
             <div className="mb-2 flex items-center gap-3 border-b border-gray-200 pb-5">
                 <div className="rounded-lg bg-blue-100 p-3 flex items-center justify-center">
                     <GoProjectRoadmap className="text-3xl text-blue-600" />

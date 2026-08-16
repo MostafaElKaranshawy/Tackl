@@ -131,6 +131,10 @@ const options: swaggerJsdoc.Options = {
                             type: "string",
                             format: "uuid",
                         },
+                        columnId: {
+                            type: "string",
+                            format: "uuid",
+                        },
                         createdAt: {
                             type: "string",
                             format: "date-time",
@@ -162,6 +166,10 @@ const options: swaggerJsdoc.Options = {
                             type: "string",
                             enum: TaskStatus,
                             example: "todo",
+                        },
+                        columnId: {
+                            type: "string",
+                            format: "uuid",
                         },
                         dueDate: {
                             type: "string",
@@ -299,6 +307,56 @@ const options: swaggerJsdoc.Options = {
                         note: {
                             type: "string",
                             example: "Worked on API implementation.",
+                        },
+                    },
+                },
+                BoardColumn: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string",
+                            format: "uuid",
+                        },
+                        name: {
+                            type: "string",
+                        },
+                        status: {
+                            type: "string",
+                            enum: TaskStatus,
+                        },
+                        order: {
+                            type: "number",
+                        },
+                        projectId: {
+                            type: "string",
+                            format: "uuid",
+                        },
+                        createdAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                        updatedAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                    },
+                },
+                BoardColumnInput: {
+                    type: "object",
+                    required: ["name", "status", "order"],
+                    properties: {
+                        name: {
+                            type: "string",
+                            example: "To Do",
+                        },
+                        status: {
+                            type: "string",
+                            enum: TaskStatus,
+                            example: "todo",
+                        },
+                        order: {
+                            type: "number",
+                            example: 1,
                         },
                     },
                 },

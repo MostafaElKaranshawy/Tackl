@@ -58,6 +58,7 @@ export default class TaskService {
 
     static async updateTask(projectId: string, taskId: string, updatedData: Partial<Task>, userId: string): Promise<Task | null> {
         const oldTask = await TaskRepository.getTaskById(userId, projectId, taskId);
+
         if (!oldTask) {
             throw new NotFoundException("Task not found.");
         }
@@ -132,5 +133,17 @@ export default class TaskService {
         }
 
         return await TaskRepository.getAllProjectTasks(projectId, sortBy, sortOrder);
+    }
+
+    static async getTaskByColumnId(projectId: string, columnId: string, userId: string): Promise<Task[]> {
+        const project = await ProjectRepository.getProjectById(projectId);
+        if (!project) {
+            throw new NotFoundException("Project not found.");
+        }
+        if (project.userId !== userId) {
+            throw new ForbiddenException("Access denied");
+        }
+
+        return await TaskRepository.getTaskByColumnId(projectId, columnId);
     }
 }

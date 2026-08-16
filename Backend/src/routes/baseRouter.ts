@@ -6,6 +6,7 @@ import checkUser from "../middlewares/checkUser.js";
 import TaskRouter from "./taskRouter.js";
 import TimeEntryRouter from "./timeEntryRouter.js";
 import TaskHistoryRouter from "./taskHistoryRouter.js";
+import BoardColumnRouter from "./boardColumnRouter.js";
 
 const baseRouter = router.Router();
 
@@ -21,4 +22,5 @@ baseRouter.use("/projects/:projectId/tasks/:taskId/time-entries", TimeEntryRoute
 
 baseRouter.use("/projects/:projectId/tasks/:taskId/history", TaskHistoryRouter);
 
+baseRouter.use("/projects/:projectId/board-columns", BoardColumnRouter);
 export default baseRouter;

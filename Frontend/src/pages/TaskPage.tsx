@@ -16,12 +16,16 @@ import { notify } from "../utils/notify";
 import TaskHistoryList from "../components/taskHistoryComponents/TaskHistoryList";
 import axios from "axios";
 
+import type { Column } from "../types/column";
+import { getBoardColumnsByProjectId } from '../services/boardColumnService';
+
+
 export default function TaskPage() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
     const [showTaskHistory, setShowTaskHistory] = useState(false);
-
+    const [boardColumns, setBoardColumns] = useState<Column[]>([]);
     const { key } = useTaskRefreshContext();
     const navigate = useNavigate();
 
@@ -40,7 +44,6 @@ export default function TaskPage() {
         const loadTask = async () => {
             try {
                 const data = await getTaskById(taskId, projectId);
-
                 if (!cancelled) {
                     setTask(data);
                 }
@@ -58,6 +61,34 @@ export default function TaskPage() {
             cancelled = true;
         };
     }, [projectId, taskId, key, navigate]);
+
+
+    useEffect(() => {
+        if (!projectId || projectId === "undefined") {
+            return;
+        }
+
+        let cancelled = false;
+
+        const loadBoardColumns = async () => {
+            try {
+                const data = await getBoardColumnsByProjectId(projectId);
+                if (!cancelled) {
+                    setBoardColumns(data);
+                }
+            } catch {
+                if (!cancelled) {
+                    notify.error("Failed to load board columns.");
+                }
+            }
+        };
+
+        loadBoardColumns();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [projectId]);
 
     const handleDeleteTask = async () => {
         if (!taskId || !projectId) return;
@@ -173,11 +204,15 @@ export default function TaskPage() {
                                         : task.status === "in_progress"
                                             ? " text-yellow-700"
                                             : " text-green-700")}>
-                                        {task.status === "todo"
-                                            ? "To Do"
-                                            : task.status === "in_progress"
-                                                ? "In Progress"
-                                                : "Done"}
+                                        {
+                                            task.columnId ? boardColumns.find(column => column.id === task.columnId)?.name
+                                                :
+                                                task.status === "todo"
+                                                    ? "To Do"
+                                                    : task.status === "in_progress"
+                                                        ? "In Progress"
+                                                        : "Done"
+                                        }
                                     </span>
                                 </div>
 

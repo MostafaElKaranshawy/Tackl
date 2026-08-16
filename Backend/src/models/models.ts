@@ -4,6 +4,7 @@ import Task from "./task";
 import TimeEntry from "./timeEntry";
 import TaskHistory from "./taskHistory";
 import TaskChange from "./taskChange";
+import BoardColumn from "./boardColumn";
 
 export const models = {
     User,
@@ -12,6 +13,7 @@ export const models = {
     TimeEntry,
     TaskHistory,
     TaskChange,
+    BoardColumn
 };
 
 export type Models = typeof models;
