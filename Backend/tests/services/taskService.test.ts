@@ -1,4 +1,4 @@
-import { afterEach, assert, describe, expect, it, vi } from "vitest";
+import { afterEach, assert, beforeEach, describe, expect, it, vi } from "vitest";
 import TaskService from "../../src/services/taskService";
 import Task from "../../src/models/task";
 import TaskRepository from "../../src/repositories/taskRepository";
@@ -8,9 +8,15 @@ import ForbiddenException from "../../src/exceptions/forbiddenException";
 import NotFoundException from "../../src/exceptions/notFoundException";
 import { ActionType } from "../../src/enums/actionType";
 import QueryParams from "../../src/interfaces/QueryParams";
+import { Transaction } from "sequelize/lib/transaction";
+import { sequelize } from "../../src/config/database";
 
 describe("TaskService", () => {
-
+    beforeEach(() => {
+        vi.spyOn(sequelize, "transaction").mockImplementation(
+            (callback: any) => callback({} as Transaction)
+        );
+    });
     afterEach(() => {
         vi.restoreAllMocks();
     });
@@ -286,7 +292,8 @@ describe("TaskService", () => {
                     newValue: "New description",
                     actionType: ActionType.UPDATED,
                 }),
-            ])
+            ]),
+            expect.anything()
         );
 
     });
@@ -336,7 +343,8 @@ describe("TaskService", () => {
                     newValue: null,
                     actionType: ActionType.DELETED,
                 }),
-            ])
+            ]),
+            expect.anything()
         );
 
     });

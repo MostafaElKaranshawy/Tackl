@@ -73,7 +73,7 @@ describe("TaskHistoryRepository", () => {
             oldValue: "Old title",
             newValue: "New title",
             actionType: ActionType.UPDATED,
-        });
+        }, undefined);
     });
 
     it("Create task history with multiple valid changes", async () => {
@@ -181,7 +181,7 @@ describe("TaskHistoryRepository", () => {
             oldValue: "Old description",
             newValue: "New description",
             actionType: ActionType.UPDATED,
-        });
+        }, undefined);
     });
 
     it("Skip a change without a field name", async () => {

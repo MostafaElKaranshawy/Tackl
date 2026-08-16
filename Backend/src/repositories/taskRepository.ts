@@ -15,15 +15,23 @@ export default class TaskRepository {
         }
 
         try {
+            if (transaction) {
+                const task = await Task.create({
+                    title: taskData.title,
+                    ...taskData,
+                    projectId,
+                },
+                    transaction && { transaction }
+                );
+                return task;
+            }
             const task = await Task.create({
                 title: taskData.title,
                 ...taskData,
                 projectId,
-            },
-                transaction && { transaction }
-            );
-
+            });
             return task;
+
         } catch (error) {
             if (error instanceof MissingRequiredDataException) {
                 throw error;
@@ -76,7 +84,11 @@ export default class TaskRepository {
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");
             }
-            await task.update(updatedData, transaction && { transaction });
+            if (transaction) {
+                await task.update(updatedData, { transaction });
+            } else {
+                await task.update(updatedData);
+            }
             return task;
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
@@ -86,7 +98,7 @@ export default class TaskRepository {
         }
     }
 
-    static async deleteTask(userId: string, projectId: string, taskId: string, transaction?: Transaction): Promise<void> {
+    static async deleteTask(userId: string, projectId: string, taskId: string): Promise<void> {
         try {
             const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {
@@ -98,7 +110,8 @@ export default class TaskRepository {
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");
             }
-            await task.destroy(transaction && { transaction });
+
+            await task.destroy();
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
