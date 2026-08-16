@@ -18,7 +18,7 @@ export default class TaskHistoryRepository {
                 userId,
                 actionType,
                 fieldName: fieldName
-            }, { transaction });
+            }, transaction && { transaction });
 
             if (!changes || changes.length === 0) return;
 
@@ -30,7 +30,7 @@ export default class TaskHistoryRepository {
                     oldValue: change.oldValue,
                     newValue: change.newValue,
                     actionType: change.actionType,
-                }, { transaction });
+                }, transaction && { transaction });
             }
 
         } catch (error) {

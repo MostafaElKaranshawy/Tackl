@@ -20,7 +20,7 @@ export default class TaskRepository {
                 ...taskData,
                 projectId,
             },
-                { transaction }
+                transaction && { transaction }
             );
 
             return task;
@@ -76,7 +76,7 @@ export default class TaskRepository {
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");
             }
-            await task.update(updatedData, { transaction });
+            await task.update(updatedData, transaction && { transaction });
             return task;
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
@@ -98,7 +98,7 @@ export default class TaskRepository {
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");
             }
-            await task.destroy({ transaction });
+            await task.destroy(transaction && { transaction });
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;

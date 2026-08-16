@@ -16,7 +16,7 @@ export default class TimeEntryRepository {
                 duration: timeEntryData.duration,
                 date: timeEntryData.date,
                 note: timeEntryData.note
-            }, { transaction });
+            }, transaction && { transaction });
             return timeEntry;
         } catch (error) {
             if (error instanceof MissingRequiredDataException) {
@@ -57,7 +57,7 @@ export default class TimeEntryRepository {
                 duration: updatedData.duration ?? timeEntry.duration,
                 date: updatedData.date ?? timeEntry.date,
                 note: updatedData.note ?? timeEntry.note
-            }, { transaction });
+            }, transaction && { transaction });
             return timeEntry;
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
@@ -76,7 +76,7 @@ export default class TimeEntryRepository {
             if (timeEntry.taskId !== taskId) {
                 throw new ForbiddenException("Time entry does not belong to the specified task.");
             }
-            await timeEntry.destroy({ transaction });
+            await timeEntry.destroy(transaction && { transaction });
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
