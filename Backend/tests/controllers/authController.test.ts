@@ -205,6 +205,38 @@ describe("AuthController", () => {
             .toBeInstanceOf(WrongCredentialsException);
     });
 
+    it("Login with not registered user", async () => {
+
+        const error = new NotFoundException(
+            "User not found"
+        );
+
+        const req = {
+            body: {
+                email: "test@example.com",
+                password: "WrongPassword",
+            },
+        } as any;
+
+        const res = {
+            cookie: vi.fn(),
+            status: vi.fn().mockReturnThis(),
+            json: vi.fn().mockReturnThis(),
+        } as any;
+
+        const next = vi.fn();
+
+        vi.spyOn(AuthService, "login")
+            .mockRejectedValue(error);
+
+        await AuthController.login(req, res, next);
+
+        expect(next).toHaveBeenCalled();
+
+        expect(next.mock.calls[0][0])
+            .toBeInstanceOf(WrongCredentialsException);
+    });
+
 
     it("Login with user not found", async () => {
 

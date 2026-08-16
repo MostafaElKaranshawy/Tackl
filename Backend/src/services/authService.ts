@@ -42,9 +42,7 @@ export default class AuthService {
             return token;
 
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw new WrongCredentialsException("Invalid email or password", 401);
-            } else if (error instanceof WrongCredentialsException) {
+            if (error instanceof WrongCredentialsException || error instanceof NotFoundException) {
                 throw error;
             }
             else {

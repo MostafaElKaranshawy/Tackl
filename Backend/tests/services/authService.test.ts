@@ -98,7 +98,7 @@ describe("AuthService", () => {
             await AuthService.login("test@example.com", "WrongPassword");
             assert.fail("Login should throw an error for wrong email");
         } catch (error) {
-            expect(error).toBeInstanceOf(WrongCredentialsException);
+            expect(error).toBeInstanceOf(NotFoundException);
         }
     });
 
@@ -168,7 +168,7 @@ describe("AuthService", () => {
     it("Confirm email with wrong ID", async () => {
         try {
             // Mock
-            vi.spyOn(User, "findOne").mockResolvedValue(null);
+            vi.spyOn(User, "findByPk").mockResolvedValue(null);
 
             // call
             await AuthService.confirmEmail("user-1");
