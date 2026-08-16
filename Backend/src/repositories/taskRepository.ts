@@ -98,7 +98,7 @@ export default class TaskRepository {
         }
     }
 
-    static async deleteTask(userId: string, projectId: string, taskId: string): Promise<void> {
+    static async deleteTask(userId: string, projectId: string, taskId: string, transaction?: Transaction): Promise<void> {
         try {
             const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {

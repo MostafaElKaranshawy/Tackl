@@ -25,7 +25,7 @@ export default class TimeEntryRepository {
                 duration: timeEntryData.duration,
                 date: timeEntryData.date,
                 note: timeEntryData.note
-            });
+            }, { transaction });
             return timeEntry;
         } catch (error) {
             if (error instanceof MissingRequiredDataException) {
@@ -75,7 +75,7 @@ export default class TimeEntryRepository {
                 duration: updatedData.duration ?? timeEntry.duration,
                 date: updatedData.date ?? timeEntry.date,
                 note: updatedData.note ?? timeEntry.note
-            });
+            }, { transaction });
             return timeEntry;
 
         } catch (error) {
