@@ -3,9 +3,11 @@ import TaskChange from "../models/taskChange";
 import DBException from "../exceptions/dbException";
 import ChangeDTO from "../dto/changeDTO";
 import { ActionType } from "../enums/actionType";
+import { Transaction } from "sequelize/lib/transaction";
+import User from "../models/user";
 
 export default class TaskHistoryRepository {
-    static async createTaskHistory(taskId: string, userId: string, actionType: ActionType, fieldName: string, changes: ChangeDTO[]): Promise<void> {
+    static async createTaskHistory(taskId: string, userId: string, actionType: ActionType, fieldName: string, changes: ChangeDTO[], transaction?: Transaction): Promise<void> {
         try {
             if (!taskId || !userId || !actionType || !fieldName) {
                 throw new Error("Missing required data for creating task history.");
@@ -16,7 +18,7 @@ export default class TaskHistoryRepository {
                 userId,
                 actionType,
                 fieldName: fieldName
-            });
+            }, { transaction });
 
             if (!changes || changes.length === 0) return;
 
@@ -28,7 +30,7 @@ export default class TaskHistoryRepository {
                     oldValue: change.oldValue,
                     newValue: change.newValue,
                     actionType: change.actionType,
-                });
+                }, { transaction });
             }
 
         } catch (error) {
@@ -45,6 +47,7 @@ export default class TaskHistoryRepository {
                 where: { taskId },
                 include: [
                     { model: TaskChange, as: "taskChanges" },
+                    { model: User, as: "actionBy", attributes: ["name"] }
                 ],
                 order: [["createdAt", "DESC"]],
             });

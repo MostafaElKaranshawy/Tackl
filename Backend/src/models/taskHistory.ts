@@ -10,6 +10,7 @@ import {
 import { sequelize } from "../config/database";
 import { Models } from "./models";
 import { ActionType } from "../enums/actionType";
+import User from "./user";
 
 export default class TaskHistory extends Model<
     InferAttributes<TaskHistory, {

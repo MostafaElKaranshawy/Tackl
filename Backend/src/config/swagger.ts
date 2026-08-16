@@ -230,8 +230,18 @@ const options: swaggerJsdoc.Options = {
                             format: "date-time",
                         },
                         taskChanges: {
-                            type: "schema",
-                            $ref: "#/components/schemas/TaskChange"
+                            type: "array",
+                            items: {
+                                $ref: "#/components/schemas/TaskChange"
+                            }
+                        },
+                        actionBy: {
+                            type: "object",
+                            properties: {
+                                name: {
+                                    type: "string",
+                                },
+                            },
                         },
                         fieldName: {
                             type: "string",

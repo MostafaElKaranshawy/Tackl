@@ -8,6 +8,7 @@ import ChangeDTO from "../dto/changeDTO";
 import { ActionType } from "../enums/actionType";
 import TaskHistoryRepository from "../repositories/taskHistoryRepository";
 import { compareDates } from "../utils/dateTimeUtils";
+import { sequelize } from "../config/database";
 
 export default class TaskService {
 
@@ -19,33 +20,35 @@ export default class TaskService {
         if (project.userId !== userId) {
             throw new ForbiddenException("Access denied");
         }
-
-        const task = await TaskRepository.createTask(taskData, projectId);
-        if (task) {
-            const changes: ChangeDTO[] = Object.entries(taskData)
-                .filter(([key, value]) => {
-                    return String(key) == "title" || String(key) == "description" || String(key) == "status" || String(key) == "priority" || String(key) == "estimatedTime" || String(key) == "dueDate";
-                })
-                .map(
-                    ([key, value]) => ({
-                        fieldName: key,
-                        oldValue: null,
-                        newValue: value ? String(value) : null,
-                        actionType: ActionType.CREATED,
+        return await sequelize.transaction(async (transaction) => {
+            const task = await TaskRepository.createTask(taskData, projectId, transaction);
+            if (task) {
+                const changes: ChangeDTO[] = Object.entries(taskData)
+                    .filter(([key, value]) => {
+                        return String(key) == "title" || String(key) == "description" || String(key) == "status" || String(key) == "priority" || String(key) == "estimatedTime" || String(key) == "dueDate";
                     })
-                );
+                    .map(
+                        ([key, value]) => ({
+                            fieldName: key,
+                            oldValue: null,
+                            newValue: value ? String(value) : null,
+                            actionType: ActionType.CREATED,
+                        })
+                    );
 
-            if (changes.length > 0) {
-                await TaskHistoryRepository.createTaskHistory(
-                    task.id,
-                    userId,
-                    ActionType.CREATED,
-                    "Task",
-                    changes
-                );
+                if (changes.length > 0) {
+                    await TaskHistoryRepository.createTaskHistory(
+                        task.id,
+                        userId,
+                        ActionType.CREATED,
+                        "Task",
+                        changes,
+                        transaction
+                    );
+                }
             }
-        }
-        return task;
+            return task;
+        });
     }
 
     static async getTaskById(projectId: string, taskId: string, userId: string): Promise<Task | null> {
@@ -58,44 +61,48 @@ export default class TaskService {
         if (!oldTask) {
             throw new NotFoundException("Task not found.");
         }
-        const updatedTask = await TaskRepository.updateTask(userId, projectId, taskId, updatedData);
 
-        if (updatedTask) {
-            const changes: ChangeDTO[] = Object.entries(updatedData)
-                .filter(([key, value]) => {
-                    const oldValue = oldTask[key as keyof Task];
-                    if (key === "dueDate" && oldValue && value) {
-                        return !compareDates(oldValue as Date, value as Date);
-                    }
-                    return oldValue !== value;
-                }).filter(([key, value]) => {
-                    return String(key) == "title" || String(key) == "description" || String(key) == "status" || String(key) == "priority" || String(key) == "estimatedTime" || String(key) == "dueDate";
-                }).map(([key, value]) => {
-                    const oldValue = oldTask[key as keyof Task];
+        return await sequelize.transaction(async (transaction) => {
+            const updatedTask = await TaskRepository.updateTask(userId, projectId, taskId, updatedData, transaction);
 
-                    return {
-                        fieldName: key,
-                        oldValue: oldValue ? String(oldValue) : null,
-                        newValue: value ? String(value) : null,
-                        actionType: !value
-                            ? ActionType.DELETED
-                            : !oldValue
-                                ? ActionType.CREATED
-                                : ActionType.UPDATED,
-                    };
-                });
+            if (updatedTask) {
+                const changes: ChangeDTO[] = Object.entries(updatedData)
+                    .filter(([key, value]) => {
+                        const oldValue = oldTask[key as keyof Task];
+                        if (key === "dueDate" && oldValue && value) {
+                            return !compareDates(oldValue as Date, value as Date);
+                        }
+                        return oldValue !== value;
+                    }).filter(([key, value]) => {
+                        return String(key) == "title" || String(key) == "description" || String(key) == "status" || String(key) == "priority" || String(key) == "estimatedTime" || String(key) == "dueDate";
+                    }).map(([key, value]) => {
+                        const oldValue = oldTask[key as keyof Task];
 
-            if (changes.length > 0) {
-                await TaskHistoryRepository.createTaskHistory(
-                    taskId,
-                    userId,
-                    ActionType.UPDATED,
-                    "Task",
-                    changes
-                );
+                        return {
+                            fieldName: key,
+                            oldValue: oldValue ? String(oldValue) : null,
+                            newValue: value ? String(value) : null,
+                            actionType: !value
+                                ? ActionType.DELETED
+                                : !oldValue
+                                    ? ActionType.CREATED
+                                    : ActionType.UPDATED,
+                        };
+                    });
+
+                if (changes.length > 0) {
+                    await TaskHistoryRepository.createTaskHistory(
+                        taskId,
+                        userId,
+                        ActionType.UPDATED,
+                        "Task",
+                        changes,
+                        transaction
+                    );
+                }
             }
-        }
-        return updatedTask;
+            return updatedTask;
+        });
     }
 
     static async deleteTask(projectId: string, taskId: string, userId: string): Promise<void> {

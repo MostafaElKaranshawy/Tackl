@@ -3,6 +3,8 @@ import type TaskHistory from "../../types/taskHistory";
 import HistoryCard from "./HistoryCard";
 import { IoMdClose } from "react-icons/io";
 import { getTaskHistory } from "../../services/taskHistoryService";
+import { notify } from "../../utils/notify";
+import axios from "axios";
 interface TaskHistoryListProps {
     taskId: string;
     projectId: string;
@@ -20,9 +22,35 @@ export default function TaskHistoryList({
         if (!taskId || !projectId) {
             return;
         }
+        let counter = 1;
         const fetchTaskHistory = async () => {
-            const data = await getTaskHistory(projectId, taskId);
-            setHistoryData(data);
+            try {
+                const data = await getTaskHistory(projectId, taskId);
+                setHistoryData(data);
+
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 404) {
+                        notify.error("Task history not found.");
+                    } else if (error.response?.status === 403) {
+                        notify.error("You do not have permission to view this task history.");
+                    } else {
+                        if (counter <= 3) {
+                            counter++;
+                            await fetchTaskHistory();
+                        } else {
+                            notify.error("Server error. Please reload the page!");
+                        }
+                    }
+                } else {
+                    if (counter <= 3) {
+                        counter++;
+                        await fetchTaskHistory();
+                    } else {
+                        notify.error("An unexpected error occurred. Please reload the page!");
+                    }
+                }
+            }
         };
 
         fetchTaskHistory();

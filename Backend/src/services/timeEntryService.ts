@@ -7,40 +7,43 @@ import { ActionType } from "../enums/actionType";
 import TaskHistoryRepository from "../repositories/taskHistoryRepository";
 import { compareDates } from "../utils/dateTimeUtils";
 import ChangeDTO from "../dto/changeDTO";
-
+import { sequelize } from "../config/database";
 export default class TimeEntryService {
     static async createTimeEntry(userId: string, projectId: string, taskId: string, timeEntryData: Partial<TimeEntry>): Promise<TimeEntry | null> {
 
         await TimeEntryService.validateUserAccess(userId, projectId, taskId);
 
-        const timeEntry = await TimeEntryRepository.createTimeEntry(taskId, timeEntryData);
-        if (timeEntry) {
-            const changes: ChangeDTO[] = Object.entries(timeEntryData)
-                .filter(([, value]) => value)
-                .map(([key, value]) => {
-                    return {
-                        fieldName: key,
-                        oldValue: null,
-                        newValue:
-                            value != null
-                                ? String(value)
-                                : null,
+        return await sequelize.transaction(async (transaction) => {
+            const timeEntry = await TimeEntryRepository.createTimeEntry(taskId, timeEntryData, transaction);
+            if (timeEntry) {
+                const changes: ChangeDTO[] = Object.entries(timeEntryData)
+                    .filter(([, value]) => value)
+                    .map(([key, value]) => {
+                        return {
+                            fieldName: key,
+                            oldValue: null,
+                            newValue:
+                                value != null
+                                    ? String(value)
+                                    : null,
 
-                        actionType: ActionType.CREATED,
-                    };
-                });
+                            actionType: ActionType.CREATED,
+                        };
+                    });
 
-            if (changes.length > 0) {
-                await TaskHistoryRepository.createTaskHistory(
-                    taskId,
-                    userId,
-                    ActionType.CREATED,
-                    "Time Entry",
-                    changes
-                );
+                if (changes.length > 0) {
+                    await TaskHistoryRepository.createTaskHistory(
+                        taskId,
+                        userId,
+                        ActionType.CREATED,
+                        "Time Entry",
+                        changes,
+                        transaction
+                    );
+                }
             }
-        }
-        return timeEntry;
+            return timeEntry;
+        });
 
     }
 
@@ -71,71 +74,74 @@ export default class TimeEntryService {
         if (!oldTimeEntry) {
             throw new NotFoundException("Time entry not found.");
         }
-
-        const updatedTimeEntry =
-            await TimeEntryRepository.updateTimeEntry(
-                taskId,
-                timeEntryId,
-                {
-                    duration: updatedData.duration,
-                    date: updatedData.date,
-                    note: updatedData.note,
-                }
-            );
-
-        if (updatedTimeEntry) {
-            const changes: ChangeDTO[] = Object.entries(updatedData)
-                .filter(([key, value]) => {
-                    const oldValue =
-                        oldTimeEntry[key as keyof TimeEntry];
-
-                    if (key === "date" && oldValue && value) {
-                        return !compareDates(
-                            oldValue as Date,
-                            value as Date
-                        );
-                    }
-
-                    return oldValue !== value;
-                })
-                .map(([key, value]) => {
-                    const oldValue =
-                        oldTimeEntry[key as keyof TimeEntry];
-
-                    return {
-                        fieldName: key,
-
-                        oldValue:
-                            oldValue != null
-                                ? String(oldValue)
-                                : null,
-
-                        newValue:
-                            value != null
-                                ? String(value)
-                                : null,
-
-                        actionType:
-                            !value
-                                ? ActionType.DELETED
-                                : !oldValue
-                                    ? ActionType.CREATED
-                                    : ActionType.UPDATED,
-                    };
-                });
-
-            if (changes.length > 0) {
-                await TaskHistoryRepository.createTaskHistory(
+        return await sequelize.transaction(async (transaction) => {
+            const updatedTimeEntry =
+                await TimeEntryRepository.updateTimeEntry(
                     taskId,
-                    userId,
-                    ActionType.UPDATED,
-                    "Time Entry",
-                    changes
+                    timeEntryId,
+                    {
+                        duration: updatedData.duration,
+                        date: updatedData.date,
+                        note: updatedData.note,
+                    },
+                    transaction
                 );
-            }
-        }
 
-        return updatedTimeEntry;
+            if (updatedTimeEntry) {
+                const changes: ChangeDTO[] = Object.entries(updatedData)
+                    .filter(([key, value]) => {
+                        const oldValue =
+                            oldTimeEntry[key as keyof TimeEntry];
+
+                        if (key === "date" && oldValue && value) {
+                            return !compareDates(
+                                oldValue as Date,
+                                value as Date
+                            );
+                        }
+
+                        return oldValue !== value;
+                    })
+                    .map(([key, value]) => {
+                        const oldValue =
+                            oldTimeEntry[key as keyof TimeEntry];
+
+                        return {
+                            fieldName: key,
+
+                            oldValue:
+                                oldValue != null
+                                    ? String(oldValue)
+                                    : null,
+
+                            newValue:
+                                value != null
+                                    ? String(value)
+                                    : null,
+
+                            actionType:
+                                !value
+                                    ? ActionType.DELETED
+                                    : !oldValue
+                                        ? ActionType.CREATED
+                                        : ActionType.UPDATED,
+                        };
+                    });
+
+                if (changes.length > 0) {
+                    await TaskHistoryRepository.createTaskHistory(
+                        taskId,
+                        userId,
+                        ActionType.UPDATED,
+                        "Time Entry",
+                        changes,
+                        transaction
+                    );
+                }
+            }
+
+            return updatedTimeEntry;
+        });
     }
 
     static async deleteTimeEntry(userId: string, projectId: string, taskId: string, timeEntryId: string): Promise<void> {
@@ -145,32 +151,35 @@ export default class TimeEntryService {
         if (!timeEntry) {
             throw new NotFoundException("Time entry not found.");
         }
-        await TimeEntryRepository.deleteTimeEntry(taskId, timeEntryId);
+        return await sequelize.transaction(async (transaction) => {
+            await TimeEntryRepository.deleteTimeEntry(taskId, timeEntryId, transaction);
 
-        const changes: ChangeDTO[] = (timeEntry) ?
-            Object.entries(timeEntry)
-                .filter(([, oldValue]) => oldValue)
-                .filter(([key,]) => {
-                    return (
-                        String(key) === "date" ||
-                        String(key) === "duration" ||
-                        String(key) === "note"
-                    );
-                })
-                .map(([fieldName, oldValue]) => ({
-                    fieldName,
-                    oldValue: oldValue !== undefined ? String(oldValue) : null,
-                    newValue: null,
-                    actionType: ActionType.DELETED
-                })) : [];
+            const changes: ChangeDTO[] = (timeEntry) ?
+                Object.entries(timeEntry)
+                    .filter(([, oldValue]) => oldValue)
+                    .filter(([key,]) => {
+                        return (
+                            String(key) === "date" ||
+                            String(key) === "duration" ||
+                            String(key) === "note"
+                        );
+                    })
+                    .map(([fieldName, oldValue]) => ({
+                        fieldName,
+                        oldValue: oldValue !== undefined ? String(oldValue) : null,
+                        newValue: null,
+                        actionType: ActionType.DELETED
+                    })) : [];
 
-        await TaskHistoryRepository.createTaskHistory(
-            taskId,
-            userId,
-            ActionType.DELETED,
-            "Time Entry",
-            changes
-        );
+            await TaskHistoryRepository.createTaskHistory(
+                taskId,
+                userId,
+                ActionType.DELETED,
+                "Time Entry",
+                changes,
+                transaction
+            );
+        });
     }
 
     static async getTaskTimeEntries(userId: string, projectId: string, taskId: string): Promise<TimeEntry[]> {

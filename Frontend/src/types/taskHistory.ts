@@ -8,5 +8,8 @@ export default interface TaskHistory {
     updatedAt: string;
     taskChanges?: TaskChange[];
     fieldName: string;
+    actionBy?: {
+        name: string;
+    }
     actionType: "created" | "updated" | "deleted";
 }

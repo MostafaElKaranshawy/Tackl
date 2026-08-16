@@ -10,7 +10,6 @@ import ChangeCard from "./ChangeCard";
 
 export default function HistoryCard({ history }: { history: TaskHistory }) {
     const [expanded, setExpanded] = useState(false);
-
     const changes = history.taskChanges ?? [];
 
     return (
@@ -38,6 +37,11 @@ export default function HistoryCard({ history }: { history: TaskHistory }) {
                     <span className="text-sm text-gray-500 truncate">
                         {formatDate(history.createdAt)}
                     </span>
+                    {history.actionBy && (
+                        <span className="text-sm text-gray-400 truncate">
+                            by {history.actionBy.name}
+                        </span>
+                    )}
                 </div>
 
                 <svg
