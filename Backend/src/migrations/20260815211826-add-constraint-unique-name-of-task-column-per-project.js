@@ -3,17 +3,17 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addConstraint('board_columns', {
-      fields: ['projectId', 'name'],
+    await queryInterface.addConstraint('task_statuses', {
+      fields: ['projectId', 'status'],
       type: 'unique',
-      name: 'unique_column_name_per_project',
+      name: 'unique_status_per_project',
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.removeConstraint(
-      'board_columns',
-      'unique_column_name_per_project'
+      'task_statuses',
+      'unique_status_per_project'
     );
   },
 };
