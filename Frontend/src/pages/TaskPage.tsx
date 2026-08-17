@@ -168,10 +168,12 @@ export default function TaskPage() {
                                     <span className="text-gray-500">Status</span>
                                     <span className={"font-medium text-right" + (task.status === "to do"
                                         ? " text-gray-700"
-                                        : task.status === "in_progress"
+                                        : task.status === "in progress"
                                             ? " text-yellow-700"
-                                            : " text-green-700")}>
-                                        {task.status}
+                                            : task.status === "done"
+                                                ? " text-green-700"
+                                                : " text-gray-700")}>
+                                        {task.status.at(0)?.toUpperCase() + task.status.slice(1).replace("_", " ")}
                                     </span>
                                 </div>
 

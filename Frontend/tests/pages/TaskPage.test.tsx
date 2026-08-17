@@ -9,6 +9,7 @@ import TaskPage from "../../src/pages/TaskPage";
 import { getTaskById, deleteTask } from "../../src/services/taskService";
 import { useTaskRefreshContext } from "../../src/contexts/TaskRefreshContext/useTaskRefreshContext";
 import Task from "../../src/types/task";
+import ManageTaskCard from "../../src/components/tasksComponents/ManageTaskCard";
 
 vi.mock("../../src/services/taskService", () => ({
     getTaskById: vi.fn(),
@@ -46,21 +47,17 @@ vi.mock("../../src/components/taskHistoryComponents/TaskHistoryList", () => ({
     ),
 }));
 
-vi.mock("../../src/components/tasksComponents/ManageTaskCard", () => ({
-    default: ({
-        onClose,
-        onSuccess,
-    }: {
-        onClose: () => void;
-        onSuccess: (task?: unknown) => void;
-    }) => (
-        <div>
-            <p>Edit Task</p>
-            <button onClick={onClose}>Close Edit</button>
-            <button onClick={() => onSuccess()}>Save Task</button>
-        </div>
-    ),
-}));
+// vi.mock("../../src/components/tasksComponents/ManageTaskCard", () => ({
+//     default: ({
+//         onClose,
+//         onSuccess,
+//     }: {
+//         onClose: () => void;
+//         onSuccess: (task?: unknown) => void;
+//     }) => (
+//         <ManageTaskCard/>
+//     ),
+// }));
 
 vi.mock(
     "../../src/components/generalPurposeComponents/ConfirmationModal",
@@ -309,7 +306,7 @@ describe("TaskPage", () => {
 
             await user.click(
                 screen.getByRole("button", {
-                    name: "Close Edit",
+                    name: "Cancel",
                 })
             );
 

@@ -657,7 +657,7 @@ describe("TaskShow", () => {
             renderTaskShow();
 
             expect(
-                await screen.findByText("In Progress")
+                await screen.findByText("In progress")
             ).toBeInTheDocument();
         });
 

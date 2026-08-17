@@ -85,24 +85,6 @@ vi.mock(
 );
 
 vi.mock(
-    "../../../src/components/projectComponents/ProjectCard",
-    () => ({
-        default: ({
-            project,
-        }: {
-            project: {
-                id: string;
-                name: string;
-            };
-        }) => (
-            <div data-testid={`project-${project.id}`}>
-                {project.name}
-            </div>
-        ),
-    })
-);
-
-vi.mock(
     "../../../src/components/projectComponents/ManageProjectCard",
     () => ({
         default: ({

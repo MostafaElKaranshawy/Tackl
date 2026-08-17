@@ -22,11 +22,7 @@ export default function TaskListCard(
                                     : "bg-green-100 text-green-700"
                                 }`}
                         >
-                            {task.status === "to do"
-                                ? "To do"
-                                : task.status === "in_progress"
-                                    ? "In Progress"
-                                    : "Done"}
+                            {task.status.at(0)?.toUpperCase() + task.status.slice(1).replace("_", " ")}
                         </span>
                     </div>
                 </div>

@@ -290,11 +290,12 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">
+                            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="priority">
                                 Priority
                             </label>
 
                             <select
+                                id="priority"
                                 value={priority}
                                 onChange={(e) =>
                                     setPriority(
@@ -322,11 +323,12 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
                         </div>
 
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">
+                            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="status">
                                 Status
                             </label>
 
                             <select
+                                id="status"
                                 value={
                                     status
                                 }

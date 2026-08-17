@@ -556,31 +556,15 @@ export default function TaskBoard({
             fetchTasks();
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                if (
-                    error.response?.status ===
-                    400 ||
-                    error.response?.status ===
-                    409
-                ) {
-                    notify.error(
-                        "Cannot delete column with tasks. Please move or delete all tasks in this column first."
-                    );
-                } else if (
-                    error.response?.status ===
-                    404
-                ) {
-                    notify.error(
-                        "Board column not found"
-                    );
+                if (error.response?.status === 400 || error.response?.status === 409) {
+                    notify.error("Cannot delete column with tasks. Please move or delete all tasks in this column first.");
+                } else if (error.response?.status === 404) {
+                    notify.error("Board column not found");
                 } else {
-                    notify.error(
-                        "Error deleting board column"
-                    );
+                    notify.error("Error deleting board column");
                 }
             } else {
-                notify.error(
-                    "Error deleting board column"
-                );
+                notify.error("Error deleting board column");
             }
         } finally {
             setDeletingColumn(false);

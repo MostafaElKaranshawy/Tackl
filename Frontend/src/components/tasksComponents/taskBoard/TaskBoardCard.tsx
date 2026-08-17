@@ -89,7 +89,7 @@ export default function TaskBoardCard({
                         : "No due date"}
                 </div>
 
-                {task.status !== "done" &&
+                {task.status.toLowerCase() !== "done" &&
                     task.dueDate &&
                     new Date(task.dueDate) <
                     new Date() && (
