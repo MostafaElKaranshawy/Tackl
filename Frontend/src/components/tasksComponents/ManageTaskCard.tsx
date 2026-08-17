@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { notify } from "../../utils/notify";
 import { createTask, updateTask } from "../../services/taskService";
@@ -20,34 +20,16 @@ export default function ManageTaskCard({
     onSuccess,
     onClose,
 }: TaskFormModalProps) {
-    const [title, setTitle] = useState("");
+    const [title, setTitle] = useState(mode === "edit" && task ? task.title : "");
     const [titleError, setTitleError] = useState("");
 
-    const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
+    const [description, setDescription] = useState(mode === "edit" && task ? task.description ?? "" : "");
+    const [priority, setPriority] = useState<"low" | "medium" | "high">(task && mode === "edit" ? task.priority : "medium");
     const [status, setStatus] = useState<"todo" | "in_progress" | "done">("todo");
-    const [dueDate, setDueDate] = useState<string | null>(null);
-    const [estimatedTime, setEstimatedTime] = useState<number | null>(null);
+    const [dueDate, setDueDate] = useState<string | null>(task && mode === "edit" ? task.dueDate : null);
+    const [estimatedTime, setEstimatedTime] = useState<number | null>(task && mode === "edit" ? task.estimatedTime : null);
 
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (mode === "edit" && task) {
-            setTitle(task.title);
-            setDescription(task.description ?? "");
-            setPriority(task.priority);
-            setStatus(task.status);
-            setDueDate(task.dueDate);
-            setEstimatedTime(task.estimatedTime);
-        } else {
-            setTitle("");
-            setDescription("");
-            setPriority("medium");
-            setStatus("todo");
-            setDueDate(null);
-            setEstimatedTime(null);
-        }
-    }, [mode, task]);
 
     const handleSubmit = async () => {
         if (!title.trim()) {
@@ -159,8 +141,9 @@ export default function ManageTaskCard({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Description
+                        <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                            <p>Description</p>
+                            <p className="text-xs text-gray-500">(Optional)</p>
                         </label>
 
                         <textarea
@@ -208,8 +191,9 @@ export default function ManageTaskCard({
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">
-                                Due Date
+                            <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                <p>Due Date</p>
+                                <p className="text-xs text-gray-500">(Optional)</p>
                             </label>
 
                             <input
@@ -221,13 +205,15 @@ export default function ManageTaskCard({
                         </div>
 
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">
-                                Estimated Time (minutes)
+                            <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                <p>Estimated Time</p>
+                                <p className="text-xs text-gray-500">(Optional)</p>
                             </label>
 
                             <input
                                 type="number"
                                 min={0}
+                                placeholder="Time in minutes"
                                 value={estimatedTime ?? ""}
                                 onChange={(e) => setEstimatedTime(e.target.value ? parseInt(e.target.value) : null)}
                                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none transition focus:border-blue-500"

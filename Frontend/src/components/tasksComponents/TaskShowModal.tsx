@@ -4,12 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdAccessTime, MdCalendarToday, MdDeleteForever, MdFlag, MdUpdate, MdOpenInNew } from "react-icons/md";
 import ManageTaskCard from "./ManageTaskCard";
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../generalPurposeComponents/ConfirmationModal";
 import { deleteTask } from "../../services/taskService";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext";
+import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext/useTaskRefreshContext";
 import TimeEntriesList from "../timeEntriesComponents/TimeEntriesList";
 import { formatMinutes } from "../../utils/timeFormater";
+import { notify } from "../../utils/notify";
 
 export default function TaskShow() {
     const [task, setTask] = useState<Task | null>(null);
@@ -19,17 +20,48 @@ export default function TaskShow() {
     const selectedTaskRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    let taskId = searchParams.get("taskId") || "";
-    let { projectId } = useParams<{ projectId: string }>();
+    const taskId = searchParams.get("taskId") || "";
+    const { projectId } = useParams<{ projectId: string }>();
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
 
     const { setKey } = useTaskRefreshContext();
 
     const closeTaskWindow = useCallback(() => {
         setTask(null);
-        // navigate(-1);
-        navigate({ pathname: `/projects${projectId ? `/${projectId}` : ''}`, search: location.search.replace(/(\?|&)taskId=[^&]*/, '') });
-    }, [navigate, projectId]);
+
+        navigate({
+            pathname: `/projects${projectId ? `/${projectId}` : ""}`,
+            search: location.search.replace(/(\?|&)taskId=[^&]*/, ""),
+        });
+    }, [navigate, projectId, location.search]);
+
+    useEffect(() => {
+        if (!taskId || !projectId || projectId === "undefined") {
+            return;
+        }
+
+        let cancelled = false;
+
+        const loadTask = async () => {
+            try {
+                const task = await getTaskById(taskId, projectId);
+
+                if (!cancelled) {
+                    setTask(task);
+                }
+            } catch{
+                if (!cancelled) {
+                    closeTaskWindow();
+                }
+            }
+        };
+
+        loadTask();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [taskId, projectId, closeTaskWindow]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -48,38 +80,16 @@ export default function TaskShow() {
         };
     }, [closeTaskWindow]);
 
-    useEffect(() => {
-        if (!taskId || !projectId) {
-            closeTaskWindow();
-            return;
-        }
-        fetchTask();
-    }, [taskId, projectId]);
-
-
-    const fetchTask = async () => {
-        if (!taskId || !projectId || projectId === "undefined") {
-            console.error("Task ID or Project ID is missing.");
-            return;
-        }
-        try {
-            const task = await getTaskById(taskId, projectId);
-            setTask(task);
-        } catch (error) {
-            closeTaskWindow();
-            console.error("Failed to fetch task:", error);
-        }
-    };
     const handleDeleteTask = async () => {
         if (!taskId || !projectId || projectId === "undefined") {
-            console.error("Task ID or Project ID is missing.");
+            notify.error("Task ID or Project ID is missing.");
             return;
         }
         try {
             await deleteTask(taskId, projectId);
             refresh(true);
-        } catch (error) {
-            console.error("Failed to delete task:", error);
+        } catch {
+            notify.error("Failed to delete task.");
         }
     };
     const refresh = (close: boolean) => {
@@ -148,7 +158,6 @@ export default function TaskShow() {
                                 title="Open Task in New Tab"
                                 className="rounded-full p-2 text-gray-500 transition hover:bg-green-100 hover:text-green-600 cursor-pointer"
                                 onClick={() => {
-                                    console.log("current location", location.pathname + location.search);
                                     navigate(`/projects/${task.projectId}/tasks/${task.id}`);
                                 }}>
                                 <MdOpenInNew

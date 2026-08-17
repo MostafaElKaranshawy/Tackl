@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { notify } from "../../utils/notify";
 import { createProject, updateProject } from "../../services/projectService";
@@ -17,21 +17,11 @@ export default function ManageProjectCard({
     onSuccess,
     onClose,
 }: ProjectFormModalProps) {
-    const [name, setName] = useState("");
+    const [name, setName] = useState(mode === "edit" && project ? project.name : "");
     const [nameError, setNameError] = useState("");
 
-    const [description, setDescription] = useState("");
+    const [description, setDescription] = useState(mode === "edit" && project ? project.description ?? "" : "");
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (mode === "edit" && project) {
-            setName(project.name);
-            setDescription(project.description ?? "");
-        } else {
-            setName("");
-            setDescription("");
-        }
-    }, [mode, project]);
 
     const handleSubmit = async () => {
         if (!name.trim()) {
@@ -40,7 +30,7 @@ export default function ManageProjectCard({
         }
 
         setLoading(true);
-        
+
         try {
             if (mode === "create") {
                 const createdProject = await createProject({
@@ -59,11 +49,11 @@ export default function ManageProjectCard({
                     name: name.trim(),
                     description: description.trim(),
                 }) as Project;
-                
+
                 onSuccess(updatedProject);
                 notify.success("Project updated successfully!");
             }
-            
+
             onClose();
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -134,8 +124,9 @@ export default function ManageProjectCard({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Description
+                        <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                            <p>Description</p>
+                            <p className="text-xs text-gray-500">(Optional)</p>
                         </label>
 
                         <textarea

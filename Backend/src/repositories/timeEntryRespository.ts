@@ -1,10 +1,15 @@
 import DBException from "../exceptions/dbException";
+import ForbiddenException from "../exceptions/forbiddenException";
+import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryRepository {
-    static async createTimeEntry(taskId: string, timeEntryData: TimeEntry): Promise<TimeEntry> {
+    static async createTimeEntry(taskId: string, timeEntryData: Partial<TimeEntry>): Promise<TimeEntry> {
         try {
+            if (!timeEntryData.duration || !timeEntryData.date) {
+                throw new MissingRequiredDataException("Missing required data for creating time entry.", 400);
+            }
             const timeEntry = await TimeEntry.create({
                 taskId: taskId,
                 duration: timeEntryData.duration,
@@ -13,24 +18,39 @@ export default class TimeEntryRepository {
             });
             return timeEntry;
         } catch (error) {
+            if (error instanceof MissingRequiredDataException) {
+                throw error;
+            }
             throw new DBException("Failed to create time entry." + (error as Error).message, 500);
         }
     }
 
-    static async getTimeEntryById(timeEntryId: string): Promise<TimeEntry | null> {
+    static async getTimeEntryById(taskId:string, timeEntryId: string): Promise<TimeEntry | null> {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
+            if (!timeEntry) {
+                throw new NotFoundException("Time entry not found.");
+            }
+            if (timeEntry.taskId !== taskId) {
+                throw new ForbiddenException("Time entry does not belong to the specified task.");
+            }
             return timeEntry;
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
             throw new DBException("Failed to retrieve time entry." + (error as Error).message, 500);
         }
     }
 
-    static async updateTimeEntry(timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry | null> {
+    static async updateTimeEntry(taskId:string, timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry | null> {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
-                throw new NotFoundException("Time entry not found.", 404);
+                throw new NotFoundException("Time entry not found.");
+            }
+            if (timeEntry.taskId !== taskId) {
+                throw new ForbiddenException("Time entry does not belong to the specified task.");
             }
             await timeEntry.update({
                 duration: updatedData.duration ?? timeEntry.duration,
@@ -39,18 +59,27 @@ export default class TimeEntryRepository {
             });
             return timeEntry;
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
             throw new DBException("Failed to update time entry." + (error as Error).message, 500);
         }
     }
 
-    static async deleteTimeEntry(timeEntryId: string): Promise<void> {
+    static async deleteTimeEntry(taskId:string, timeEntryId: string): Promise<void> {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
                 throw new NotFoundException("Time entry not found.", 404);
             }
+            if (timeEntry.taskId !== taskId) {
+                throw new ForbiddenException("Time entry does not belong to the specified task.");
+            }
             await timeEntry.destroy();
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
             throw new DBException("Failed to delete time entry." + (error as Error).message, 500);
         }
     }
@@ -65,6 +94,9 @@ export default class TimeEntryRepository {
             });
             return timeEntries;
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
             throw new DBException("Failed to retrieve time entries for task." + (error as Error).message, 500);
         }
     }
@@ -76,6 +108,9 @@ export default class TimeEntryRepository {
             });
             return timeEntry ? timeEntry.taskId : null;
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
             throw new DBException("Failed to retrieve task ID for time entry." + (error as Error).message, 500);
         }
     }

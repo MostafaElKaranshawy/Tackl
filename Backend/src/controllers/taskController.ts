@@ -1,28 +1,35 @@
-import { TaskPriority } from '../enums/taskPriority';
-import { TaskStatus } from '../enums/taskStatus';
 import ForbiddenException from '../exceptions/forbiddenException';
 import MissingRequiredDataException from '../exceptions/missingRequiredDataException';
-import NotFoundException from '../exceptions/notFoundException';
 import QueryParams from '../interfaces/QueryParams';
 import Task from '../models/task';
 import TaskService from '../services/taskService'
 import { checkQueryParams } from '../utils/checkQueryParams';
+import { NextFunction, Request, Response } from 'express';
 
 export default class TaskController {
 
-    static async createTask(req: any, res: any) {
+    static async createTask(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId
             const taskData = req.body as Task;
             const projectId = req.params.projectId;
 
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
             if (!taskData.title) {
                 throw new MissingRequiredDataException("Missing required task data.");
             }
 
-            if (!projectId) {
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
+            
+            if (taskData.dueDate && isNaN(Date.parse(taskData.dueDate.toString()))) {
+                throw new MissingRequiredDataException("Invalid due date format.");
+            }
+
             const parsedTaskData = {
                 title: taskData.title,
                 description: taskData.description || null,
@@ -34,50 +41,59 @@ export default class TaskController {
             const task = await TaskService.createTask(parsedTaskData, projectId, userId);
             res.status(201).json(task);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            next(error);
         }
 
     }
 
-    static async getTaskById(req: any, res: any) {
+    static async getTaskById(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+            const projectId = req.params.projectId;
+
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
             const taskId = req.params.taskId;
-            if (!taskId) {
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
                 throw new MissingRequiredDataException("Task ID is required.");
             }
-            const task = await TaskService.getTaskById(taskId, userId);
+            const task = await TaskService.getTaskById(projectId, taskId, userId);
             res.status(200).json(task);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            next(error);
         }
     }
 
-    static async updateTask(req: any, res: any) {
+    static async updateTask(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
-            const taskId = req.params.taskId;
-            const updatedData = req.body as Partial<Task>;
 
-            if (!taskId) {
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
+            const projectId = req.params.projectId;
+
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            const taskId = req.params.taskId;
+
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
                 throw new MissingRequiredDataException("Task ID is required.");
             }
+            const updatedData = req.body as Partial<Task>;
+
+            if (updatedData.dueDate && isNaN(Date.parse(updatedData.dueDate.toString()))) {
+                throw new MissingRequiredDataException("Invalid due date format.");
+            }
+
             const parsedTaskData = {
                 ...(updatedData.title !== undefined && { title: updatedData.title }),
                 ...(updatedData.description !== undefined && { description: updatedData.description }),
@@ -89,49 +105,53 @@ export default class TaskController {
                 }),
             };
 
-            const task = await TaskService.updateTask(taskId, parsedTaskData, userId);
+            const task = await TaskService.updateTask(projectId, taskId, parsedTaskData, userId);
             res.status(200).json(task);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            next(error);
         }
     }
 
-    static async deleteTask(req: any, res: any) {
+    static async deleteTask(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
-            const taskId = req.params.taskId;
 
-            if (!taskId) {
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
+            const projectId = req.params.projectId;
+
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
+            const taskId = req.params.taskId;
+            if (!taskId || !(taskId && typeof taskId === 'string')) {
                 throw new MissingRequiredDataException("Task ID is required.");
             }
 
-            await TaskService.deleteTask(taskId, userId);
+            await TaskService.deleteTask(projectId, taskId, userId);
             res.status(204).send();
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            next(error);
         }
     }
 
-    static async getProjectTasks(req: any, res: any) {
+    static async getProjectTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
+
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
             const projectId = req.params.projectId;
+
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
+                throw new MissingRequiredDataException("Project ID is required.");
+            }
+
             const page = parseInt(req.query.page as string) || undefined;
             const limit = parseInt(req.query.limit as string) || undefined;
             const sortBy = (req.query.sortBy as string) || 'createdAt';
@@ -143,9 +163,6 @@ export default class TaskController {
             const filterPriority = req.query.priority as string | undefined;
             const filterOverDue = req.query.overdue === 'true' ? true : req.query.overdue === 'false' ? false : undefined;
 
-            if (!projectId) {
-                throw new MissingRequiredDataException("Project ID is required.");
-            }
             const queryParams: QueryParams = {
                 page,
                 limit,
@@ -162,26 +179,23 @@ export default class TaskController {
             const result = await TaskService.getProjectTasks(projectId, userId, queryParams);
             res.status(200).json(result);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            next(error);
         }
     }
 
-    static async getAllProjectTasks(req: any, res: any) {
+    static async getAllProjectTasks(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.userId;
+
+            if (!userId) {
+                throw new ForbiddenException("User ID is required.");
+            }
+
             const projectId = req.params.projectId;
             const sortBy = (req.query.sortBy as string) || 'createdAt';
             const sortOrder = (req.query.sortOrder as string) || 'asc';
 
-            if (!projectId) {
+            if (!projectId || !(projectId && typeof projectId === 'string')) {
                 throw new MissingRequiredDataException("Project ID is required.");
             }
 
@@ -195,15 +209,7 @@ export default class TaskController {
             const tasks = await TaskService.getAllProjectTasks(projectId, userId, sortBy, sortOrder);
             res.status(200).json(tasks);
         } catch (error) {
-            if (error instanceof ForbiddenException) {
-                res.status(403).json({ message: error.message });
-            } else if (error instanceof NotFoundException) {
-                res.status(404).json({ message: error.message });
-            } else if (error instanceof MissingRequiredDataException) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: (error as Error).message });
-            }
+            next(error);
         }
     }
 }

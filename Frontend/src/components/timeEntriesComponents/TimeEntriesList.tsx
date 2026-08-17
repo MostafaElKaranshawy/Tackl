@@ -4,7 +4,8 @@ import type TimeEntry from "../../types/timeEntry";
 import TimeEntryListCard from "./TimeEntryListCard";
 import { formatMinutes } from "../../utils/timeFormater";
 import TimeEntryManageModal from "./TimeEntryManageModal";
-import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext";
+import { useTaskRefreshContext } from "../../contexts/TaskRefreshContext/useTaskRefreshContext";
+import { notify } from "../../utils/notify";
 
 export default function TimeEntriesList({ projectId, taskId, currentScreen, updateTotalTime }: { projectId: string, taskId: string, currentScreen: string, updateTotalTime: (totalMinutes: number) => void }) {
     const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
@@ -17,15 +18,24 @@ export default function TimeEntriesList({ projectId, taskId, currentScreen, upda
             const entries = await getTaskTimeEntries(projectId, taskId);
             setTimeEntries(entries);
             updateTotalTime(entries.reduce((total, entry) => total + entry.duration, 0));
-        } catch (error) {
-            console.error("Error fetching time entries:", error);
+        } catch {
+            notify.error("Error fetching time entries. Please try again later.");
         }
     };
 
     useEffect(() => {
         if (!taskId || !projectId) return;
-        fetchTimeEntries();
-    }, [taskId, projectId, key]);
+        const fetchData = async () => {
+            try {
+                const entries = await getTaskTimeEntries(projectId, taskId);
+                setTimeEntries(entries);
+                updateTotalTime(entries.reduce((total, entry) => total + entry.duration, 0));
+            } catch {
+                notify.error("Error fetching time entries. Please try again later.");
+            }
+        };
+        fetchData();
+    }, [taskId, projectId, key, updateTotalTime]);
 
 
     return (

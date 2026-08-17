@@ -1,4 +1,6 @@
-export default async function nameValidator(req: any, res: any, next: any) {
+import { Request, Response } from "express";
+
+export default async function nameValidator(req: Request, res: Response, next: () => void) {
     let { name } = req.body;
 
     if (!name) {

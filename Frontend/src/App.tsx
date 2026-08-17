@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import './App.css'
 import SignUpPage from './pages/signUpPage/SignUpPage'
 import LoginPage from './pages/loginPage/LoginPage'
 import GetPasswordLinkPage from './pages/resetPasswordPage/GetPasswordLinkPage'
@@ -11,7 +10,7 @@ import GetEmailConfirmationLinkPage from './pages/emailConfirmationPage/GetEmail
 import HomePage from './pages/HomePage/HomePage'
 import TaskPage from './pages/TaskPage'
 
-import { RefreshProvider } from './contexts/RefreshContext'
+import { RefreshProvider } from './contexts/RefreshContext/RefreshProvider'
 
 function App() {
     return (

@@ -8,7 +8,7 @@ import {
 } from "../../services/timeEntriesService";
 import type TimeEntry from "../../types/timeEntry";
 import { notify } from "../../utils/notify";
-import ConfirmationModal from "../ConfirmationModal";
+import ConfirmationModal from "../generalPurposeComponents/ConfirmationModal";
 
 type Props = {
     projectId: string;
@@ -75,8 +75,7 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
             }
 
             onUpdate();
-        } catch (error) {
-            console.error(error);
+        } catch {
             notify.error("Failed to save time entry.");
         } finally {
             setIsSubmitting(false);
@@ -95,8 +94,7 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
 
             onUpdate();
             onClose();
-        } catch (error) {
-            console.error(error);
+        } catch {
             notify.error("Failed to delete time entry.");
         } finally {
             setIsSubmitting(false);
@@ -184,8 +182,13 @@ export default function TimeEntryManageModal({ projectId, taskId, timeEntry, onC
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Note
+                        <label className="mb-1 block text-sm font-medium text-gray-700 flex items-center gap-1">
+                            <p>Note</p>
+                            {
+                                mode !== "show" && (
+                                    <p className="text-xs text-gray-500">(Optional)</p>
+                                )
+                            }
                         </label>
 
                         <textarea

@@ -1,30 +1,28 @@
-import { useEffect, useState } from "react";
-import { getProjectById } from "../../../services/projectService";
-import type Project from "../../../types/project";
+import { useCallback, useEffect, useState } from "react";
+import { getProjectById } from "../../services/projectService";
+import type Project from "../../types/project";
 import ProjectShow from "./ProjectShow";
-import { notify } from "../../../utils/notify";
-import { useRefreshContext } from "../../../contexts/RefreshContext";
+import { notify } from "../../utils/notify";
+import { useRefreshContext } from "../../contexts/RefreshContext/useRefreshContext";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-export default function ProjectBoard() {
+export default function ProjectSection() {
     const navigate = useNavigate();
-    let { projectId } = useParams<{ projectId: string }>();
+    const { projectId } = useParams<{ projectId: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const { setKey } = useRefreshContext();
 
-    const returnToProjectsPage = () => {
+    const returnToProjectsPage = useCallback(() => {
         setProject(null);
-        console.log("Returning to projects page with search params:", location.search);
         navigate({
             pathname: "/projects",
             search: location.search,
         });
-    }
+    }, [navigate]);
+
     useEffect(() => {
         if (!projectId || projectId === "undefined") {
-            setProject(null);
-            returnToProjectsPage();
             return;
         }
 
@@ -53,11 +51,10 @@ export default function ProjectBoard() {
         return () => {
             ignore = true;
         };
-    }, [projectId, navigate]);
+    }, [projectId, navigate, returnToProjectsPage]);
 
     const handleProjectDelete = () => {
         returnToProjectsPage();
-        setKey(prev => prev === null ? 1 : (prev + 1) % 2);
     }
     const handleProjectUpdate = (updatedProject: Project) => {
         setProject(updatedProject);

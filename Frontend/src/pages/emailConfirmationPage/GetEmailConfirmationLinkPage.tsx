@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { getEmailConfirmationLink } from "../../services/authService";
-import FormComponent from "../../components/FormComponent";
-import FloatingInput from "../../components/FloatingInput";
-import {notify} from "../../utils/notify";
+import FormComponent from "../../components/generalPurposeComponents/FormComponent";
+import FloatingInput from "../../components/generalPurposeComponents/FloatingInput";
+import { notify } from "../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function GetEmailConfirmationLinkPage() {
     const navigate = useNavigate();
@@ -18,7 +19,23 @@ export default function GetEmailConfirmationLinkPage() {
                 navigate("/login");
             }, 3000);
         } catch (error) {
-            notify.error("Error sending confirmation link. Please try again.");
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 400) {
+                    notify.error("Invalid input. Please check your email and try again.");
+                } else if (error.response?.status === 409) {
+                    if (error.response.data.message === "Email is already confirmed, login instead") {
+                        notify.error("Email is already confirmed. Please log in.");
+                    } else {
+                        notify.error("Confirmation link was sent recently. Please check your email.");
+                    }
+                } else if (error.response?.status === 404) {
+                    notify.error("Email not found. Please check your email and try again.");
+                } else {
+                    notify.error("An unexpected error occurred. Please try again.");
+                }
+            } else {
+                notify.error("Error sending confirmation link. Please try again.");
+            }
         }
     }
 

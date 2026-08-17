@@ -3,6 +3,7 @@ import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
 import { TaskStatus } from "../enums/taskStatus";
 import { TaskPriority } from "../enums/taskPriority";
+import logger from "./logger";
 
 const appUrl = process.env.APP_SERVER + ":" + process.env.PORT;
 const options: swaggerJsdoc.Options = {
@@ -286,10 +287,8 @@ const options: swaggerJsdoc.Options = {
             }
         },
         security: [
-            {
-                cookieAuth: [],
-                bearerAuth: [],
-            },
+            { cookieAuth: [] },
+            { bearerAuth: [] },
         ],
     },
     apis: ["./src/routes/**/*.ts"], // location of your Swagger comments
@@ -298,6 +297,6 @@ const options: swaggerJsdoc.Options = {
 const swaggerSpec = swaggerJsdoc(options);
 
 export default function setupSwagger(app: Express) {
-    console.log("Swagger is running at: " + appUrl + "/api-docs");
+    logger.info("Swagger is running at: " + appUrl + "/api-docs");
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }

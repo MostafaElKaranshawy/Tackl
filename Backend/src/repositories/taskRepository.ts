@@ -5,21 +5,33 @@ import NotFoundException from "../exceptions/notFoundException";
 import QueryParams from "../interfaces/QueryParams";
 import Task from "../models/task";
 import Project from "../models/project";
+import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
+import ForbiddenException from "../exceptions/forbiddenException";
 
 export default class TaskRepository {
-    static async createTask(taskData: Task, projectId: string): Promise<Task> {
+    static async createTask(taskData: Partial<Task>, projectId: string): Promise<Task> {
+        if (!taskData.title) {
+            throw new MissingRequiredDataException("Task title is required.");
+        }
+
         try {
             const task = await Task.create({
+                title: taskData.title,
                 ...taskData,
                 projectId,
             });
+
             return task;
         } catch (error) {
-            throw new DBException("Failed to create task: " + (error as Error).message);
+            if (error instanceof MissingRequiredDataException) {
+                throw error;
+            }
+            const message = (error as Error).message || "Unknown error";
+            throw new DBException(`Failed to create task: ${message}`);
         }
     }
 
-    static async getTaskById(taskId: string): Promise<Task | null> {
+    static async getTaskById(userId: string, projectId: string, taskId: string): Promise<Task | null> {
         try {
             const task = await Task.findByPk(taskId,
                 {
@@ -32,37 +44,61 @@ export default class TaskRepository {
                     ],
                 }
             );
+            if (!task) {
+                throw new NotFoundException("Task not found.");
+            }
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
+            }
+            if (task.project?.userId !== userId) {
+                throw new ForbiddenException("User does not have access to this task.");
+            }
             return task;
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
             throw new DBException("Failed to retrieve task: " + (error as Error).message);
         }
     }
 
-    static async updateTask(taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
+    static async updateTask(userId: string, projectId: string, taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
         try {
-            const task = await TaskRepository.getTaskById(taskId);
+            const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
+            }
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
+            }
+            if (task.project?.userId !== userId) {
+                throw new ForbiddenException("User does not have access to this task.");
             }
             await task.update(updatedData);
             return task;
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
             }
             throw new DBException("Failed to update task: " + (error as Error).message);
         }
     }
 
-    static async deleteTask(taskId: string): Promise<void> {
+    static async deleteTask(userId: string, projectId: string, taskId: string): Promise<void> {
         try {
-            const task = await TaskRepository.getTaskById(taskId);
+            const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {
                 throw new NotFoundException("Task not found.");
             }
+            if (task.projectId !== projectId) {
+                throw new ForbiddenException("Task does not belong to the specified project.");
+            }
+            if (task.project?.userId !== userId) {
+                throw new ForbiddenException("User does not have access to this task.");
+            }
             await task.destroy();
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
             }
             throw new DBException("Failed to delete task: " + (error as Error).message);
@@ -157,6 +193,9 @@ export default class TaskRepository {
             }
             return task.projectId;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to retrieve task project ID: " + (error as Error).message);
         }
     }
@@ -179,6 +218,9 @@ export default class TaskRepository {
             }
             return userId;
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
             throw new DBException("Failed to retrieve task user ID: " + (error as Error).message);
         }
     }

@@ -7,6 +7,7 @@ import WrongCredentialsException from "../exceptions/wrongCredentialsException";
 import NotFoundException from "../exceptions/notFoundException";
 import EmailService from "./emailService";
 import AlreadyExistsException from "../exceptions/alreadyExistsException";
+import EmailAlreadyConfirmedException from "../exceptions/emailAlreadyConfirmed";
 
 export default class AuthService {
 
@@ -15,15 +16,11 @@ export default class AuthService {
         const passwordSalt = randomInt(1, 15);
 
         const hashedPassword = await bcrypt.hash(password, passwordSalt);
-        try {
-            const user = await UserRepository.createUser(name, email, hashedPassword);
-            const confirmationToken = Jwt.generateToken({ id: user.id, purpose: 'emailConfirmation' });
-            const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
+        const user = await UserRepository.createUser(name, email, hashedPassword);
+        const confirmationToken = Jwt.generateToken({ id: user.id, purpose: 'emailConfirmation' });
+        const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
 
-            await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${name},\n\nThank you for signing up! We're excited to have you on board. \n\n Use the following link to confirm your email: ${confirmationLink}\n\nBest regards,\nThe Team`);
-        } catch (error) {
-            throw error;
-        }
+        await EmailService.sendEmail(email, "Welcome to Our Service", `Hello ${name},\n\nThank you for signing up! We're excited to have you on board. \n\n Use the following link to confirm your email: ${confirmationLink}\n\nBest regards,\nThe Team`);
     }
 
 
@@ -60,81 +57,62 @@ export default class AuthService {
         }
     }
     static async confirmEmail(userId: string): Promise<void> {
-        try {
-            await UserRepository.confirmUserEmail(userId);
-        } catch (error) {
-            throw error;
-        }
+        await UserRepository.confirmUserEmail(userId);
     }
 
     static async getConfirmationLink(email: string): Promise<void> {
-        try {
-            const user = await UserRepository.getUserByEmail(email);
-            if (!user) {
-                throw new NotFoundException("User not found", 404);
-            }
-            if (user.confirmed) {
-                throw new AlreadyExistsException("Email is already confirmed", 400);
-            }
-            if (user.lastLinkTime) {
-                const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
-                const oneHourInMilliseconds = 60 * 60 * 1000;
-                if (timeSinceLastLink < oneHourInMilliseconds) {
-                    throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.", 409);
-                }
-            }
-            await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-            const confirmationToken = Jwt.generateToken({ id: user.id, purpose: 'emailConfirmation' }, '30m');
-            const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
-            await EmailService.sendEmail(email, "Email Confirmation", `Hello ${user.name},\n\nPlease confirm your email by clicking the following link: ${confirmationLink}\n\nBest regards,\nThe Team`);
-        } catch (error) {
-            throw error;
+        const user = await UserRepository.getUserByEmail(email);
+        if (!user) {
+            throw new NotFoundException("User not found");
         }
+        if (user.confirmed) {
+            throw new EmailAlreadyConfirmedException("Email is already confirmed, login instead");
+        }
+        if (user.lastLinkTime) {
+            const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
+            const oneHourInMilliseconds = 60 * 60 * 1000;
+            if (timeSinceLastLink < oneHourInMilliseconds) {
+                throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.");
+            }
+        }
+        await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
+        const confirmationToken = Jwt.generateToken({ id: user.id, purpose: 'emailConfirmation' }, '30m');
+        const confirmationLink = `${process.env.FRONTEND_LINK}/confirm-email/${confirmationToken}`;
+        await EmailService.sendEmail(email, "Email Confirmation", `Hello ${user.name},\n\nPlease confirm your email by clicking the following link: ${confirmationLink}\n\nBest regards,\nThe Team`);
     }
 
     static async resetPassword(password: string, userId: string): Promise<void> {
-        try {
-
-            const user = await UserRepository.getUserById(userId);
-            if (!user) {
-                throw new NotFoundException("User not found", 404);
-            }
-
-            const passwordSalt = randomInt(1, 15);
-            const hashedPassword = await bcrypt.hash(password, passwordSalt);
-
-            await UserRepository.updateUser(user.id, { password: hashedPassword });
-        } catch (error) {
-            console.error("Error in resetPassword:", error); // Debugging line
-            throw error;
+        const user = await UserRepository.getUserById(userId);
+        if (!user) {
+            throw new NotFoundException("User not found", 404);
         }
+
+        const passwordSalt = randomInt(1, 15);
+        const hashedPassword = await bcrypt.hash(password, passwordSalt);
+
+        await UserRepository.updateUser(user.id, { password: hashedPassword });
     }
 
     static async getResetPasswordLink(email: string): Promise<string> {
-        try {
-
-            const user = await UserRepository.getUserByEmail(email);
-            if (!user) {
-                throw new NotFoundException("User not found", 404);
-            }
-            if (user.lastLinkTime) {
-                const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
-                const oneHourInMilliseconds = 60 * 60 * 1000;
-                if (timeSinceLastLink < oneHourInMilliseconds) {
-                    throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.", 409);
-                }
-            }
-    
-            const resetToken = Jwt.generateToken({ id: user.id, purpose: 'passwordReset' }, '30m');
-            const resetLink = `${process.env.FRONTEND_LINK}/reset-password/${resetToken}`;
-
-            await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
-            
-            await EmailService.sendEmail(email, "Password Reset Request", `Hello ${user.name},\n\nYou requested a password reset. Please use the following link to reset your password: ${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`);
-    
-            return resetLink;
-        } catch (error) {
-            throw error;
+        const user = await UserRepository.getUserByEmail(email);
+        if (!user) {
+            throw new NotFoundException("User not found", 404);
         }
+        if (user.lastLinkTime) {
+            const timeSinceLastLink = Date.now() - user.lastLinkTime.getTime();
+            const oneHourInMilliseconds = 60 * 60 * 1000;
+            if (timeSinceLastLink < oneHourInMilliseconds) {
+                throw new AlreadyExistsException("Confirmation link was sent recently. Please check your email.", 409);
+            }
+        }
+
+        const resetToken = Jwt.generateToken({ id: user.id, purpose: 'passwordReset' }, '30m');
+        const resetLink = `${process.env.FRONTEND_LINK}/reset-password/${resetToken}`;
+
+        await UserRepository.updateUser(user.id, { lastLinkTime: new Date() });
+
+        await EmailService.sendEmail(email, "Password Reset Request", `Hello ${user.name},\n\nYou requested a password reset. Please use the following link to reset your password: ${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`);
+
+        return resetLink;
     }
 }

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { resetPassword } from "../../services/authService";
 import { useParams } from "react-router-dom";
-import FormComponent from "../../components/FormComponent";
-import FloatingInput from "../../components/FloatingInput";
+import FormComponent from "../../components/generalPurposeComponents/FormComponent";
+import FloatingInput from "../../components/generalPurposeComponents/FloatingInput";
 import { notify } from "../../utils/notify";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { validatePasswordRules, validatePassword } from "../../utils/validators";
@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
             setTimeout(() => {
                 navigate("/login");
             }, 3000);
-        } catch (error) {
+        } catch {
             notify.error("Failed to reset password. Please try again.");
         }
 
@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
             submitText="Reset Password"
             onSubmit={handleSubmit}
             children={
-                <>  
+                <>
                     <div className="password-container relative">
                         <FloatingInput
                             label="New Password"

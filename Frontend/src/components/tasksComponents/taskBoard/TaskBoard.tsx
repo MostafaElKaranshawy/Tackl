@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import type Task from "../../../types/task";
 import TaskBoardCard from "./TaskBoardCard";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useTaskRefreshContext } from "../../../contexts/TaskRefreshContext";
+import { useTaskRefreshContext } from "../../../contexts/TaskRefreshContext/useTaskRefreshContext";
 
 export default function TaskBoard({
     projectId,
@@ -15,7 +15,7 @@ export default function TaskBoard({
 
     useEffect(() => {
         fetchTasks();
-    }, [projectId, key]);
+    }, [projectId, key, fetchTasks]);
 
     const handleTaskClick = (taskId: string) => {
         navigate({ pathname: location.pathname, search: `?taskId=${taskId}` + location.search.replace(/(\?|&)taskId=[^&]*/, '') });

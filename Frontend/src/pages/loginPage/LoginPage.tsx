@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { login } from '../../services/authService';
-import FloatingInput from '../../components/FloatingInput';
+import FloatingInput from '../../components/generalPurposeComponents/FloatingInput';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
-import FormComponent from '../../components/FormComponent';
+import FormComponent from '../../components/generalPurposeComponents/FormComponent';
 import { validateEmail } from '../../utils/validators';
 import { notify } from '../../utils/notify';
 import axios from 'axios';
@@ -18,17 +18,15 @@ export default function LoginPage() {
 
     useEffect(() => {
         const verifyAuthentication = async () => {
-            try {
-                const authenticated = await checkAuthentication();
-                if (authenticated) {
-                    navigate("/projects");
-                }
-            } finally {
+            const authenticated = await checkAuthentication();
+            if (authenticated) {
+                navigate("/projects");
             }
+
         };
 
         verifyAuthentication();
-    }, []);
+    }, [navigate]);
 
     const resetForm = () => {
         setPassword('');
@@ -103,7 +101,7 @@ export default function LoginPage() {
             footer={
                 <div>
                     <p className="text-sm text-gray-600">
-                        Don't have an account? <a href="/" className="text-blue-500 hover:underline">
+                        Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">
                             Sign Up here
                         </a>
                     </p>

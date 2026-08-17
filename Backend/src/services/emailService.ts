@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-
+import logger from '../config/logger';
 export default class EmailService {
     static transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -21,9 +21,9 @@ export default class EmailService {
 
         try {
             await EmailService.transporter.sendMail(mailOptions);
-            console.log(`Email sent to ${to}`);
+            logger.info(`Email sent to ${to} with subject "${subject}"`);
         } catch (error) {
-            console.error(`Error sending email to ${to}:`, error);
+            logger.error(`Error sending email to ${to}:`, error);
             throw error;
         }
     }
