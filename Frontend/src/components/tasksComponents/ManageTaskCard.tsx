@@ -53,11 +53,7 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
                     );
 
                 setTaskStatuses(taskStatuses);
-                setStatus(
-                    taskStatuses.length > 0
-                        ? taskStatuses[0].status
-                        : ""
-                );
+                if (mode === "create") setStatus(taskStatuses.length > 0 ? taskStatuses[0].status : "");
             } catch (error) {
                 if (axios.isAxiosError(error)) {
                     if (error.response?.status === 404) {
