@@ -610,4 +610,43 @@ describe("TaskService", () => {
 
     });
 
+    it("Get tasks by task status", async () => {
+
+        const mockTasks = [
+            {
+                id: "1",
+                title: "Test Task 1",
+                description: "Description 1",
+                projectId: "1",
+                status: "in progress",
+            } as Task,
+
+            {
+                id: "2",
+                title: "Test Task 2",
+                description: "Description 2",
+                projectId: "1",
+                status: "in progress",
+            } as Task,
+        ];
+
+        vi.spyOn(ProjectRepository, "getProjectById")
+            .mockResolvedValue({
+                id: "1",
+                userId: "1",
+            } as any);
+
+        vi.spyOn(TaskRepository, "getTaskByTaskStatus")
+            .mockResolvedValue(mockTasks);
+
+        const result = await TaskService.getTaskByTaskStatus(
+            "1",
+            "in progress",
+            "1"
+        );
+
+        expect(result).toEqual(mockTasks);
+
+    });
+
 });

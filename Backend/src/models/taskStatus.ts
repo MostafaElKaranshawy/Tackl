@@ -9,7 +9,6 @@ import {
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
-import { MainTaskStatus } from "../enums/mainTaskStatus";
 import Task from "./task";
 import Project from "./project";
 export default class TaskStatus extends Model<

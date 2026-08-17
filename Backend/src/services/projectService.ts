@@ -25,6 +25,7 @@ export default class ProjectService {
                     transaction
                 );
             }
+            return createdProject;
         });
     }
 

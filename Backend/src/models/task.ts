@@ -10,7 +10,6 @@ import {
 import { sequelize } from "../config/database";
 import { Models } from "./models";
 import Project from "./project";
-import { MainTaskStatus } from "../enums/mainTaskStatus";
 import { TaskPriority } from "../enums/taskPriority";
 
 export default class Task extends Model<
