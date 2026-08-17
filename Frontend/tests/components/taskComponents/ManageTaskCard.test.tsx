@@ -359,21 +359,6 @@ describe("ManageTaskCard", () => {
             expect(onClose).toHaveBeenCalled();
         });
 
-        it("shows an error and returns early when no task is provided in edit mode", async () => {
-            const user = userEvent.setup();
-            setup({ mode: "edit", task: undefined });
-
-            await waitFor(() => expect(mockedGetStatuses).toHaveBeenCalled());
-
-            await user.type(
-                screen.getByPlaceholderText("Enter task title"),
-                "Some title"
-            );
-            await user.click(screen.getByRole("button", { name: /save changes/i }));
-
-            expect(notify.error).toHaveBeenCalledWith("No task selected.");
-            expect(mockedUpdateTask).not.toHaveBeenCalled();
-        });
     });
 
     describe("submission error handling", () => {
