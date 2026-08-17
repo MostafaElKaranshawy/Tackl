@@ -3,7 +3,7 @@ import MissingRequiredDataException from "../exceptions/missingRequiredDataExcep
 import NotFoundException from "../exceptions/notFoundException";
 import TimeEntryService from "../services/timeEntryService";
 import { Request, Response, NextFunction } from "express";
-import { validateDate, validateTime } from "../utils/validateTime";
+import { validateDate, validateTime } from "../utils/dateTimeUtils";
 import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryController {

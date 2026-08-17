@@ -3,7 +3,7 @@ import MissingRequiredDataException from "../exceptions/missingRequiredDataExcep
 import NotFoundException from "../exceptions/notFoundException";
 import Project from "../models/project";
 
-export default class ProjectRepo {
+export default class ProjectRepository {
     static async createProject(projectData: Partial<Project>, userId: string): Promise<Project> {
         try {
             if (!projectData.name) {

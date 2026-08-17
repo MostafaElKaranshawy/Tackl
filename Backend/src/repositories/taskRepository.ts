@@ -1,4 +1,4 @@
-import { FindOptions } from "sequelize";
+import { FindOptions, Transaction } from "sequelize";
 import { Op } from "../config/database";
 import DBException from "../exceptions/dbException";
 import NotFoundException from "../exceptions/notFoundException";
@@ -9,19 +9,29 @@ import MissingRequiredDataException from "../exceptions/missingRequiredDataExcep
 import ForbiddenException from "../exceptions/forbiddenException";
 
 export default class TaskRepository {
-    static async createTask(taskData: Partial<Task>, projectId: string): Promise<Task> {
+    static async createTask(taskData: Partial<Task>, projectId: string, transaction?: Transaction): Promise<Task> {
         if (!taskData.title) {
             throw new MissingRequiredDataException("Task title is required.");
         }
 
         try {
+            if (transaction) {
+                const task = await Task.create({
+                    title: taskData.title,
+                    ...taskData,
+                    projectId,
+                },
+                    transaction && { transaction }
+                );
+                return task;
+            }
             const task = await Task.create({
                 title: taskData.title,
                 ...taskData,
                 projectId,
             });
-
             return task;
+
         } catch (error) {
             if (error instanceof MissingRequiredDataException) {
                 throw error;
@@ -62,7 +72,7 @@ export default class TaskRepository {
         }
     }
 
-    static async updateTask(userId: string, projectId: string, taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
+    static async updateTask(userId: string, projectId: string, taskId: string, updatedData: Partial<Task>, transaction?: Transaction): Promise<Task | null> {
         try {
             const task = await TaskRepository.getTaskById(userId, projectId, taskId);
             if (!task) {
@@ -74,7 +84,11 @@ export default class TaskRepository {
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");
             }
-            await task.update(updatedData);
+            if (transaction) {
+                await task.update(updatedData, { transaction });
+            } else {
+                await task.update(updatedData);
+            }
             return task;
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
@@ -96,6 +110,7 @@ export default class TaskRepository {
             if (task.project?.userId !== userId) {
                 throw new ForbiddenException("User does not have access to this task.");
             }
+
             await task.destroy();
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {

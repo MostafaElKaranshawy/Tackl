@@ -4,6 +4,7 @@ import { Express } from "express";
 import { TaskStatus } from "../enums/taskStatus";
 import { TaskPriority } from "../enums/taskPriority";
 import logger from "./logger";
+import { ActionType } from "../enums/actionType";
 
 const appUrl = process.env.APP_SERVER + ":" + process.env.PORT;
 const options: swaggerJsdoc.Options = {
@@ -188,9 +189,9 @@ const options: swaggerJsdoc.Options = {
                             type: "string",
                             format: "uuid",
                         },
-                        changeType: {
+                        actionType: {
                             type: "string",
-                            enum: ["created", "updated", "deleted"],
+                            enum: ActionType,
                         },
                         changeDetails: {
                             type: "string",
@@ -210,7 +211,7 @@ const options: swaggerJsdoc.Options = {
                         },
                         actionType: {
                             type: "string",
-                            enum: ["created", "updated", "deleted"],
+                            enum: ActionType,
                         },
                         taskId: {
                             type: "string",
@@ -227,6 +228,23 @@ const options: swaggerJsdoc.Options = {
                         updatedAt: {
                             type: "string",
                             format: "date-time",
+                        },
+                        taskChanges: {
+                            type: "array",
+                            items: {
+                                $ref: "#/components/schemas/TaskChange"
+                            }
+                        },
+                        actionBy: {
+                            type: "object",
+                            properties: {
+                                name: {
+                                    type: "string",
+                                },
+                            },
+                        },
+                        fieldName: {
+                            type: "string",
                         },
                     },
                 },
@@ -291,7 +309,7 @@ const options: swaggerJsdoc.Options = {
             { bearerAuth: [] },
         ],
     },
-    apis: ["./src/routes/**/*.ts"], // location of your Swagger comments
+    apis: ["./dist/routes/**/*.js", "./src/routes/**/*.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

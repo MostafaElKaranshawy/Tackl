@@ -22,3 +22,21 @@ export function validateDate(date: Date): boolean {
         return false;
     }
 }
+export function compareDates(
+    oldValue: unknown,
+    newValue: unknown
+): boolean {
+    if (oldValue instanceof Date && newValue instanceof Date) {
+        return oldValue.getTime() === newValue.getTime();
+    }
+
+    if (oldValue instanceof Date && typeof newValue === "string") {
+        return oldValue.getTime() === new Date(newValue).getTime();
+    }
+
+    if (typeof oldValue === "string" && newValue instanceof Date) {
+        return new Date(oldValue).getTime() === newValue.getTime();
+    }
+
+    return oldValue === newValue;
+}

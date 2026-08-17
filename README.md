@@ -276,7 +276,75 @@ Verify Docker installation:
 docker --version
 ```
 
-Make sure Docker is running before starting the containerized application.
+Change the .env url variables in the `./Backend/.env`
+
+```bash
+DB_HOST=tackl-db
+```
+
+### Build docker images and running the contrainers
+
+```bash
+docker compose up
+```
+
+Stop and remove the running containers
+
+```bash
+docker compose down
+```
+
+Rebuild certain image
+
+- Directly from dockerfile
+
+```bash
+cd ./Backend
+docker build .
+```
+
+>or
+
+```bash
+cd ./Frontend
+docker build .
+```
+
+- From docker compose file
+
+```bash
+docker compose build --no-cache image-name
+```
+
+> The `--no-cache` argument builds the image from scratch even if it was built before (reinstalling the dependencies again).
+
+### Access running application
+
+```bash
+http://localhost:5173/ # or whatever port you use.
+```
+
+### Access system logs
+
+- From docker terminal
+
+```bash
+docker ps # to get the running containers
+docker logs container-name-or-id
+```
+
+- From the log files in the server
+
+  - Run the server as interactive terminal
+  - Access the files in the server directory
+
+```bash
+docker exec -it tackl-server sh
+cd logs/
+ls
+cat error.log
+exit
+```
 
 ---
 

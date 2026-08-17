@@ -9,6 +9,7 @@ import EmailConfirmationPage from './pages/emailConfirmationPage/EmailConfirmati
 import GetEmailConfirmationLinkPage from './pages/emailConfirmationPage/GetEmailConfirmationLinkPage'
 import HomePage from './pages/HomePage/HomePage'
 import TaskPage from './pages/TaskPage'
+import { TaskRefreshProvider } from './contexts/TaskRefreshContext/TaskRefreshProvider'
 
 import { RefreshProvider } from './contexts/RefreshContext/RefreshProvider'
 
@@ -16,28 +17,30 @@ function App() {
     return (
         <div className="app container w-screen h-screen bg-white min-h-screen flex flex-col items-center justify-center">
             <RefreshProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/signup" element={<SignUpPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/reset-password" element={<GetPasswordLinkPage />} />
-                        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-                        <Route path="/confirm-email" element={<GetEmailConfirmationLinkPage />} />
-                        <Route path="/confirm-email/:token" element={<EmailConfirmationPage />} />
-                        <Route path="/projects/:projectId?" element={<HomePage />} />
-                        <Route path="/projects/:projectId/tasks/:taskId" element={<TaskPage />} />
-                        <Route path="*" element={<Navigate to="/projects" replace />} />
-                    </Routes>
-                </Router>
-                <ToastContainer
-                    position="top-right"
-                    autoClose={3000}
-                    hideProgressBar={false}
-                    newestOnTop
-                    closeOnClick
-                    pauseOnHover
-                    theme="light"
-                />
+                <TaskRefreshProvider>
+                    <Router>
+                        <Routes>
+                            <Route path="/signup" element={<SignUpPage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/reset-password" element={<GetPasswordLinkPage />} />
+                            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+                            <Route path="/confirm-email" element={<GetEmailConfirmationLinkPage />} />
+                            <Route path="/confirm-email/:token" element={<EmailConfirmationPage />} />
+                            <Route path="/projects/:projectId?" element={<HomePage />} />
+                            <Route path="/projects/:projectId/tasks/:taskId" element={<TaskPage />} />
+                            <Route path="*" element={<Navigate to="/projects" replace />} />
+                        </Routes>
+                    </Router>
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        pauseOnHover
+                        theme="light"
+                    />
+                </TaskRefreshProvider>
             </RefreshProvider>
         </div>
     )

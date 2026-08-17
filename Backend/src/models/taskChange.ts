@@ -9,6 +9,7 @@ import {
 } from "sequelize";
 import { sequelize } from "../config/database";
 import { Models } from "./models";
+import { ActionType } from "../enums/actionType";
 
 export default class TaskChange extends Model<
     InferAttributes<TaskChange, {
@@ -22,6 +23,7 @@ export default class TaskChange extends Model<
     declare fieldName: string;
     declare oldValue: CreationOptional<string | null>;
     declare newValue: CreationOptional<string | null>;
+    declare actionType: CreationOptional<ActionType>;
     declare taskHistoryId: ForeignKey<string>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
@@ -53,6 +55,10 @@ TaskChange.init(
         newValue: {
             type: DataTypes.TEXT,
             allowNull: true,
+        },
+        actionType: {
+            type: DataTypes.ENUM(...Object.values(ActionType)),
+            allowNull: false,
         },
         taskHistoryId: {
             type: DataTypes.UUID,

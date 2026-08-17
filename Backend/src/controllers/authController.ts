@@ -122,6 +122,9 @@ export default class AuthController {
     }
 
     static async checkAuthentication(req: Request, res: Response, next: NextFunction) {
+        if (!req.cookies || !req.cookies.accessToken) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
         const token = req.cookies.accessToken;
 
         if (!token) {

@@ -9,7 +9,7 @@ interface TaskFormModalProps {
     mode: "create" | "edit";
     task?: Task;
     projectId: string;
-    onSuccess: (task?: Task) => void;
+    onSuccess: (data?: Task) => void;
     onClose: () => void;
 }
 
@@ -25,7 +25,7 @@ export default function ManageTaskCard({
 
     const [description, setDescription] = useState(mode === "edit" && task ? task.description ?? "" : "");
     const [priority, setPriority] = useState<"low" | "medium" | "high">(task && mode === "edit" ? task.priority : "medium");
-    const [status, setStatus] = useState<"todo" | "in_progress" | "done">("todo");
+    const [status, setStatus] = useState<"todo" | "in_progress" | "done">(task && mode === "edit" ? task.status : "todo");
     const [dueDate, setDueDate] = useState<string | null>(task && mode === "edit" ? task.dueDate : null);
     const [estimatedTime, setEstimatedTime] = useState<number | null>(task && mode === "edit" ? task.estimatedTime : null);
 
@@ -50,8 +50,8 @@ export default function ManageTaskCard({
                     estimatedTime: estimatedTime,
                 };
 
-                const createdTask = await createTask(taskData, projectId) as Task;
-                onSuccess(createdTask);
+                const createdTaskData = await createTask(taskData, projectId) as Task;
+                onSuccess(createdTaskData);
                 notify.success("Task created successfully!");
             } else {
                 if (!task) {
@@ -66,8 +66,8 @@ export default function ManageTaskCard({
                     dueDate: dueDate,
                     estimatedTime: estimatedTime,
                 };
-                const updatedTask = await updateTask(task.id, updatedTaskData, task.projectId) as Task;
-                onSuccess(updatedTask);
+                const data = await updateTask(task.id, updatedTaskData, task.projectId) as Task;
+                onSuccess(data);
                 notify.success("Task updated successfully!");
             }
 

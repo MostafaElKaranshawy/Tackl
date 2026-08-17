@@ -24,7 +24,7 @@ export default function TaskShow() {
     const { projectId } = useParams<{ projectId: string }>();
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
 
-    const { setKey } = useTaskRefreshContext();
+    const { key, setKey } = useTaskRefreshContext();
 
     const closeTaskWindow = useCallback(() => {
         setTask(null);
@@ -43,13 +43,12 @@ export default function TaskShow() {
         let cancelled = false;
 
         const loadTask = async () => {
-            try {
-                const task = await getTaskById(taskId, projectId);
-
+            try {            
+                const data = await getTaskById(taskId, projectId);
                 if (!cancelled) {
-                    setTask(task);
+                    setTask(data);
                 }
-            } catch{
+            } catch {
                 if (!cancelled) {
                     closeTaskWindow();
                 }
@@ -61,7 +60,7 @@ export default function TaskShow() {
         return () => {
             cancelled = true;
         };
-    }, [taskId, projectId, closeTaskWindow]);
+    }, [taskId, projectId, closeTaskWindow, key]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -295,9 +294,9 @@ export default function TaskShow() {
                             task={task}
                             projectId={task.projectId}
                             onClose={() => setShowEditModal(false)}
-                            onSuccess={(updatedTask) => {
-                                if (updatedTask) {
-                                    setTask(updatedTask);
+                            onSuccess={(updatedData) => {
+                                if (updatedData) {
+                                    setTask(updatedData);
                                 }
 
                                 setShowEditModal(false);

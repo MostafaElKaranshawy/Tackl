@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize/lib/transaction";
 import DBException from "../exceptions/dbException";
 import ForbiddenException from "../exceptions/forbiddenException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
@@ -5,10 +6,19 @@ import NotFoundException from "../exceptions/notFoundException";
 import TimeEntry from "../models/timeEntry";
 
 export default class TimeEntryRepository {
-    static async createTimeEntry(taskId: string, timeEntryData: Partial<TimeEntry>): Promise<TimeEntry> {
+    static async createTimeEntry(taskId: string, timeEntryData: Partial<TimeEntry>, transaction?: Transaction): Promise<TimeEntry> {
         try {
             if (!timeEntryData.duration || !timeEntryData.date) {
                 throw new MissingRequiredDataException("Missing required data for creating time entry.", 400);
+            }
+            if (transaction) {
+                const timeEntry = await TimeEntry.create({
+                    taskId: taskId,
+                    duration: timeEntryData.duration,
+                    date: timeEntryData.date,
+                    note: timeEntryData.note
+                }, { transaction });
+                return timeEntry;
             }
             const timeEntry = await TimeEntry.create({
                 taskId: taskId,
@@ -25,7 +35,7 @@ export default class TimeEntryRepository {
         }
     }
 
-    static async getTimeEntryById(taskId:string, timeEntryId: string): Promise<TimeEntry | null> {
+    static async getTimeEntryById(taskId: string, timeEntryId: string): Promise<TimeEntry | null> {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
@@ -34,7 +44,7 @@ export default class TimeEntryRepository {
             if (timeEntry.taskId !== taskId) {
                 throw new ForbiddenException("Time entry does not belong to the specified task.");
             }
-            return timeEntry;
+            return timeEntry.dataValues as TimeEntry;
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
@@ -43,7 +53,7 @@ export default class TimeEntryRepository {
         }
     }
 
-    static async updateTimeEntry(taskId:string, timeEntryId: string, updatedData: Partial<TimeEntry>): Promise<TimeEntry | null> {
+    static async updateTimeEntry(taskId: string, timeEntryId: string, updatedData: Partial<TimeEntry>, transaction?: Transaction): Promise<TimeEntry | null> {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
@@ -52,12 +62,22 @@ export default class TimeEntryRepository {
             if (timeEntry.taskId !== taskId) {
                 throw new ForbiddenException("Time entry does not belong to the specified task.");
             }
+
+            if (transaction) {
+                await timeEntry.update({
+                    duration: updatedData.duration ?? timeEntry.duration,
+                    date: updatedData.date ?? timeEntry.date,
+                    note: updatedData.note ?? timeEntry.note
+                }, transaction ? { transaction } : undefined);
+                return timeEntry;
+            }
             await timeEntry.update({
                 duration: updatedData.duration ?? timeEntry.duration,
                 date: updatedData.date ?? timeEntry.date,
                 note: updatedData.note ?? timeEntry.note
             });
             return timeEntry;
+
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
@@ -66,7 +86,7 @@ export default class TimeEntryRepository {
         }
     }
 
-    static async deleteTimeEntry(taskId:string, timeEntryId: string): Promise<void> {
+    static async deleteTimeEntry(taskId: string, timeEntryId: string, transaction?: Transaction): Promise<void> {
         try {
             const timeEntry = await TimeEntry.findByPk(timeEntryId);
             if (!timeEntry) {
@@ -75,7 +95,11 @@ export default class TimeEntryRepository {
             if (timeEntry.taskId !== taskId) {
                 throw new ForbiddenException("Time entry does not belong to the specified task.");
             }
-            await timeEntry.destroy();
+            if (transaction) {
+                await timeEntry.destroy({ transaction });
+            } else {
+                await timeEntry.destroy();
+            }
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 throw error;
