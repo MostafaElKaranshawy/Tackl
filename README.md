@@ -7,10 +7,17 @@ Tackl is a personal project and task-management application inspired by tools su
 Users can:
 
 - Create and manage personal projects.
-- Organize tasks on a three-column task board.
-- Track task priorities, estimates, due dates, and time spent.
-- Track the history of changes made to each task.
-- Log your work for each task to track your progress.
+- Organize tasks individually in each project.
+  - Track task priorities, due dates, and time spent.
+  - Track task working time and log the finished time slots.
+  - Search and filter tasks based on different critereas
+    - Search by keywords in tasks title or description.
+    - Filter tasks by status, priority, overdued tasks.
+  - Drag tasks between different column to change the task working status.
+- Customize each project status depending on the required working flow of the project
+  - Adding new project statuses that appear as new columns to add tasks in.
+  - Reordering of the statuses flow of the project by drag the columns to required position.
+- Track Tackl workflow, modifications for each task to allow user actions' history logging.
 
 The application supports multiple registered users. However, the product is intentionally personal: each user can access only their own projects, tasks, time entries, and related data.
 
@@ -35,21 +42,32 @@ The application supports multiple registered users. However, the product is inte
 
 **API Documentation:** Swagger / Swagger UI
 
-**Logging:**
+**Traceability:**
 
-- **Client History Log:** Displays user actions and changes made to each task.
-- **Operational Log:** Winston logger for backend/server logging.
+- **Client-level** Add task level history Logs to track user actions and changes made to each task.
+- **Operational Log:** Winston logger for backend/server logging to trace system state and behaviour throughout the working time, showing the handled requests, catched errors with the trace of each error, warnings, system initialization and shutdown logs.
 
 **Testing:**
 
-- Node.js Unit Testing
-- React.js Unit Testing
-- Swagger UI for API/client testing
+- Node.js Unit Testing using Vitest
+- React.js Unit Testing using Vitest
+- Swagger UI for API/client testing.
+
+#### Testing Coverage
+
+##### Backend Coverage
+
+![Backend Unit Testing Coverage](assets/backend-testing-coverage.png)
+
+##### Frontend Coverage
+
+![Frontend Unit Testing Coverage](assets/frontend-testing-coverage.png)
+
+---
 
 **Containerization:**
 
 - Docker
-- GitHub Container Registry (GHCR)
 
 ### High Level Design
 
@@ -358,9 +376,8 @@ Navigate to the backend directory:
 
 ```bash
 cd ./Backend
+npm run test:coverage
 ```
-
-Run the configured backend test command.
 
 ### Frontend Tests
 
@@ -368,9 +385,8 @@ Navigate to the frontend directory:
 
 ```bash
 cd ./Frontend
+npm run test:coverage
 ```
-
-Run the configured frontend test command.
 
 ### API Testing
 
@@ -378,6 +394,11 @@ Swagger UI is provided for testing and exploring the REST API.
 
 Once the backend is running, open the Swagger UI endpoint configured by the backend.
 
+```bash
+http://localhost:4000/api-docs
+```
+
+> Change the port to the one you use for tackl-server container.
 ---
 
 ## API Documentation
@@ -388,9 +409,15 @@ Swagger describes the available REST API endpoints, request parameters, request 
 
 Swagger UI can also be used to manually test the API endpoints.
 
+```bash
+http://localhost:4000/api-docs
+```
+
+> Change the port to the one you use for tackl-server container.
+---
 ---
 
-## Logging
+## Logging / Traceability
 
 Tackl provides two types of logging.
 
@@ -443,8 +470,8 @@ Operational logs are intended for monitoring and debugging backend activity, err
 
 ### Testing Stack
 
-- Node.js Unit Testing
-- React Unit Testing
+- Node.js Unit Testing with vitest
+- React Unit Testing with vitest
 - Swagger UI
 
 ### DevOps
