@@ -25,4 +25,4 @@ COPY --from=builder /app/.sequelizerc ./.sequelizerc
 
 EXPOSE 5000
 
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx sequelize-cli db:migrate && node dist/index.js"]
