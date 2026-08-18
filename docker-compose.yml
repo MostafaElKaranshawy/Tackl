@@ -23,7 +23,7 @@ services:
     environment:
       - PORT=4000
       - DB_HOST=tackl-db
-      - NODE_ENV=deployment
+      - NODE_ENV=production
     depends_on:
       - database
     ports:
