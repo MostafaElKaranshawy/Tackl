@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProjectTaskStatusByProjectId } from "../../services/taskStatusService";
+import { useParams } from "react-router-dom";
+import { notify } from "../../utils/notify";
 
 export default function ProjectsFilterMenu({
     onConfirm,
@@ -13,6 +16,28 @@ export default function ProjectsFilterMenu({
     const [priorityFilter, setPriorityFilter] = useState(filter.priority || "");
     const [overdueFilter, setOverdueFilter] = useState(filter.overdue || false);
 
+    const [statuses, setStatuses] = useState<string[]>([]);
+
+    const { projectId } = useParams<{ projectId: string; }>();
+    useEffect(() => {
+        if (!projectId) return;
+        let counter = 0;
+        const fetchStatuses = async () => {
+            try {
+                const data = await getProjectTaskStatusByProjectId(projectId);
+                setStatuses(data.map((statusObj: { status: string }) => statusObj.status));
+            } catch (error) {
+                if (counter < 3) {
+                    counter++;
+                    fetchStatuses();
+                } else {
+                    notify.error("Error fetching task statuses, please reload the page or try again later.");
+                }
+            }
+        };
+
+        fetchStatuses();
+    }, [projectId]);
     return (
         <div className="mt-2 w-80 rounded-xl border border-gray-200 bg-white p-5 shadow-xl z-50">
             <h3 className="mb-4 text-lg font-semibold text-gray-800">
@@ -36,9 +61,13 @@ export default function ProjectsFilterMenu({
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     >
                         <option value="">All</option>
-                        <option value="to do">To do</option>
-                        <option value="in progress">In Progress</option>
-                        <option value="done">Done</option>
+                        {
+                            statuses.map((status) => (
+                                <option key={status} value={status}>
+                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                </option>
+                            ))
+                        }
                     </select>
                 </div>
 

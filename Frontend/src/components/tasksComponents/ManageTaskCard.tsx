@@ -38,8 +38,7 @@ export default function ManageTaskCard({ mode, task, projectId, onSuccess, onClo
         );
 
     const [loading, setLoading] = useState(false);
-    const [columnsLoading, setColumnsLoading] =
-        useState(true);
+    const [columnsLoading, setColumnsLoading] = useState(true);
 
     useEffect(() => {
         let count = 0;

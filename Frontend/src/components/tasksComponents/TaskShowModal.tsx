@@ -204,7 +204,7 @@ export default function TaskShow() {
                         </div>
 
                         <div
-                            className={"group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4" + (task.dueDate && new Date(task.dueDate) < new Date() ? " border-red-200 bg-red-100" : "")}
+                            className={"group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4" + (task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() ? " border-red-200 bg-red-100" : "")}
                         >
                             <MdCalendarToday className="text-2xl text-blue-600" />
 

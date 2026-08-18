@@ -75,6 +75,9 @@ export default function ProjectShow(
                     search,
                     ...filter
                 });
+            if (response.tasks && response.tasks.length === 0 && currentPage > 1) {
+                setCurrentPage(prev => prev - 1);
+            }
             setTaskList(response.tasks);
             setTotalTasks(response.total);
         } catch {
@@ -396,6 +399,7 @@ export default function ProjectShow(
                             if (project && onUpdated) {
                                 onUpdated(project);
                             }
+                            fetchTasks();
                         }}
                         onClose={() => setShowEditModal(false)}
                     />

@@ -37,9 +37,7 @@ export default function ResetPasswordPage() {
             setPassword("");
             setConfirmPassword("");
             notify.success("Password reset successful! You can now log in with your new password.");
-            setTimeout(() => {
-                navigate("/login");
-            }, 3000);
+            navigate("/login");
         } catch {
             notify.error("Failed to reset password. Please try again.");
         }
