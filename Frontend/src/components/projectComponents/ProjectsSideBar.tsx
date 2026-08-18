@@ -12,11 +12,12 @@ import CreateProjectCard from "./ManageProjectCard";
 import { IoReload } from "react-icons/io5";
 import { useRefreshContext } from "../../contexts/RefreshContext/useRefreshContext";
 import { PROJECTS_PAGE_SIZE } from "../../constants";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 export default function ProjectsSideBar() {
     const PAGE_SIZE = PROJECTS_PAGE_SIZE;
     const [searchParams] = useSearchParams();
+    const location = useLocation();
     const navigate = useNavigate();
     const sortMenuRef = useRef<HTMLDivElement>(null);
     const { projectId } = useParams<{ projectId: string }>();
@@ -29,6 +30,7 @@ export default function ProjectsSideBar() {
     const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") === "asc" ? "asc" : "desc");
     const [sortBy, setSortBy] = useState(searchParams.get("sortBy") && sortByAttributesList.includes(searchParams.get("sortBy")!) ? searchParams.get("sortBy")! : "createdAt");
     const [currentPage, setCurrentPage] = useState(searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1);
+    const searchQuery = new URLSearchParams(location.search).get("search") || "";
 
     const fetchProjects = async () => {
         try {
@@ -36,7 +38,8 @@ export default function ProjectsSideBar() {
                 page: currentPage,
                 pageSize: PAGE_SIZE,
                 sortBy,
-                sortOrder
+                sortOrder,
+                search: searchQuery
             });
             if (data.projects.length === 0 && currentPage > 1) {
                 setCurrentPage((prev) => prev - 1);
@@ -58,7 +61,6 @@ export default function ProjectsSideBar() {
     };
 
     useEffect(() => {
-
         searchParams.set("sortBy", sortBy);
         searchParams.set("sortOrder", sortOrder);
 
@@ -79,7 +81,8 @@ export default function ProjectsSideBar() {
                     page: currentPage,
                     pageSize: PAGE_SIZE,
                     sortBy,
-                    sortOrder
+                    sortOrder,
+                    search: searchQuery
                 });
                 if (data.projects.length === 0 && currentPage > 1) {
                     setCurrentPage((prev) => prev - 1);
@@ -106,7 +109,7 @@ export default function ProjectsSideBar() {
         return () => {
             ignore = true;
         };
-    }, [sortOrder, sortBy, currentPage, key, PAGE_SIZE, projectId, navigate]);
+    }, [sortOrder, sortBy, currentPage, key, PAGE_SIZE, searchQuery, projectId, navigate]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

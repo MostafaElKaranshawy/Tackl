@@ -67,7 +67,7 @@ export default class ProjectService {
         return await ProjectRepository.deleteProject(projectId);
     }
 
-    static async getProjectsByUserId(userId: string, page: number, limit: number, sortBy: string, sortOrder: string) {
-        return await ProjectRepository.getUserProjects(userId, page, limit, sortBy, sortOrder);
+    static async getProjectsByUserId(userId: string, page: number, limit: number, sortBy: string, sortOrder: string, search?: string) {
+        return await ProjectRepository.getUserProjects(userId, page, limit, sortBy, sortOrder, search);
     }
 }

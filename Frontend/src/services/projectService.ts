@@ -2,14 +2,15 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL + "/api/projects";
 
-const getProjects = async (options: { page: number; pageSize: number; sortBy: string; sortOrder: string }) => {
+const getProjects = async (options: { page: number; pageSize: number; sortBy: string; sortOrder: string, search?: string }) => {
     const response = await axios.get(`${API_URL}`, {
         withCredentials: true,
         params: {
             page: options.page,
             limit: options.pageSize,
             sortBy: options.sortBy,
-            sortOrder: options.sortOrder
+            sortOrder: options.sortOrder,
+            search: options.search || undefined
         }
     });
     return response.data;

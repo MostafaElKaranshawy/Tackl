@@ -1,4 +1,4 @@
-import { Transaction } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import DBException from "../exceptions/dbException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
@@ -79,11 +79,17 @@ export default class ProjectRepository {
         }
     }
 
-    static async getUserProjects(userId: string, page: number, limit: number, sortBy: string, sortOrder: string): Promise<{ projects: Project[], total: number }> {
+    static async getUserProjects(userId: string, page: number, limit: number, sortBy: string, sortOrder: string, search?: string): Promise<{ projects: Project[], total: number }> {
         try {
             const projects = await Project.findAll({
                 where: {
-                    userId: userId
+                    userId: userId,
+                    ...(search && {
+                        [Op.or]: [
+                            { name: { [Op.like]: `%${search}%` } },
+                            { description: { [Op.like]: `%${search}%` } }
+                        ]
+                    })
                 },
                 offset: (page - 1) * limit,
                 limit: limit,

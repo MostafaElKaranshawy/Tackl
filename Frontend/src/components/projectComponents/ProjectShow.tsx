@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { IoSearchSharp } from "react-icons/io5";
 import ProjectsFilterMenu from "./ProjectsFilterMenu";
 import { notify } from "../../utils/notify";
+import { IoMdClose } from "react-icons/io";
 
 export default function ProjectShow(
     { project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
@@ -151,6 +152,15 @@ export default function ProjectShow(
                     <MdDeleteForever
                         className="text-gray-500 cursor-pointer hover:text-red-700 transition ease duration-150"
                         onClick={() => setShowDeleteConfirmation(true)}
+                    />
+                    <IoMdClose
+                        className="text-gray-500 cursor-pointer hover:text-red-700 transition ease duration-150"
+                        onClick={() => {
+                            navigate({
+                                pathname: "/projects",
+                                search: location.search,
+                            });
+                        }}
                     />
 
                 </div>
