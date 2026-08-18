@@ -190,6 +190,7 @@ describe("ProjectsSideBar", () => {
                     pageSize: expect.any(Number),
                     sortBy: "createdAt",
                     sortOrder: "desc",
+                    search: "",
                 });
             });
         });

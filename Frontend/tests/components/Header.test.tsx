@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import Header from "../../src/components/Header";
 import { logout } from "../../src/services/authService";
+import { useLocation } from "react-router-dom";
 
 const navigate = vi.fn();
 
@@ -19,8 +20,13 @@ vi.mock("react-router-dom", async () => {
     return {
         ...actual,
         useNavigate: () => navigate,
+        useLocation: () => ({
+            pathname: "/projects",
+            search: "",
+        }),
     };
 });
+
 
 describe("Header", () => {
     afterEach(() => {

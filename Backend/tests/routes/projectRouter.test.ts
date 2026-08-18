@@ -31,7 +31,7 @@ vi.mock("../../src/middlewares/checkUser", () => ({
 const app = express();
 
 app.use(express.json());
-app.use("/api/projects", mocks.checkUser,projectRouter);
+app.use("/api/projects", mocks.checkUser, projectRouter);
 
 describe("Project Router", () => {
     beforeEach(() => {
@@ -60,7 +60,7 @@ describe("Project Router", () => {
                     name: "Test Project",
                     description: "A test project",
                 });
-            
+
             expect(response.status).toBe(201);
             expect(response.body).toEqual(mockProject);
 
@@ -207,14 +207,14 @@ describe("Project Router", () => {
                 },
             ];
 
-            mocks.getProjectsByUserId.mockResolvedValue({total: 2, projects, page: 1, limit: 10 });
+            mocks.getProjectsByUserId.mockResolvedValue({ total: 2, projects, page: 1, limit: 10 });
 
             const response = await request(app)
                 .get("/api/projects");
-            
-                console.log(response);
+
+            console.log(response);
             expect(response.status).toBe(200);
-            expect(response.body).toEqual({total: 2, projects, page: 1, limit: 10});
+            expect(response.body).toEqual({ total: 2, projects, page: 1, limit: 10 });
 
             expect(mocks.getProjectsByUserId).toHaveBeenCalledTimes(1);
             expect(mocks.getProjectsByUserId).toHaveBeenCalledWith(
@@ -222,7 +222,8 @@ describe("Project Router", () => {
                 1,
                 10,
                 "createdAt",
-                "asc"
+                "asc",
+                undefined
             );
         });
     });
