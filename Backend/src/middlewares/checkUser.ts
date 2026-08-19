@@ -1,6 +1,7 @@
 import Jwt from "../config/jwt";
 import { Request, Response } from "express";
 import logger from "../config/logger";
+import UserRepository from "../repositories/userRepository";
 
 export default async function checkUser(req: Request, res: Response, next: () => void) {
     const token = req.cookies.accessToken || req.headers.authorization?.split("Bearer ")[1];
@@ -18,7 +19,16 @@ export default async function checkUser(req: Request, res: Response, next: () =>
             });
             return res.status(401).json({ message: "Unauthorized" });
         }
-
+        UserRepository.getUserById(tokenData.id).then((user) => {
+            if (!user) {
+                res.clearCookie("accessToken", {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                });
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+        });
         req.userId = tokenData.id;
         req.tokenPurpose = tokenData.purpose;
 
