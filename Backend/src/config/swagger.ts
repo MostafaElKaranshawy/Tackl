@@ -1,7 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
-import { TaskStatus } from "../enums/taskStatus";
 import { TaskPriority } from "../enums/taskPriority";
 import logger from "./logger";
 import { ActionType } from "../enums/actionType";
@@ -114,7 +113,6 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: TaskStatus,
                         },
                         priority: {
                             type: "string",
@@ -160,8 +158,7 @@ const options: swaggerJsdoc.Options = {
                         },
                         status: {
                             type: "string",
-                            enum: TaskStatus,
-                            example: "todo",
+                            example: "to do",
                         },
                         dueDate: {
                             type: "string",
@@ -299,6 +296,54 @@ const options: swaggerJsdoc.Options = {
                         note: {
                             type: "string",
                             example: "Worked on API implementation.",
+                        },
+                    },
+                },
+                TaskStatus: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string",
+                            format: "uuid",
+                        },
+                        name: {
+                            type: "string",
+                        },
+                        status: {
+                            type: "string",
+                        },
+                        order: {
+                            type: "number",
+                        },
+                        projectId: {
+                            type: "string",
+                            format: "uuid",
+                        },
+                        createdAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                        updatedAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                    },
+                },
+                TaskStatusInput: {
+                    type: "object",
+                    required: ["name", "status", "order"],
+                    properties: {
+                        name: {
+                            type: "string",
+                            example: "To Do",
+                        },
+                        status: {
+                            type: "string",
+                            example: "to do",
+                        },
+                        order: {
+                            type: "number",
+                            example: 1,
                         },
                     },
                 },

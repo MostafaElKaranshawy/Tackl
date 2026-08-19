@@ -40,6 +40,13 @@ export default class Project extends Model<
             as: "tasks",
             onDelete: "CASCADE",
         });
+
+
+        Project.hasMany(models.TaskStatus, {
+            foreignKey: "projectId",
+            as: "taskStatuses",
+            onDelete: "CASCADE",
+        });
     }
 }
 

@@ -2,10 +2,31 @@ import ForbiddenException from "../exceptions/forbiddenException";
 import NotFoundException from "../exceptions/notFoundException";
 import Project from "../models/project";
 import ProjectRepository from "../repositories/projectRepository";
-
+import TaskStatusRepository from "../repositories/taskStatusRepository";
+import { sequelize } from "../config/database";
 export default class ProjectService {
     static async createProject(projectData: Partial<Project>, userId: string) {
-        return await ProjectRepository.createProject(projectData, userId);
+        await sequelize.transaction(async (transaction) => {
+            const createdProject = await ProjectRepository.createProject(projectData, userId, transaction);
+
+            // Create default task statuses for the new project
+            const defaultTaskStatuses = [
+                { status: "to do", order: 1 },
+                { status: "in progress", order: 2 },
+                { status: "done", order: 3 },
+            ];
+
+            for (const taskStatus of defaultTaskStatuses) {
+                await TaskStatusRepository.create(
+                    createdProject.id,
+                    {
+                        ...taskStatus,
+                    },
+                    transaction
+                );
+            }
+            return createdProject;
+        });
     }
 
     static async getProjectById(projectId: string, userId: string) {
@@ -46,7 +67,7 @@ export default class ProjectService {
         return await ProjectRepository.deleteProject(projectId);
     }
 
-    static async getProjectsByUserId(userId: string, page: number, limit: number, sortBy: string, sortOrder: string) {
-        return await ProjectRepository.getUserProjects(userId, page, limit, sortBy, sortOrder);
+    static async getProjectsByUserId(userId: string, page: number, limit: number, sortBy: string, sortOrder: string, search?: string) {
+        return await ProjectRepository.getUserProjects(userId, page, limit, sortBy, sortOrder, search);
     }
 }

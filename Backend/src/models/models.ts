@@ -4,6 +4,7 @@ import Task from "./task";
 import TimeEntry from "./timeEntry";
 import TaskHistory from "./taskHistory";
 import TaskChange from "./taskChange";
+import TaskStatus from "./taskStatus";
 
 export const models = {
     User,
@@ -12,6 +13,7 @@ export const models = {
     TimeEntry,
     TaskHistory,
     TaskChange,
+    TaskStatus,
 };
 
 export type Models = typeof models;

@@ -140,6 +140,7 @@ export default class ProjectController {
                     "Invalid sortOrder value. Must be 'asc' or 'desc'."
                 );
             }
+            const search = (req.query.search as string) || undefined;
 
             const { projects, total } =
                 await ProjectService.getProjectsByUserId(
@@ -147,7 +148,8 @@ export default class ProjectController {
                     page,
                     limit,
                     sortBy,
-                    sortOrder
+                    sortOrder,
+                    search
                 );
 
             res.status(200).json({

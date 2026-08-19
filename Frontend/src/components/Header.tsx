@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 import { IoSearchSharp } from "react-icons/io5";
 import { logout } from "../services/authService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ConfirmationModal from "./generalPurposeComponents/ConfirmationModal";
 
 export default function Header() {
     const [showLogout, setShowLogout] = useState(false);
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
     const logOutRef = useRef<HTMLDivElement>(null);
+    const [searchQuery, setSearchQuery] = useState(location.search ? new URLSearchParams(location.search).get("search") || "" : "");
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -24,12 +26,36 @@ export default function Header() {
         };
     }, [logOutRef]);
 
+    const handleSearchChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const value = event.target.value;
+
+        setSearchQuery(value);
+
+        const params = new URLSearchParams(location.search);
+
+        if (value) {
+            params.set("search", value);
+        } else {
+            params.delete("search");
+        }
+
+        navigate(
+            {
+                pathname: location.pathname,
+                search: `?${params.toString()}`,
+            },
+            { replace: true }
+        );
+    };
+
     return (
         <header className="w-full max-h-[70px] p-2 pr-4 pl-4 h-full flex items-center justify-between gap-4 relative">
             <p className="logo text-blue-500 text-4xl font-bold">Tackl</p>
             <div className="search-bar flex-1 max-w-[800px] relative">
                 <IoSearchSharp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
-                <input type="text" placeholder="Search..." className="p-2 min-w-full rounded bg-white text-lg text-gray-700 pl-10 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow shadow-blue-300" />
+                <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchChange} className="p-2 min-w-full rounded bg-white text-lg text-gray-700 pl-10 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow shadow-blue-300" />
             </div>
             <div className="user-profile" onClick={() => setShowLogout((prev) => !prev)}>
                 <FaRegUserCircle className="text-blue-500 text-3xl bg-gray-200 rounded-full border-blue-800 cursor-pointer hover:bg-gray-300 transition ease duration-150" />

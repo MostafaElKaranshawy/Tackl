@@ -57,7 +57,10 @@ export default function HomePage() {
             <Header />
             <div className="main-section w-full flex flex-1 flex-row items-stretch p-2 gap-4">
                 <ProjectsSideBar />
-                <ProjectShowSection />
+                <div className="flex-1 min-w-0">
+                    <ProjectShowSection />
+
+                </div>
                 <TaskShow />
             </div>
         </div>

@@ -10,9 +10,7 @@ import {
 import { sequelize } from "../config/database";
 import { Models } from "./models";
 import Project from "./project";
-
-export type TaskStatus = "todo" | "in_progress" | "done";
-export type TaskPriority = "low" | "medium" | "high";
+import { TaskPriority } from "../enums/taskPriority";
 
 export default class Task extends Model<
     InferAttributes<Task, {
@@ -25,16 +23,20 @@ export default class Task extends Model<
     declare id: CreationOptional<string>;
     declare title: string;
     declare description: CreationOptional<string | null>;
-    declare status: CreationOptional<TaskStatus>;
     declare priority: CreationOptional<TaskPriority>;
     declare estimatedTime: CreationOptional<number | null>;
     declare dueDate: CreationOptional<Date | null>;
+    declare status: CreationOptional<string>;
+
     declare projectId: ForeignKey<Project["id"]>;
+
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+
     declare project?: NonAttribute<Project>;
     declare timeEntries?: NonAttribute<Model[]>;
     declare taskHistories?: NonAttribute<Model[]>;
+
     static associate(models: Models) {
         Task.belongsTo(models.Project, {
             foreignKey: "projectId",
@@ -72,11 +74,11 @@ Task.init(
             allowNull: true,
         },
         status: {
-            type: DataTypes.ENUM("todo", "in_progress", "done"),
-            defaultValue: "todo",
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         priority: {
-            type: DataTypes.ENUM("low", "medium", "high"),
+            type: DataTypes.ENUM(...Object.values(TaskPriority)),
             defaultValue: "medium",
         },
         estimatedTime: {

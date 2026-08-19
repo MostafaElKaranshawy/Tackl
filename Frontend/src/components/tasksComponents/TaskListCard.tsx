@@ -15,18 +15,14 @@ export default function TaskListCard(
                 <div className="col flex flex-col items-end gap-2">
                     <div className="flex flex-col items-end gap-1">
                         <span
-                            className={`rounded-full px-3 py-1 text-xs font-medium ${task.status === "todo"
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${task.status === "to do"
                                 ? "bg-gray-100 text-gray-700"
                                 : task.status === "in_progress"
                                     ? "bg-yellow-100 text-yellow-700"
                                     : "bg-green-100 text-green-700"
                                 }`}
                         >
-                            {task.status === "todo"
-                                ? "To Do"
-                                : task.status === "in_progress"
-                                    ? "In Progress"
-                                    : "Done"}
+                            {task.status.at(0)?.toUpperCase() + task.status.slice(1).replace("_", " ")}
                         </span>
                     </div>
                 </div>

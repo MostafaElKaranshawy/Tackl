@@ -1,23 +1,35 @@
+import { Op, Transaction } from "sequelize";
 import DBException from "../exceptions/dbException";
 import MissingRequiredDataException from "../exceptions/missingRequiredDataException";
 import NotFoundException from "../exceptions/notFoundException";
 import Project from "../models/project";
 
 export default class ProjectRepository {
-    static async createProject(projectData: Partial<Project>, userId: string): Promise<Project> {
+    static async createProject(projectData: Partial<Project>, userId: string, transaction?: Transaction): Promise<Project> {
         try {
             if (!projectData.name) {
                 throw new MissingRequiredDataException("Project name is required.");
             }
-            const project = await Project.create({
-                name: projectData.name,
-                ...(projectData.description !== undefined && {
-                    description: projectData.description,
-                }),
-                userId,
-            });
 
-            return project;
+            if (transaction) {
+                const project = await Project.create({
+                    name: projectData.name,
+                    ...(projectData.description !== undefined && {
+                        description: projectData.description,
+                    }),
+                    userId,
+                }, { transaction });
+                return project;
+            } else {
+                const project = await Project.create({
+                    name: projectData.name,
+                    ...(projectData.description !== undefined && {
+                        description: projectData.description,
+                    }),
+                    userId,
+                });
+                return project;
+            }
         } catch (error) {
             const message = error instanceof Error
                 ? error.message
@@ -67,11 +79,17 @@ export default class ProjectRepository {
         }
     }
 
-    static async getUserProjects(userId: string, page: number, limit: number, sortBy: string, sortOrder: string): Promise<{ projects: Project[], total: number }> {
+    static async getUserProjects(userId: string, page: number, limit: number, sortBy: string, sortOrder: string, search?: string): Promise<{ projects: Project[], total: number }> {
         try {
             const projects = await Project.findAll({
                 where: {
-                    userId: userId
+                    userId: userId,
+                    ...(search && {
+                        [Op.or]: [
+                            { name: { [Op.like]: `%${search}%` } },
+                            { description: { [Op.like]: `%${search}%` } }
+                        ]
+                    })
                 },
                 offset: (page - 1) * limit,
                 limit: limit,

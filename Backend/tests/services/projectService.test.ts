@@ -2,8 +2,10 @@ import { afterEach, assert, describe, expect, it, vi } from "vitest";
 import ProjectService from "../../src/services/projectService";
 import Project from "../../src/models/project";
 import ProjectRepository from "../../src/repositories/projectRepository";
-import ForbiddenException from "../../src/exceptions/forbiddenException";
+import TaskStatusRepository from "../../src/repositories/taskStatusRepository";
+import { sequelize } from "../../src/config/database";
 import NotFoundException from "../../src/exceptions/notFoundException";
+import ForbiddenException from "../../src/exceptions/forbiddenException";
 
 describe("ProjectService", () => {
     afterEach(() => {
@@ -11,30 +13,69 @@ describe("ProjectService", () => {
     });
 
     it("Create a new valid project", async () => {
-        vi.spyOn(ProjectRepository, "createProject").mockResolvedValue({
+        const createdProject = {
             id: "1",
             name: "Test Project",
             description: "This is a test project",
             userId: "1",
-        } as Project);
+        } as Project;
+
+        vi.spyOn(ProjectRepository, "createProject")
+            .mockResolvedValue(createdProject);
+
+        vi.spyOn(TaskStatusRepository, "create")
+            .mockResolvedValue({} as any);
+
+        vi.spyOn(sequelize, "transaction")
+            .mockImplementation(async (callback: any) => {
+                return await callback({});
+            });
 
         const projectData = {
             name: "Test Project",
             description: "This is a test project",
         };
 
-        const result = await ProjectService.createProject(projectData, "1");
-        expect(result).toEqual({
-            id: "1",
-            name: "Test Project",
-            description: "This is a test project",
-            userId: "1",
-        });
+        await ProjectService.createProject(projectData, "1");
+
+        expect(ProjectRepository.createProject).toHaveBeenCalledWith(
+            projectData,
+            "1",
+            expect.anything()
+        );
+
+        expect(TaskStatusRepository.create).toHaveBeenCalledTimes(3);
+
+        expect(TaskStatusRepository.create).toHaveBeenNthCalledWith(
+            1,
+            "1",
+            {
+                status: "to do",
+                order: 1,
+            },
+            expect.anything()
+        );
+
+        expect(TaskStatusRepository.create).toHaveBeenNthCalledWith(
+            2,
+            "1",
+            {
+                status: "in progress",
+                order: 2,
+            },
+            expect.anything()
+        );
+
+        expect(TaskStatusRepository.create).toHaveBeenNthCalledWith(
+            3,
+            "1",
+            {
+                status: "done",
+                order: 3,
+            },
+            expect.anything()
+        );
     });
-
-    
-
-    
 
     it("Get a valid project by Id", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -52,7 +93,7 @@ describe("ProjectService", () => {
             userId: "1",
         });
     });
-    
+
 
     it("Get a valid project by Id but with a different user", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -68,7 +109,7 @@ describe("ProjectService", () => {
             expect(error).toBeInstanceOf(ForbiddenException);
         }
     });
-    
+
 
     it("Get a project by wrong Id", async () => {
         vi.spyOn(Project, "findByPk").mockResolvedValue(null);
@@ -80,7 +121,7 @@ describe("ProjectService", () => {
         }
     });
 
-    
+
 
     it("Update a project", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -110,7 +151,7 @@ describe("ProjectService", () => {
             userId: "1",
         });
     });
-    
+
 
     it("Update a project with invalid Id", async () => {
         vi.spyOn(Project, "findByPk").mockResolvedValue(null);
@@ -134,7 +175,7 @@ describe("ProjectService", () => {
         }
     });
 
-    
+
 
     it("Update a project with valid userId", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -156,7 +197,7 @@ describe("ProjectService", () => {
         }
     });
 
-    
+
 
     it("Delete a project", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -175,7 +216,7 @@ describe("ProjectService", () => {
         }
     });
 
-    
+
 
     it("Delete a project with invalid Id", async () => {
         vi.spyOn(Project, "findByPk").mockResolvedValue(null);
@@ -190,7 +231,7 @@ describe("ProjectService", () => {
         }
     });
 
-    
+
 
     it("Delete a project with valid userId", async () => {
         vi.spyOn(ProjectRepository, "getProjectById").mockResolvedValue({
@@ -208,7 +249,7 @@ describe("ProjectService", () => {
         }
     });
 
-    
+
 
     it("Get projects by userId", async () => {
         const mockResponse = {

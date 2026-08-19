@@ -30,9 +30,9 @@ export default function FormComponent({
             </div>
 
             <form onSubmit={async (e) => {
-                e.preventDefault();
                 setIsSubmitting(true);
-                if(validateForm && !validateForm(e)) {
+                e.preventDefault();
+                if (validateForm && !validateForm(e)) {
                     setIsSubmitting(false);
                     return;
                 }
@@ -43,7 +43,7 @@ export default function FormComponent({
 
                 <button
                     type="submit"
-                    className={"cursor-pointer rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600"}
+                    className={"cursor-pointer rounded-md bg-blue-500 p-2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-400"}
                     disabled={isSubmitting}
                 >
                     {submitText}

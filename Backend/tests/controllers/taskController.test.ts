@@ -23,7 +23,7 @@ describe("TaskController", () => {
             body: {
                 title: "Test Task",
                 description: "Test description",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
                 estimatedTime: 60,
                 dueDate: "2026-08-20",
@@ -41,7 +41,7 @@ describe("TaskController", () => {
             id: "task-1",
             title: "Test Task",
             description: "Test description",
-            status: "todo",
+            status: "to do",
             priority: "medium",
             estimatedTime: 60,
             dueDate: new Date("2026-08-20"),
@@ -56,7 +56,7 @@ describe("TaskController", () => {
             {
                 title: "Test Task",
                 description: "Test description",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
                 estimatedTime: 60,
                 dueDate: expect.any(Date),
@@ -194,7 +194,7 @@ describe("TaskController", () => {
             {
                 title: "Test Task",
                 description: null,
-                status: "todo",
+                status: "to do",
                 priority: "medium",
                 estimatedTime: null,
                 dueDate: null,
@@ -574,7 +574,7 @@ describe("TaskController", () => {
                 sortBy: "createdAt",
                 sortOrder: "asc",
                 search: "test",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
                 overdue: "true",
             },
@@ -610,7 +610,7 @@ describe("TaskController", () => {
                 sortBy: "createdAt",
                 sortOrder: "asc",
                 search: "test",
-                filterStatus: "todo",
+                filterStatus: "to do",
                 filterPriority: "medium",
                 filterOverDue: true,
             }
