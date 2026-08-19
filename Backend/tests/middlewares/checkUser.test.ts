@@ -16,6 +16,11 @@ vi.mock("../../src/config/logger", () => ({
     },
 }));
 
+vi.mock("../../src/repositories/userRepository", () => ({
+    default: {
+        getUserById: vi.fn().mockResolvedValue({ id: "user-123" }),
+    },
+}));
 describe("checkUser middleware", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
