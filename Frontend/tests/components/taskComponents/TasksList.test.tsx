@@ -26,7 +26,7 @@ describe("TasksList", () => {
             id: "task-1",
             title: "First Task",
             description: "First task description",
-            status: "todo",
+            status: "to do",
             priority: "high",
             estimatedTime: 120,
             dueDate: "2026-08-20",
@@ -55,7 +55,7 @@ describe("TasksList", () => {
         return render(
             <MemoryRouter
                 initialEntries={[
-                    "/projects/project-1?status=todo&taskId=old-task",
+                    "/projects/project-1?status=to do&taskId=old-task",
                 ]}
             >
                 <Routes>
@@ -133,7 +133,7 @@ describe("TasksList", () => {
             rerender(
                 <MemoryRouter
                     initialEntries={[
-                        "/projects/project-1?status=todo&taskId=old-task",
+                        "/projects/project-1?status=to do&taskId=old-task",
                     ]}
                 >
                     <Routes>

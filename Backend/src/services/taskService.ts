@@ -9,6 +9,7 @@ import { ActionType } from "../enums/actionType";
 import TaskHistoryRepository from "../repositories/taskHistoryRepository";
 import { compareDates } from "../utils/dateTimeUtils";
 import { sequelize } from "../config/database";
+import { Transaction } from "sequelize/lib/transaction";
 
 export default class TaskService {
 
@@ -56,8 +57,9 @@ export default class TaskService {
         return task;
     }
 
-    static async updateTask(projectId: string, taskId: string, updatedData: Partial<Task>, userId: string): Promise<Task | null> {
+    static async updateTask(projectId: string, taskId: string, updatedData: Partial<Task>, userId: string, transaction?: Transaction): Promise<Task | null> {
         const oldTask = await TaskRepository.getTaskById(userId, projectId, taskId);
+
         if (!oldTask) {
             throw new NotFoundException("Task not found.");
         }
@@ -132,5 +134,17 @@ export default class TaskService {
         }
 
         return await TaskRepository.getAllProjectTasks(projectId, sortBy, sortOrder);
+    }
+
+    static async getTaskByTaskStatus(projectId: string, status: string, userId: string): Promise<Task[]> {
+        const project = await ProjectRepository.getProjectById(projectId);
+        if (!project) {
+            throw new NotFoundException("Project not found.");
+        }
+        if (project.userId !== userId) {
+            throw new ForbiddenException("Access denied");
+        }
+
+        return await TaskRepository.getTaskByTaskStatus(projectId, status);
     }
 }

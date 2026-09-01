@@ -9,6 +9,7 @@ import TaskPage from "../../src/pages/TaskPage";
 import { getTaskById, deleteTask } from "../../src/services/taskService";
 import { useTaskRefreshContext } from "../../src/contexts/TaskRefreshContext/useTaskRefreshContext";
 import Task from "../../src/types/task";
+import ManageTaskCard from "../../src/components/tasksComponents/ManageTaskCard";
 
 vi.mock("../../src/services/taskService", () => ({
     getTaskById: vi.fn(),
@@ -46,21 +47,17 @@ vi.mock("../../src/components/taskHistoryComponents/TaskHistoryList", () => ({
     ),
 }));
 
-vi.mock("../../src/components/tasksComponents/ManageTaskCard", () => ({
-    default: ({
-        onClose,
-        onSuccess,
-    }: {
-        onClose: () => void;
-        onSuccess: (task?: unknown) => void;
-    }) => (
-        <div>
-            <p>Edit Task</p>
-            <button onClick={onClose}>Close Edit</button>
-            <button onClick={() => onSuccess()}>Save Task</button>
-        </div>
-    ),
-}));
+// vi.mock("../../src/components/tasksComponents/ManageTaskCard", () => ({
+//     default: ({
+//         onClose,
+//         onSuccess,
+//     }: {
+//         onClose: () => void;
+//         onSuccess: (task?: unknown) => void;
+//     }) => (
+//         <ManageTaskCard/>
+//     ),
+// }));
 
 vi.mock(
     "../../src/components/generalPurposeComponents/ConfirmationModal",
@@ -90,7 +87,7 @@ const task = {
     id: "task-1",
     title: "Test Task",
     description: "Test task description",
-    status: "todo",
+    status: "to do",
     priority: "medium",
     estimatedTime: 120,
     dueDate: "2099-01-01T00:00:00.000Z",
@@ -149,7 +146,7 @@ describe("TaskPage", () => {
             ).toBeInTheDocument();
 
             expect(
-                screen.getByText("To Do")
+                screen.getByText("To do")
             ).toBeInTheDocument();
 
             expect(
@@ -309,7 +306,7 @@ describe("TaskPage", () => {
 
             await user.click(
                 screen.getByRole("button", {
-                    name: "Close Edit",
+                    name: "Cancel",
                 })
             );
 

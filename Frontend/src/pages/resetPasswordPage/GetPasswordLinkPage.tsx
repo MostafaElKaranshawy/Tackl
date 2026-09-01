@@ -4,6 +4,7 @@ import FormComponent from "../../components/generalPurposeComponents/FormCompone
 import FloatingInput from "../../components/generalPurposeComponents/FloatingInput";
 import { notify } from "../../utils/notify";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function GetPasswordLinkPage() {
     const navigate = useNavigate();
@@ -16,7 +17,11 @@ export default function GetPasswordLinkPage() {
             await getResetPasswordLink(email);
             notify.success("Password reset link sent! Please check your email.");
             navigate("/login");
-        } catch {
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.status == 409) {
+                notify.warning("An email was sent recently, please check your inbox or try again later.");
+                return;
+            }
             notify.error("Failed to send password reset link. Please try again.");
         }
     }

@@ -25,7 +25,7 @@ describe("taskService", () => {
                         id: "task-1",
                         title: "Task 1",
                         description: "First task",
-                        status: "todo",
+                        status: "to do",
                         priority: "high",
                     },
                     {
@@ -52,7 +52,7 @@ describe("taskService", () => {
                 sortBy: "createdAt",
                 sortOrder: "desc",
                 search: "",
-                status: "todo",
+                status: "to do",
                 priority: "high",
                 overdue: false,
             };
@@ -100,7 +100,7 @@ describe("taskService", () => {
                     sortBy: "createdAt",
                     sortOrder: "desc",
                     search: "",
-                    status: "todo",
+                    status: "to do",
                     priority: "high",
                     overdue: false,
                 });
@@ -119,7 +119,7 @@ describe("taskService", () => {
                     id: "task-1",
                     title: "Task 1",
                     description: "First task",
-                    status: "todo",
+                    status: "to do",
                     priority: "high",
                 },
                 {
@@ -171,7 +171,7 @@ describe("taskService", () => {
                     id: "task-1",
                     title: "Task 1",
                     description: "First task",
-                    status: "todo",
+                    status: "to do",
                     priority: "high",
                 },
             ];
@@ -232,7 +232,7 @@ describe("taskService", () => {
                 id: "task-1",
                 title: "Test Task",
                 description: "Test description",
-                status: "todo",
+                status: "to do",
                 priority: "high",
             };
 
@@ -287,7 +287,7 @@ describe("taskService", () => {
             const taskData: CreateTaskDto = {
                 title: "New Task",
                 description: "New task description",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
             } as CreateTaskDto;
 
@@ -336,7 +336,7 @@ describe("taskService", () => {
                     {
                         title: "New Task",
                         description: "Description",
-                        status: "todo",
+                        status: "to do",
                         priority: "medium",
                     } as CreateTaskDto,
                     "project-1"
@@ -363,7 +363,7 @@ describe("taskService", () => {
                 id: taskId,
                 title: "Updated Task",
                 description: "Updated description",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
             };
 
@@ -404,7 +404,7 @@ describe("taskService", () => {
                 id: taskId,
                 title: "Updated Task",
                 description: "Old description",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
             };
 
@@ -445,7 +445,7 @@ describe("taskService", () => {
                 id: taskId,
                 title: "Old title",
                 description: "Updated description",
-                status: "todo",
+                status: "to do",
                 priority: "medium",
             };
 

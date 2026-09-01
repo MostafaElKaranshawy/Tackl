@@ -12,6 +12,7 @@ export default function ProjectShowSection() {
     const { projectId } = useParams<{ projectId: string }>();
     const [project, setProject] = useState<Project | null>(null);
     const { setKey } = useRefreshContext();
+    const { search } = useParams<{ search: string }>();
 
     const returnToProjectsPage = useCallback(() => {
         setProject(null);
@@ -20,9 +21,14 @@ export default function ProjectShowSection() {
             search: location.search,
         });
     }, [navigate]);
-
     useEffect(() => {
-        if (!projectId || projectId === "undefined") {
+        if (search) {
+            returnToProjectsPage();
+        }
+    }, [search, returnToProjectsPage]);
+    useEffect(() => {
+        if (!projectId || projectId === "undefined" || projectId == undefined) {
+            setProject(null);
             return;
         }
 

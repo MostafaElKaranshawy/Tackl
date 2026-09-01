@@ -464,7 +464,8 @@ describe("ProjectController", () => {
             1,
             10,
             "name",
-            "asc"
+            "asc",
+            undefined
         );
 
         expect(res.status).toHaveBeenCalledWith(200);
@@ -503,7 +504,8 @@ describe("ProjectController", () => {
             1,
             10,
             "createdAt",
-            "asc"
+            "asc",
+            undefined
         );
 
         expect(res.status).toHaveBeenCalledWith(200);
@@ -653,7 +655,8 @@ describe("ProjectController", () => {
             2,
             5,
             "updatedAt",
-            "desc"
+            "desc",
+            undefined
         );
     });
 });

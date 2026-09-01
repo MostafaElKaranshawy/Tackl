@@ -21,7 +21,6 @@ export default function TaskPage() {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
     const [showTaskHistory, setShowTaskHistory] = useState(false);
-
     const { key } = useTaskRefreshContext();
     const navigate = useNavigate();
 
@@ -40,7 +39,6 @@ export default function TaskPage() {
         const loadTask = async () => {
             try {
                 const data = await getTaskById(taskId, projectId);
-
                 if (!cancelled) {
                     setTask(data);
                 }
@@ -168,16 +166,14 @@ export default function TaskPage() {
 
                                 <div className="flex justify-between py-3">
                                     <span className="text-gray-500">Status</span>
-                                    <span className={"font-medium text-right" + (task.status === "todo"
+                                    <span className={"font-medium text-right" + (task.status === "to do"
                                         ? " text-gray-700"
-                                        : task.status === "in_progress"
+                                        : task.status === "in progress"
                                             ? " text-yellow-700"
-                                            : " text-green-700")}>
-                                        {task.status === "todo"
-                                            ? "To Do"
-                                            : task.status === "in_progress"
-                                                ? "In Progress"
-                                                : "Done"}
+                                            : task.status === "done"
+                                                ? " text-green-700"
+                                                : " text-gray-700")}>
+                                        {task.status.at(0)?.toUpperCase() + task.status.slice(1).replace("_", " ")}
                                     </span>
                                 </div>
 
@@ -194,7 +190,7 @@ export default function TaskPage() {
                                 <div
                                     className={
                                         "group relative flex justify-between py-3"
-                                        + (task.dueDate && new Date(task.dueDate) < new Date() ? " bg-red-100" : "")
+                                        + (task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() ? " bg-red-100" : "")
                                     }>
                                     <span
                                         className="text-gray-500">

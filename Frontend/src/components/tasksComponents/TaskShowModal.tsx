@@ -23,8 +23,7 @@ export default function TaskShow() {
     const taskId = searchParams.get("taskId") || "";
     const { projectId } = useParams<{ projectId: string }>();
     const [totalLoggedTime, setTotalLoggedTime] = useState(0);
-
-    const { key, setKey } = useTaskRefreshContext();
+    const { setKey } = useTaskRefreshContext();
 
     const closeTaskWindow = useCallback(() => {
         setTask(null);
@@ -33,6 +32,7 @@ export default function TaskShow() {
             pathname: `/projects${projectId ? `/${projectId}` : ""}`,
             search: location.search.replace(/(\?|&)taskId=[^&]*/, ""),
         });
+        setKey(prevKey => (prevKey + 1) % 2);
     }, [navigate, projectId, location.search]);
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export default function TaskShow() {
         let cancelled = false;
 
         const loadTask = async () => {
-            try {            
+            try {
                 const data = await getTaskById(taskId, projectId);
                 if (!cancelled) {
                     setTask(data);
@@ -60,7 +60,7 @@ export default function TaskShow() {
         return () => {
             cancelled = true;
         };
-    }, [taskId, projectId, closeTaskWindow, key]);
+    }, [taskId, projectId, closeTaskWindow]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -92,9 +92,11 @@ export default function TaskShow() {
         }
     };
     const refresh = (close: boolean) => {
-        setKey(prevKey => (prevKey + 1) % 2);
         if (close) {
             closeTaskWindow();
+        }
+        else {
+            setKey(prevKey => (prevKey + 1) % 2);
         }
     }
     if (!task) {
@@ -102,11 +104,13 @@ export default function TaskShow() {
     }
 
     const statusClasses =
-        task.status === "todo"
+        task.status === "to do"
             ? "bg-gray-100 text-gray-700"
-            : task.status === "in_progress"
+            : task.status === "in progress"
                 ? "bg-yellow-100 text-yellow-700"
-                : "bg-green-100 text-green-700";
+                : task.status === "done" ?
+                    "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700";
 
     const priorityClasses =
         task.priority === "high"
@@ -128,11 +132,9 @@ export default function TaskShow() {
                             <span
                                 className={`mt-3 inline-flex rounded-full px-3 py-1 text-sm font-medium ${statusClasses}`}
                             >
-                                {task.status === "todo"
-                                    ? "To Do"
-                                    : task.status === "in_progress"
-                                        ? "In Progress"
-                                        : "Done"}
+                                {
+                                    task.status.charAt(0).toUpperCase() + task.status.slice(1).replace("_", " ")
+                                }
                             </span>
                         </div>
 
@@ -202,7 +204,7 @@ export default function TaskShow() {
                         </div>
 
                         <div
-                            className={"group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4" + (task.dueDate && new Date(task.dueDate) < new Date() ? " border-red-200 bg-red-100" : "")}
+                            className={"group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4" + (task.status !== "done" && task.dueDate && new Date(task.dueDate) < new Date() ? " border-red-200 bg-red-100" : "")}
                         >
                             <MdCalendarToday className="text-2xl text-blue-600" />
 

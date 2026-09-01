@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { IoSearchSharp } from "react-icons/io5";
 import ProjectsFilterMenu from "./ProjectsFilterMenu";
 import { notify } from "../../utils/notify";
+import { IoMdClose } from "react-icons/io";
 
 export default function ProjectShow(
     { project, deleteRefresh, onUpdated }: { project: Project, deleteRefresh?: () => void, onUpdated?: (project: Project) => void }) {
@@ -37,7 +38,9 @@ export default function ProjectShow(
     const attributesList = ["title", "dueDate", "priority", "createdAt", "updatedAt"];
     const sortRef = useRef<HTMLDivElement>(null);
     const filterRef = useRef<HTMLDivElement>(null);
-    const [currentSection, setCurrentSection] = useState<"list" | "board">("list");
+    const searchParams = new URLSearchParams(location.search);
+    const currentSection = searchParams.get("section") === "board" ? "board" : "list";
+
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [filter, setFilter] = useState<{ status: string; priority: string; overdue: boolean | false }>({
         status: "",
@@ -73,6 +76,9 @@ export default function ProjectShow(
                     search,
                     ...filter
                 });
+            if (response.tasks && response.tasks.length === 0 && currentPage > 1) {
+                setCurrentPage(prev => prev - 1);
+            }
             setTaskList(response.tasks);
             setTotalTasks(response.total);
         } catch {
@@ -97,6 +103,7 @@ export default function ProjectShow(
                         ...filter
                     });
                 if (!ignore) {
+                    console.log("Fetched tasks:", response.tasks);
                     setTaskList(response.tasks);
                     setTotalTasks(response.total);
                 }
@@ -122,7 +129,7 @@ export default function ProjectShow(
         }
     }
     return (
-        <section className="flex-1 rounded-xl border border-gray-200 bg-white p-8 shadow-md">
+        <section className="flex-1 rounded-xl border border-gray-200 bg-white p-4 shadow-md">
             <div className="mb-2 flex items-center gap-3 border-b border-gray-200 pb-5">
                 <div className="rounded-lg bg-blue-100 p-3 flex items-center justify-center">
                     <GoProjectRoadmap className="text-3xl text-blue-600" />
@@ -145,6 +152,15 @@ export default function ProjectShow(
                     <MdDeleteForever
                         className="text-gray-500 cursor-pointer hover:text-red-700 transition ease duration-150"
                         onClick={() => setShowDeleteConfirmation(true)}
+                    />
+                    <IoMdClose
+                        className="text-gray-500 cursor-pointer hover:text-red-700 transition ease duration-150"
+                        onClick={() => {
+                            navigate({
+                                pathname: "/projects",
+                                search: location.search,
+                            });
+                        }}
                     />
 
                 </div>
@@ -202,7 +218,16 @@ export default function ProjectShow(
                     </h2>
                     <div className="flex rounded-lg border border-gray-300 bg-gray-100 p-1 ">
                         <button
-                            onClick={() => setCurrentSection("list")}
+                            onClick={() => {
+                                const searchParams = new URLSearchParams(location.search);
+
+                                searchParams.set("section", "list");
+
+                                navigate({
+                                    pathname: `/projects/${project.id}`,
+                                    search: `?${searchParams.toString()}`,
+                                });
+                            }}
                             className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition cursor-pointer
                                     ${currentSection === "list"
                                     ? "bg-white text-blue-600 shadow"
@@ -214,7 +239,16 @@ export default function ProjectShow(
                         </button>
 
                         <button
-                            onClick={() => setCurrentSection("board")}
+                            onClick={() => {
+                                const searchParams = new URLSearchParams(location.search);
+
+                                searchParams.set("section", "board");
+
+                                navigate({
+                                    pathname: `/projects/${project.id}`,
+                                    search: `?${searchParams.toString()}`,
+                                });
+                            }}
                             className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition cursor-pointer
                                     ${currentSection === "board"
                                     ? "bg-white text-blue-600 shadow"
@@ -237,7 +271,10 @@ export default function ProjectShow(
                             }}
                         />
                         <FaFilter
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg cursor-pointer hover:text-blue-500 transition ease duration-150"
+                            className={
+                                "absolute right-3 top-1/2 transform -translate-y-1/2 text-lg cursor-pointer hover:text-blue-500 transition ease duration-150"
+                                + (filter.status !== "" || filter.priority !== "" || filter.overdue === true ? " text-blue-500" : "text-gray-400")
+                            }
                             onClick={() => {
                                 setShowFilterMenu((prev) => !prev);
                             }}
@@ -255,6 +292,25 @@ export default function ProjectShow(
                                 )
                             }
                         </div>
+                    </div>
+                    <div className="sort-section relative" ref={sortRef}>
+                        <MdOutlineSort
+                            className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150"
+                            onClick={() => {
+                                setShowSortOptions((prev) => !prev);
+                            }}
+                        />
+                        {
+                            showSortOptions && (
+                                <SortByComponent
+                                    attributesList={attributesList}
+                                    sortBy={sortBy}
+                                    setSortBy={setSortBy}
+                                    sortOrder={sortOrder}
+                                    setSortOrder={setSortOrder}
+                                />
+                            )
+                        }
                     </div>
                     <button
                         className="rounded-md bg-blue-500 px-3 py-1 text-sm font-medium text-white cursor-pointer hover:bg-blue-600 transition ease duration-150"
@@ -283,25 +339,6 @@ export default function ProjectShow(
                         currentSection === "list" && (
 
                             <div className="tools flex items-center gap-3 text-gray-500 self-end">
-                                <div className="sort-section relative" ref={sortRef}>
-                                    <MdOutlineSort
-                                        className="text-blue-500 text-2xl cursor-pointer hover:text-blue-700 transition ease duration-150"
-                                        onClick={() => {
-                                            setShowSortOptions((prev) => !prev);
-                                        }}
-                                    />
-                                    {
-                                        showSortOptions && (
-                                            <SortByComponent
-                                                attributesList={attributesList}
-                                                sortBy={sortBy}
-                                                setSortBy={setSortBy}
-                                                sortOrder={sortOrder}
-                                                setSortOrder={setSortOrder}
-                                            />
-                                        )
-                                    }
-                                </div>
                                 <MdOutlineKeyboardArrowLeft
                                     onClick={() => {
                                         if (currentPage > 1) {
@@ -372,6 +409,7 @@ export default function ProjectShow(
                             if (project && onUpdated) {
                                 onUpdated(project);
                             }
+                            fetchTasks();
                         }}
                         onClose={() => setShowEditModal(false)}
                     />

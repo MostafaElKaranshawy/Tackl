@@ -15,7 +15,7 @@ describe("taskHistoryService", () => {
                     id: "1",
                     taskId: "task-1",
                     fieldName: "status",
-                    oldValue: "todo",
+                    oldValue: "to do",
                     newValue: "in_progress",
                 },
                 {

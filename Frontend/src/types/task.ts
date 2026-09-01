@@ -2,7 +2,7 @@ export default interface Task {
     id: string;
     title: string;
     description: string | null;
-    status: "todo" | "in_progress" | "done";
+    status: string;
     priority: "low" | "medium" | "high";
     dueDate: string | null;
     estimatedTime: number | null;
