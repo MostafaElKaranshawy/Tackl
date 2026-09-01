@@ -28,6 +28,7 @@
     "pg-hstore": "^2.3.4",
     "postgres": "^3.4.9",
     "sequelize": "^6.37.8",
+    "serverless-http": "^4.0.0",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "vite-tsconfig-paths": "^6.1.1",
